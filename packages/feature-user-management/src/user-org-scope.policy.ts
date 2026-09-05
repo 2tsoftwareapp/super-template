@@ -1,7 +1,8 @@
-import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 import type { OrganizationMembership } from "@repo/feature-organizations/contracts";
 
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
+import { ERROR_CODES } from "@repo/api-runtime";
 import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 
 export function resolveUsersListOrganizationId(

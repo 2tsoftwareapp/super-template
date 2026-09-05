@@ -1,4 +1,4 @@
-import type { TenantContext } from "@repo/api-runtime";
+import type { TenantContext } from "@repo/api-kernel";
 import type { PoolClient } from "pg";
 
 import { sql } from "drizzle-orm";

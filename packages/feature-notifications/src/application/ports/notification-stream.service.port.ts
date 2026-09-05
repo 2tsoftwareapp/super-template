@@ -1,4 +1,4 @@
-import type { JsonObject } from "@repo/api-runtime";
+import type { JsonObject } from "@repo/api-kernel";
 import type { Observable } from "rxjs";
 
 export interface NotificationStreamEvent {

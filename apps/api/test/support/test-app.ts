@@ -1,4 +1,4 @@
-import type { TenantContext } from "@repo/api-runtime";
+import type { TenantContext } from "@repo/api-kernel";
 import type { Server } from "node:http";
 
 import { type INestApplication, ValidationPipe } from "@nestjs/common";

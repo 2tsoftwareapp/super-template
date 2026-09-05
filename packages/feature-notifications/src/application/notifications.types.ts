@@ -1,4 +1,4 @@
-import type { JsonObject } from "@repo/api-runtime";
+import type { JsonObject } from "@repo/api-kernel";
 export type NotificationAudience = "USER" | "USERS" | "ALL";
 
 export type NotificationJobStatus = "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";

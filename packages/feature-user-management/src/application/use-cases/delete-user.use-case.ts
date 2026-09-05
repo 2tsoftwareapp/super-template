@@ -1,9 +1,9 @@
-import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
-import type { TransactionPort } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-kernel";
+import type { TransactionPort } from "@repo/api-kernel";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
-import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import {
   ROLE_NAMES,
   USER_ACCESS_CONTROL,

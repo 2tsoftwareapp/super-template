@@ -1,4 +1,4 @@
-import type { PlatformTransactionPort, TransactionExecutor } from "@repo/api-runtime";
+import type { PlatformTransactionPort, TransactionExecutor } from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { sql } from "drizzle-orm";

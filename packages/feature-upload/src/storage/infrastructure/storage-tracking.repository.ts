@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from "@repo/api-runtime";
+import type { TransactionExecutor } from "@repo/api-kernel";
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";

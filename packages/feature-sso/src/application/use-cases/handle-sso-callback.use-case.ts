@@ -1,16 +1,10 @@
-import type { RequestContext } from "@repo/api-runtime";
-import type { TransactionPort } from "@repo/api-runtime";
+import type { RequestContext } from "@repo/api-kernel";
+import type { TransactionPort } from "@repo/api-kernel";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError, generateOpaqueToken, hashOpaqueToken, normalizeEmail, SYSTEM_SCOPE } from "@repo/api-kernel";
+import { PLATFORM_TRANSACTION_PORT } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
-import {
-  AppError,
-  generateOpaqueToken,
-  hashOpaqueToken,
-  normalizeEmail,
-  SYSTEM_SCOPE,
-} from "@repo/api-runtime";
-import { PLATFORM_TRANSACTION_PORT } from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { hashPassword } from "@repo/feature-auth/contracts";

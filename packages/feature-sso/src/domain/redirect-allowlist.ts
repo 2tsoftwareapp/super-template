@@ -1,4 +1,4 @@
-import { AppError } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
 
 import { SSO_ERROR_CODES } from "../public/error-codes";
 

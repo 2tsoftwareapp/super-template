@@ -1,7 +1,7 @@
-import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
 
 import { AUDIT_ERROR_CODES } from "../../public/error-codes";
 import { AuditMapper } from "../audit.mapper";

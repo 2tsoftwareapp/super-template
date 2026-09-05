@@ -1,8 +1,9 @@
-import type { TransactionExecutor } from "@repo/api-runtime";
+import type { TransactionExecutor } from "@repo/api-kernel";
 import type { UserAccessControl } from "@repo/feature-access-control/contracts";
 import type { AssignableRoleName } from "@repo/feature-users/contracts";
 
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
+import { ERROR_CODES } from "@repo/api-runtime";
 import { ROLE_NAMES, type RolePolicyTarget } from "@repo/feature-access-control/contracts";
 
 export async function resolveAssignableRole(

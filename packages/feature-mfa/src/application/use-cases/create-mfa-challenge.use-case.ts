@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { durationToMilliseconds, generateOpaqueToken, hashOpaqueToken } from "@repo/api-runtime";
+import { durationToMilliseconds, generateOpaqueToken, hashOpaqueToken } from "@repo/api-kernel";
 
 import type { MfaCreateChallengeCommand } from "../mfa.types";
 

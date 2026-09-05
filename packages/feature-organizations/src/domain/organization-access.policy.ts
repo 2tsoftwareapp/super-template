@@ -1,4 +1,5 @@
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
+import { ERROR_CODES } from "@repo/api-runtime";
 
 import { ORGANIZATION_ERROR_CODES } from "../public/error-codes";
 export type OrganizationMemberRole = "OWNER" | "ADMIN" | "MEMBER";

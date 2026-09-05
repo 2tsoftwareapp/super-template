@@ -1,7 +1,8 @@
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 import type { UserView } from "@repo/feature-users/contracts";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, type AuthenticatedRequestUser } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
 import {
   ROLE_NAMES,
   USER_ACCESS_CONTROL,

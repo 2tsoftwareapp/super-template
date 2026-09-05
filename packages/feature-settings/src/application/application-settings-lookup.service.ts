@@ -1,11 +1,8 @@
+import type { JsonObject } from "@repo/api-kernel";
+
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import {
-  adaptRedisClient,
-  createRedisClient,
-  EnvironmentService,
-  isJsonObject,
-  type JsonObject,
-} from "@repo/api-runtime";
+import { isJsonObject } from "@repo/api-kernel";
+import { adaptRedisClient, createRedisClient, EnvironmentService } from "@repo/api-runtime";
 import { type ApplicationSettingsLookup } from "@repo/feature-settings/contracts";
 
 import { SETTINGS_REPOSITORY, type SettingsRepositoryPort } from "./ports/settings.repository.port";

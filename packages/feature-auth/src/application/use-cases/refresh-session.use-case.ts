@@ -1,8 +1,8 @@
-import type { RequestContext } from "@repo/api-runtime";
+import type { RequestContext } from "@repo/api-kernel";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
-import { AppError } from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";

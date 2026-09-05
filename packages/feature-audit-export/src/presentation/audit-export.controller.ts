@@ -1,4 +1,4 @@
-import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 import type { Request, Response } from "express";
 
 import {

@@ -1,5 +1,6 @@
 import { HttpStatus } from "@nestjs/common";
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
+import { ERROR_CODES } from "@repo/api-runtime";
 
 import {
   PREFERENCE_LANGUAGES,

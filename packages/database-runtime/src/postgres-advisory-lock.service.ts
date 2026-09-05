@@ -1,4 +1,4 @@
-import type { AdvisoryLockPort } from "@repo/api-runtime";
+import type { AdvisoryLockPort } from "@repo/api-kernel";
 import type { Pool } from "pg";
 
 import { Inject, Injectable, Logger } from "@nestjs/common";

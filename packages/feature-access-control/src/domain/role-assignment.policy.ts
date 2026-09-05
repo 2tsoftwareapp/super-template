@@ -1,7 +1,8 @@
-import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
+import { AppError } from "@repo/api-kernel";
 import { ACTION, hasPermission, perm } from "@repo/api-runtime";
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import { ERROR_CODES } from "@repo/api-runtime";
 
 import { isPrivilegedRoleName, ROLE_NAMES } from "../access-control.constants";
 

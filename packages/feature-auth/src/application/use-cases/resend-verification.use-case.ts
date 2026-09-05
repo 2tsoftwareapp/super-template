@@ -1,5 +1,6 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, durationToMilliseconds, ERROR_CODES, normalizeEmail } from "@repo/api-runtime";
+import { AppError, durationToMilliseconds, normalizeEmail } from "@repo/api-kernel";
+import { ERROR_CODES } from "@repo/api-runtime";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 
 import type { ResendVerificationCommand } from "../auth.types";

@@ -1,7 +1,8 @@
+import type { AdvisoryLockPort } from "@repo/api-kernel";
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { ADVISORY_LOCK_PORT, type AdvisoryLockPort } from "@repo/api-runtime";
+import { ADVISORY_LOCK_PORT } from "@repo/api-kernel";
 import { DATABASE, runInTransaction } from "@repo/database-runtime";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 

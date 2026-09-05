@@ -1,4 +1,4 @@
-import type { AuthenticatedRequestUser, TransactionExecutor } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser, TransactionExecutor } from "@repo/api-kernel";
 
 /**
  * Consumer-owned facade port for the access-control operations the users

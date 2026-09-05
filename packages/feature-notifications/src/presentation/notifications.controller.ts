@@ -1,4 +1,4 @@
-import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 import type { Request } from "express";
 import type { Observable } from "rxjs";
 
@@ -17,15 +17,8 @@ import {
   Sse,
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import {
-  ACTION,
-  ApiDataResponse,
-  ApiPaginatedResponse,
-  CountDto,
-  perm,
-  requireOrganizationId,
-  SuccessFlagDto,
-} from "@repo/api-runtime";
+import { requireOrganizationId } from "@repo/api-kernel";
+import { ACTION, ApiDataResponse, ApiPaginatedResponse, CountDto, perm, SuccessFlagDto } from "@repo/api-runtime";
 import { CurrentUser } from "@repo/api-runtime";
 import { Authorize } from "@repo/api-runtime";
 import { SkipEnvelope } from "@repo/api-runtime";

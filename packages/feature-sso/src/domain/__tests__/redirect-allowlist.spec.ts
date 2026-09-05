@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { AppError } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
 
 import { assertAllowedRedirectUri } from "../redirect-allowlist";
 

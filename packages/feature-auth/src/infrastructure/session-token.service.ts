@@ -1,6 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { durationToMilliseconds, EnvironmentService } from "@repo/api-runtime";
+import { durationToMilliseconds } from "@repo/api-kernel";
+import { EnvironmentService } from "@repo/api-runtime";
 import { randomUUID } from "node:crypto";
 
 import type {

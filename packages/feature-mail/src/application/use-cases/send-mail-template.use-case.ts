@@ -1,5 +1,8 @@
+import type { JsonObject } from "@repo/api-kernel";
+
 import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
-import { AppError, ERROR_CODES, type JsonObject } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
+import { ERROR_CODES } from "@repo/api-runtime";
 import {
   USER_PREFERENCES_LOOKUP,
   type UserPreferencesLookup,

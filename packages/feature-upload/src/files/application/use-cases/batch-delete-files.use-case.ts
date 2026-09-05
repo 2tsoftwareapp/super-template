@@ -1,7 +1,7 @@
-import type { AuthenticatedRequestUser, JsonObject, RequestContext } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser, JsonObject, RequestContext } from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { requireOrganizationId } from "@repo/api-runtime";
+import { requireOrganizationId } from "@repo/api-kernel";
 
 import { FILES_REPOSITORY, type FilesRepositoryPort } from "../ports/files.repository.port";
 import { DeleteFileUseCase } from "./delete-file.use-case";

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
+import { ERROR_CODES } from "@repo/api-runtime";
 import { FILE_VISIBILITY } from "@repo/feature-upload/contracts";
 
 import { AUDIT_EXPORT_FILE_KIND } from "./export-audit-logs.use-case";

@@ -1,11 +1,9 @@
+import type { AdvisoryLockPort, PlatformTransactionPort } from "@repo/api-kernel";
+
 import { Inject, Injectable } from "@nestjs/common";
-import { EnvironmentService, SYSTEM_SCOPE } from "@repo/api-runtime";
-import {
-  ADVISORY_LOCK_PORT,
-  type AdvisoryLockPort,
-  PLATFORM_TRANSACTION_PORT,
-  type PlatformTransactionPort,
-} from "@repo/api-runtime";
+import { SYSTEM_SCOPE } from "@repo/api-kernel";
+import { ADVISORY_LOCK_PORT, PLATFORM_TRANSACTION_PORT } from "@repo/api-kernel";
+import { EnvironmentService } from "@repo/api-runtime";
 
 import { AUDIT_REPOSITORY, type AuditRepositoryPort } from "../ports/audit.repository.port";
 import { RecordAuditLogUseCase } from "./record-audit-log.use-case";

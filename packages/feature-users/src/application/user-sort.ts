@@ -1,9 +1,6 @@
-import {
-  parseSortParam,
-  type SortCriterion,
-  type SortOrder,
-  sortsFromQuery,
-} from "@repo/api-runtime";
+import type { SortCriterion, SortOrder } from "@repo/api-kernel";
+
+import { parseSortParam, sortsFromQuery } from "@repo/api-kernel";
 
 export const USER_SORT_FIELDS = ["createdAt", "displayName", "email", "status"] as const;
 

@@ -1,5 +1,6 @@
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
+
 import { Inject, Injectable } from "@nestjs/common";
-import { type AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import type { OrganizationMembership } from "../../public/contracts";
 

@@ -1,7 +1,7 @@
-import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, requireOrganizationId } from "@repo/api-runtime";
+import { AppError, requireOrganizationId } from "@repo/api-kernel";
 import { NOTIFICATION_ERROR_CODES } from "@repo/feature-notifications/contracts";
 
 import type { ListNotificationsQuery, NotificationView } from "../notifications.types";

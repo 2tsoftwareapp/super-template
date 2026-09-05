@@ -1,7 +1,7 @@
-import type { TransactionExecutor } from "@repo/api-runtime";
+import type { TransactionExecutor } from "@repo/api-kernel";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
 
 import type { OrganizationMembership } from "../../public/contracts";
 

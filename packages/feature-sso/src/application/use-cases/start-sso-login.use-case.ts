@@ -1,11 +1,6 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  durationToMilliseconds,
-  EnvironmentService,
-  generateOpaqueToken,
-  hashOpaqueToken,
-} from "@repo/api-runtime";
+import { AppError, durationToMilliseconds, generateOpaqueToken, hashOpaqueToken } from "@repo/api-kernel";
+import { EnvironmentService } from "@repo/api-runtime";
 import { SSO_ERROR_CODES } from "@repo/feature-sso/contracts";
 
 import type { StartSsoLoginCommand } from "../sso.types";

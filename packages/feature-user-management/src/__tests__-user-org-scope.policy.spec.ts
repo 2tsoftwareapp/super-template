@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { AppError } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
 import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 
 import {

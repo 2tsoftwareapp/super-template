@@ -7,7 +7,8 @@ import {
   Inject,
   Injectable,
 } from "@nestjs/common";
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
+import { ERROR_CODES } from "@repo/api-runtime";
 
 import { APPLICATION_SETTINGS_LOOKUP, type ApplicationSettingsLookup } from "./public/contracts";
 

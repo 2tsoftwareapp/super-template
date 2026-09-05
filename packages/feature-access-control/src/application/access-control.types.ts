@@ -1,4 +1,4 @@
-import type { SYSTEM_SCOPE } from "@repo/api-runtime";
+import type { SYSTEM_SCOPE } from "@repo/api-kernel";
 export type RoleScope = "platform" | "organization";
 
 export interface PermissionView {

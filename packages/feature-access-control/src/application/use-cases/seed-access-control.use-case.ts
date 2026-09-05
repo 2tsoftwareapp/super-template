@@ -1,8 +1,9 @@
+import type { TransactionExecutor } from "@repo/api-kernel";
 import type { ComposedAuthorization } from "@repo/api-plugin-kit";
-import type { TransactionExecutor } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
+import { ERROR_CODES } from "@repo/api-runtime";
 
 import {
   ACCESS_CONTROL_REPOSITORY,

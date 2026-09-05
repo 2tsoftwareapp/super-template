@@ -1,5 +1,5 @@
-import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
-import type { TransactionExecutor } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-kernel";
+import type { TransactionExecutor } from "@repo/api-kernel";
 
 import { Injectable } from "@nestjs/common";
 

@@ -1,4 +1,4 @@
-import type { RequestContext } from "@repo/api-runtime";
+import type { RequestContext } from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { AccessControlService } from "@repo/feature-access-control/contracts";

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { TenantContext } from "@repo/api-runtime";
+import type { TenantContext } from "@repo/api-kernel";
 
 import { getTenantContext, TenantContextService } from "@repo/api-runtime";
 

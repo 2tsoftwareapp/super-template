@@ -1,4 +1,4 @@
-import type { JsonObject, TransactionExecutor } from "@repo/api-runtime";
+import type { JsonObject, TransactionExecutor } from "@repo/api-kernel";
 
 import type { JobStatus } from "../../domain/job-status";
 import type { JobScope } from "../jobs.types";

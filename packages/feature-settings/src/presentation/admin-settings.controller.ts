@@ -1,4 +1,4 @@
-import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 import type { Request } from "express";
 
 import { Body, Controller, Get, Param, Patch, Req } from "@nestjs/common";

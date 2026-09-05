@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from "@repo/api-runtime";
+import type { TransactionExecutor } from "@repo/api-kernel";
 
 export interface TwoFactorSecretRecord {
   userId: string;

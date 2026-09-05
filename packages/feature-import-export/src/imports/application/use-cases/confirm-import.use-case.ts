@@ -1,6 +1,8 @@
+import type { TransactionPort } from "@repo/api-kernel";
+
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
-import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from "@repo/api-runtime";
+import { AuthenticatedRequestUser, RequestContext } from "@repo/api-kernel";
+import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-kernel";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { FileAccessService } from "@repo/feature-upload/contracts";

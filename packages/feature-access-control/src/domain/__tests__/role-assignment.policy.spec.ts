@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { ACTION, AppError, perm } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
+import { ACTION, perm } from "@repo/api-runtime";
 import { ROLE_NAMES } from "../../public/role.constants";
 
 import {

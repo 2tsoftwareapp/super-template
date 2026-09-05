@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { EnvironmentService, generateOpaqueToken } from "@repo/api-runtime";
+import { generateOpaqueToken } from "@repo/api-kernel";
+import { EnvironmentService } from "@repo/api-runtime";
 
 import type {
   SsoIdentity,

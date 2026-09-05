@@ -1,11 +1,8 @@
+import type { JsonObject } from "@repo/api-kernel";
+
 import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
-import {
-  adaptRedisClient,
-  createRedisClient,
-  EnvironmentService,
-  isJsonObject,
-  type JsonObject,
-} from "@repo/api-runtime";
+import { isJsonObject } from "@repo/api-kernel";
+import { adaptRedisClient, createRedisClient, EnvironmentService } from "@repo/api-runtime";
 import { Observable, Subject } from "rxjs";
 
 import type { NotificationStreamServicePort } from "../application/ports/notification-stream.service.port";

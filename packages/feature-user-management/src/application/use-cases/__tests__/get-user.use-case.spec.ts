@@ -1,4 +1,4 @@
-import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
 import { describe, expect, it, vi } from "vitest";
 

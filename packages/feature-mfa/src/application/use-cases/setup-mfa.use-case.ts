@@ -1,5 +1,6 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, EnvironmentService } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
+import { EnvironmentService } from "@repo/api-runtime";
 import { MFA_ERROR_CODES } from "@repo/feature-mfa/contracts";
 
 import type { MfaSetupResult } from "../mfa.types";

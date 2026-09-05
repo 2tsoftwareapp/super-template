@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from "@repo/api-runtime";
+import type { TransactionExecutor } from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { EnvironmentService } from "@repo/api-runtime";

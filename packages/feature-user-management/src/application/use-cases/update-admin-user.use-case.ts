@@ -1,8 +1,8 @@
-import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-kernel";
 import type { UpdateAdminUserCommand, UserView } from "@repo/feature-users/contracts";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, normalizeEmail, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { AppError, normalizeEmail, SYSTEM_SCOPE } from "@repo/api-kernel";
 import {
   ROLE_NAMES,
   USER_ACCESS_CONTROL,

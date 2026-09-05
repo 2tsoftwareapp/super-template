@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
+import { ERROR_CODES } from "@repo/api-runtime";
 
 import { FileVersionConflictError } from "../../../domain/errors";
 import { CreateFileVersionUseCase } from "../create-file-version.use-case";

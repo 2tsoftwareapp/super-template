@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from "@repo/api-runtime";
+import type { TransactionExecutor } from "@repo/api-kernel";
 
 /**
  * Minimal structural view of an executor that can run raw SQL, which is what

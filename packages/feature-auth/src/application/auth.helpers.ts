@@ -1,5 +1,5 @@
 import { HttpStatus } from "@nestjs/common";
-import { AppError, generateOpaqueToken, hashOpaqueToken } from "@repo/api-runtime";
+import { AppError, generateOpaqueToken, hashOpaqueToken } from "@repo/api-kernel";
 import {
   hashPassword,
   hashRefreshToken,

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
 import { AttachFileUseCase } from "../attach-file.use-case";
 

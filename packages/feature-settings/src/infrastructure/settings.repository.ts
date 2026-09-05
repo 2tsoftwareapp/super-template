@@ -1,7 +1,7 @@
+import type { JsonObject } from "@repo/api-kernel";
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { type JsonObject } from "@repo/api-runtime";
 import { DATABASE } from "@repo/database-runtime";
 import { eq } from "drizzle-orm";
 

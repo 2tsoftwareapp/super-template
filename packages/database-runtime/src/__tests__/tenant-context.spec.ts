@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { tenantContextForJob, WORKER_DISPATCH_CONTEXT } from "@repo/api-runtime";
+import { tenantContextForJob, WORKER_DISPATCH_CONTEXT } from "@repo/api-kernel";
 import type { DatabaseExecutor } from "../database.types";
 
 import { setTenantContextOnExecutor, setTenantContextOnPgClient } from "../tenant-context";

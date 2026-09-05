@@ -1,7 +1,8 @@
-import type { TenantContext } from "@repo/api-runtime";
+import type { TenantContext } from "@repo/api-kernel";
 import type { INestApplication } from "@nestjs/common";
 
-import { TenantContextService, WORKER_DISPATCH_CONTEXT } from "@repo/api-runtime";
+import { WORKER_DISPATCH_CONTEXT } from "@repo/api-kernel";
+import { TenantContextService } from "@repo/api-runtime";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 

@@ -1,18 +1,9 @@
-import type {
-  AuthenticatedRequestUser,
-  RequestContext,
-  TransactionExecutor,
-} from "@repo/api-runtime";
+import type { AuthenticatedRequestUser, RequestContext, TransactionExecutor } from "@repo/api-kernel";
+import type { PlatformTransactionPort, TransactionPort } from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
-import {
-  PLATFORM_TRANSACTION_PORT,
-  type PlatformTransactionPort,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-  type TransactionPort,
-} from "@repo/api-runtime";
-import { requireOrganizationId, toCsv } from "@repo/api-runtime";
+import { PLATFORM_TRANSACTION_PORT, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-kernel";
+import { requireOrganizationId, toCsv } from "@repo/api-kernel";
 import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import {
   AUDIT_REPOSITORY,

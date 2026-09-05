@@ -1,6 +1,8 @@
+import type { AppLogger } from "@repo/api-kernel";
+
 import { Inject, Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import { APP_LOGGER, type AppLogger } from "@repo/api-runtime";
+import { APP_LOGGER } from "@repo/api-kernel";
 
 import {
   EXPORT_JOBS_REPOSITORY,

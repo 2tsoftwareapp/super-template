@@ -1,4 +1,4 @@
-import type { TenantContext, TransactionExecutor, TransactionPort } from "@repo/api-runtime";
+import type { TenantContext, TransactionExecutor, TransactionPort } from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { TenantContextService } from "@repo/api-runtime";

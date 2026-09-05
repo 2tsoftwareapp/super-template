@@ -1,5 +1,7 @@
+import type { JsonObject } from "@repo/api-kernel";
+
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { type JsonObject, PaginationQueryDto } from "@repo/api-runtime";
+import { PaginationQueryDto } from "@repo/api-runtime";
 import { IsDateString, IsEnum, IsOptional, IsString, IsUUID } from "class-validator";
 
 export class JobDto {

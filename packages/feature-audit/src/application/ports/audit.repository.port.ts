@@ -1,6 +1,6 @@
-import type { JsonObject } from "@repo/api-runtime";
-import type { TransactionExecutor } from "@repo/api-runtime";
-import type { SYSTEM_SCOPE } from "@repo/api-runtime";
+import type { JsonObject } from "@repo/api-kernel";
+import type { TransactionExecutor } from "@repo/api-kernel";
+import type { SYSTEM_SCOPE } from "@repo/api-kernel";
 
 export interface AuditLogRecord {
   id: string;

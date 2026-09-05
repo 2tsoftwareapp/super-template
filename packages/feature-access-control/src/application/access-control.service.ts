@@ -1,6 +1,6 @@
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
+import type { TransactionExecutor } from "@repo/api-kernel";
 import type { ComposedAuthorization } from "@repo/api-plugin-kit";
-import type { AuthenticatedRequestUser } from "@repo/api-runtime";
-import type { TransactionExecutor } from "@repo/api-runtime";
 
 import { Injectable } from "@nestjs/common";
 

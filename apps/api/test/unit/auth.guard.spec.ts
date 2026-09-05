@@ -1,7 +1,7 @@
 import type { ExecutionContext } from "@nestjs/common";
 import type { Reflector } from "@nestjs/core";
 
-import { AppError } from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
 import { type AccessTokenAuthenticator } from "@repo/feature-auth/contracts";
 import { describe, expect, it, vi } from "vitest";
 

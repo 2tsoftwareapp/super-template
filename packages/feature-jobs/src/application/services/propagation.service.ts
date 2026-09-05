@@ -1,9 +1,7 @@
+import type { TransactionExecutor, TransactionPort } from "@repo/api-kernel";
+
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import {
-  TRANSACTION_PORT,
-  type TransactionExecutor,
-  type TransactionPort,
-} from "@repo/api-runtime";
+import { TRANSACTION_PORT } from "@repo/api-kernel";
 
 import { isBlockingStatus, isTerminalStatus } from "../../domain/job-lifecycle";
 import {

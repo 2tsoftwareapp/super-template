@@ -1,9 +1,10 @@
-import type { RequestContext } from "@repo/api-runtime";
-import type { TransactionPort } from "@repo/api-runtime";
+import type { RequestContext } from "@repo/api-kernel";
+import type { TransactionPort } from "@repo/api-kernel";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, SYSTEM_SCOPE } from "@repo/api-runtime";
-import { TRANSACTION_PORT } from "@repo/api-runtime";
+import { AppError, SYSTEM_SCOPE } from "@repo/api-kernel";
+import { TRANSACTION_PORT } from "@repo/api-kernel";
+import { ERROR_CODES } from "@repo/api-runtime";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 

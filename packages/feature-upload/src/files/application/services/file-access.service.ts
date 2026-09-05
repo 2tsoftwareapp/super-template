@@ -1,8 +1,8 @@
-import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
-import { AppError } from "@repo/api-runtime";
 import { FILE_ERROR_CODES } from "@repo/feature-upload/contracts";
 
 import { canAccessFile } from "../../domain/file-access.policy";

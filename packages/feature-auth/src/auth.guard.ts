@@ -8,12 +8,8 @@ import {
   Injectable,
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import {
-  ALLOW_MUST_CHANGE_PASSWORD_KEY,
-  AppError,
-  ERROR_CODES,
-  IS_PUBLIC_KEY,
-} from "@repo/api-runtime";
+import { AppError } from "@repo/api-kernel";
+import { ALLOW_MUST_CHANGE_PASSWORD_KEY, ERROR_CODES, IS_PUBLIC_KEY } from "@repo/api-runtime";
 
 import { ACCESS_TOKEN_AUTHENTICATOR, type AccessTokenAuthenticator } from "./public/contracts";
 

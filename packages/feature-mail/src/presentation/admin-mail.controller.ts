@@ -1,4 +1,4 @@
-import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
 import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";

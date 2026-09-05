@@ -1,4 +1,4 @@
-import { hashOpaqueToken } from "@repo/api-runtime";
+import { hashOpaqueToken } from "@repo/api-kernel";
 
 import { normalizeRecoveryCode } from "./recovery-codes";
 

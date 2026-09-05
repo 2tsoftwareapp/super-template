@@ -1,4 +1,5 @@
-import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
+import type { PlatformTransactionPort } from "@repo/api-kernel";
 import type {
   CreateOrganizationCommand,
   OrganizationAccessControlPort,
@@ -6,12 +7,8 @@ import type {
 } from "@repo/feature-organizations/contracts";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  ERROR_CODES,
-  PLATFORM_TRANSACTION_PORT,
-  type PlatformTransactionPort,
-} from "@repo/api-runtime";
+import { AppError, PLATFORM_TRANSACTION_PORT } from "@repo/api-kernel";
+import { ERROR_CODES } from "@repo/api-runtime";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import {
   ORGANIZATION_ACCESS_CONTROL,

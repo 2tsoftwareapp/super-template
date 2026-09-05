@@ -1,4 +1,4 @@
-import type { RequestContext } from "@repo/api-runtime";
+import type { RequestContext } from "@repo/api-kernel";
 
 import { Injectable } from "@nestjs/common";
 

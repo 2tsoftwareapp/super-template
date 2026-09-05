@@ -1,4 +1,4 @@
-import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 import type { ListUsersQuery, UsersCoreListQuery } from "@repo/feature-users/contracts";
 
 import { Inject, Injectable } from "@nestjs/common";

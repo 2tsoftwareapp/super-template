@@ -20,15 +20,8 @@ import {
 import { enabledFeatures } from "../../src/composition/feature-registry";
 import { buildOrderedGuardCatalog } from "../../src/composition/global-pipeline";
 import { DATABASE } from "@repo/database-runtime";
-import {
-  ADVISORY_LOCK_PORT,
-  APP_LOGGER,
-  EnvironmentService,
-  ErrorReporterService,
-  PLATFORM_TRANSACTION_PORT,
-  TenantContextService,
-  TRANSACTION_PORT,
-} from "@repo/api-runtime";
+import { ADVISORY_LOCK_PORT, APP_LOGGER, PLATFORM_TRANSACTION_PORT, TRANSACTION_PORT } from "@repo/api-kernel";
+import { EnvironmentService, ErrorReporterService, TenantContextService } from "@repo/api-runtime";
 
 /**
  * Infrastructure-only fakes for external services.

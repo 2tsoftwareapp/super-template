@@ -1,7 +1,7 @@
-import type { TransactionExecutor } from "@repo/api-runtime";
+import type { TransactionExecutor } from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { durationToMilliseconds, generateOpaqueToken, hashOpaqueToken } from "@repo/api-runtime";
+import { durationToMilliseconds, generateOpaqueToken, hashOpaqueToken } from "@repo/api-kernel";
 import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
 
 import {

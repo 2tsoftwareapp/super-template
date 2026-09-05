@@ -1,5 +1,5 @@
-import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
-import type { TransactionPort } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-kernel";
+import type { TransactionPort } from "@repo/api-kernel";
 import type {
   OrganizationAccessControlPort,
   OrganizationCustomRolesPurgePort,
@@ -9,7 +9,7 @@ import type {
 } from "@repo/feature-organizations/contracts";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-kernel";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import {
   ORGANIZATION_ACCESS_CONTROL,

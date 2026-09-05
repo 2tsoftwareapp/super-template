@@ -1,7 +1,7 @@
-import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { requireOrganizationId } from "@repo/api-runtime";
+import { requireOrganizationId } from "@repo/api-kernel";
 
 import { listFilesAccessScope } from "../../domain/file-access.policy";
 import { FilesMapper } from "../files.mapper";

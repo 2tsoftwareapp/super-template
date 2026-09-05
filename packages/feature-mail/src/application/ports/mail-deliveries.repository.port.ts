@@ -1,5 +1,5 @@
-import type { JsonObject } from "@repo/api-runtime";
-import type { TransactionExecutor } from "@repo/api-runtime";
+import type { JsonObject } from "@repo/api-kernel";
+import type { TransactionExecutor } from "@repo/api-kernel";
 
 export type MailDeliveryStatus = "PENDING" | "PROCESSING" | "PROVIDER_ACCEPTED" | "SENT" | "FAILED";
 

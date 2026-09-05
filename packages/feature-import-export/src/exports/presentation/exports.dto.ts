@@ -1,4 +1,4 @@
-import type { JsonObject } from "@repo/api-runtime";
+import type { JsonObject } from "@repo/api-kernel";
 
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsObject, IsOptional, IsString, MaxLength } from "class-validator";

@@ -1,11 +1,11 @@
-import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
-import type { TransactionPort } from "@repo/api-runtime";
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-kernel";
+import type { TransactionPort } from "@repo/api-kernel";
 import type { PersonalOrganizationProvisioner } from "@repo/feature-organization-management/contracts";
 import type { CreateAdminUserCommand, UserView } from "@repo/feature-users/contracts";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError, normalizeEmail, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
-import { AppError, normalizeEmail, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import {
   assertCanAssignRoleTargets,
   assertRoleScopeCanBeAssigned,

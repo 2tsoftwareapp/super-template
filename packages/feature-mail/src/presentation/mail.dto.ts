@@ -1,5 +1,7 @@
+import type { JsonObject, JsonValue } from "@repo/api-kernel";
+
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { type JsonObject, type JsonValue, PaginationQueryDto } from "@repo/api-runtime";
+import { PaginationQueryDto } from "@repo/api-runtime";
 import { Transform } from "class-transformer";
 import { IsEmail, IsEnum, IsObject, IsOptional, IsString, MaxLength } from "class-validator";
 

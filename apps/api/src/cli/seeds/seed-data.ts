@@ -1,8 +1,9 @@
 import type { INestApplicationContext } from "@nestjs/common";
 import type { DatabaseClient } from "@repo/database-runtime";
 
+import { WORKER_DISPATCH_CONTEXT } from "@repo/api-kernel";
 import { EnvironmentService } from "@repo/api-runtime";
-import { TenantContextService, WORKER_DISPATCH_CONTEXT } from "@repo/api-runtime";
+import { TenantContextService } from "@repo/api-runtime";
 import { DATABASE } from "@repo/database-runtime";
 
 import { composedAuthorization, composedSeeders } from "../../composition/composed-schema";
