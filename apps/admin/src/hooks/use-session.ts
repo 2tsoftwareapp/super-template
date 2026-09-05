@@ -1,7 +1,8 @@
 "use client";
 
-import { adminSessionQueryKey } from "@/lib/query-keys";
 import { createUseSession } from "@repo/web-hooks/use-session-factory";
+
+import { adminSessionQueryKey } from "@/lib/query-keys";
 
 export const sessionQueryKey = adminSessionQueryKey;
 

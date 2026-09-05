@@ -1,6 +1,5 @@
 "use client";
 
-import { adminSessionQueryKey } from "@/lib/query-keys";
 import { useDebouncedUrlSearch } from "@repo/web-hooks/use-debounced-url-search";
 import { createUseSession } from "@repo/web-hooks/use-session-factory";
 import { classifyError, getErrorMessage } from "@repo/web-utils/errors";
@@ -8,6 +7,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+
+import { adminSessionQueryKey } from "@/lib/query-keys";
 
 import type { SettingsViewModel, SettingValue } from "../model/settings.types";
 
