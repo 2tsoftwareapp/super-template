@@ -33,7 +33,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async headers() {
+  headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
 };

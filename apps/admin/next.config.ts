@@ -25,7 +25,7 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
   transpilePackages: ["@repo/web-ui", "@repo/web-hooks", "@repo/config", "@repo/env-loader"],
-  async headers() {
+  headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
 };
