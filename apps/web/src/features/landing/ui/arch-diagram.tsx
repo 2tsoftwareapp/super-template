@@ -13,10 +13,7 @@ const LAYERS = [
   },
   {
     label: "API",
-    items: [
-      "NestJS 11 composition root",
-      "Feature plugins · OpenAPI · JWT rotation",
-    ],
+    items: ["NestJS 11 composition root", "Feature plugins · OpenAPI · JWT rotation"],
   },
   {
     label: "Data",
@@ -53,10 +50,7 @@ export function ArchDiagram() {
             </ul>
           </div>
 
-          <div
-            aria-hidden
-            className="hidden items-center justify-center px-2 text-primary lg:flex"
-          >
+          <div aria-hidden className="hidden items-center justify-center px-2 text-primary lg:flex">
             <span className="text-2xl">→</span>
           </div>
 

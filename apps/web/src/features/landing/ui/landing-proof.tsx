@@ -8,7 +8,10 @@ export function LandingProof() {
         <Reveal>
           <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-5 md:justify-between md:gap-x-6">
             {proofLogos.map((logo) => (
-              <li key={logo.slug} className="opacity-70 grayscale transition hover:opacity-100 hover:grayscale-0">
+              <li
+                key={logo.slug}
+                className="opacity-70 grayscale transition hover:opacity-100 hover:grayscale-0"
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element -- Simple Icons CDN marks */}
                 <img
                   src={`https://cdn.simpleicons.org/${logo.slug}/6b7280`}

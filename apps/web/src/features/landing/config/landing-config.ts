@@ -52,8 +52,7 @@ export const capabilities = [
   },
   {
     title: "Multi-tenant auth",
-    description:
-      "JWT in HttpOnly cookies, workspace isolation, CSRF on BFFs, roles and TOTP MFA.",
+    description: "JWT in HttpOnly cookies, workspace isolation, CSRF on BFFs, roles and TOTP MFA.",
     detail: "Argon2 · GitHub / Google / Apple SSO · session revocation",
   },
   {
@@ -76,8 +75,7 @@ export const capabilities = [
   },
   {
     title: "Web stays marketing-only",
-    description:
-      "Fast, indexable landing. Sign-in and product flows live in Admin on purpose.",
+    description: "Fast, indexable landing. Sign-in and product flows live in Admin on purpose.",
     detail: "SSR · Tailwind 4 · shared web-ui",
   },
 ];

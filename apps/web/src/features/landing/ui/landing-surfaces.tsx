@@ -19,8 +19,8 @@ export function LandingSurfaces() {
             One backend. Four clear surfaces.
           </h2>
           <p className="mt-4 max-w-[52ch] text-base leading-relaxed text-muted-foreground">
-            Web stays marketing. Admin owns auth and operations. Mobile ships native. All three
-            talk to the same NestJS API.
+            Web stays marketing. Admin owns auth and operations. Mobile ships native. All three talk
+            to the same NestJS API.
           </p>
         </Reveal>
 

@@ -28,11 +28,7 @@ export function LandingNav() {
 
         <nav className="hidden items-center gap-5 text-sm text-muted-foreground md:flex lg:gap-6">
           {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="transition-colors hover:text-foreground"
-            >
+            <a key={link.href} href={link.href} className="transition-colors hover:text-foreground">
               {link.label}
             </a>
           ))}

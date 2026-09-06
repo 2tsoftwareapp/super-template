@@ -18,7 +18,12 @@ export function LandingFooter() {
         </div>
 
         <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-          <a href={ADMIN_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
+          <a
+            href={ADMIN_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-foreground"
+          >
             Admin
           </a>
           <a
@@ -29,7 +34,12 @@ export function LandingFooter() {
           >
             API docs
           </a>
-          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-foreground"
+          >
             GitHub
           </a>
           <a href="#start" className="hover:text-foreground">

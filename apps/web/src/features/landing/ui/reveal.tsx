@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  type ReactNode,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { type ReactNode, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 interface RevealProps {
   children: ReactNode;

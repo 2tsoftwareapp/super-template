@@ -5,10 +5,7 @@ import { ADMIN_URL } from "../config/landing-config";
 
 export function LandingHero() {
   return (
-    <section
-      id="top"
-      className="relative isolate overflow-hidden border-b border-border"
-    >
+    <section id="top" className="relative isolate overflow-hidden border-b border-border">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_left,oklch(0.92_0.04_145/_0.7),transparent_55%),radial-gradient(ellipse_at_bottom_right,oklch(0.94_0.02_145/_0.5),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,oklch(0.28_0.04_145/_0.45),transparent_55%),radial-gradient(ellipse_at_bottom_right,oklch(0.22_0.02_145/_0.4),transparent_50%)]"
@@ -56,9 +53,7 @@ export function LandingHero() {
               <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-background/90">
                 Four surfaces · one contract
               </p>
-              <p className="mt-1 text-sm font-medium text-background">
-                Web · Admin · API · Mobile
-              </p>
+              <p className="mt-1 text-sm font-medium text-background">Web · Admin · API · Mobile</p>
             </div>
           </div>
         </div>
