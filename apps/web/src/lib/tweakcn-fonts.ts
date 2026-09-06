@@ -1,7 +1,7 @@
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono, Manrope } from "next/font/google";
 
-/** Fonts paired with the tweakcn Light Green preset. */
-export const tweakcnFontSans = Inter({
+/** Landing / marketing type: Manrope display+body, mono for code samples. */
+export const tweakcnFontSans = Manrope({
   subsets: ["latin"],
   variable: "--font-sans",
 });
