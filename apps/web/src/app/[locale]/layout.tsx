@@ -15,9 +15,9 @@ const themeInitScript = `(function(){try{var t=localStorage.getItem('theme');var
 const swCleanupScript = `if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister();});})}`;
 
 export const metadata: Metadata = {
-  title: "Super Template — Full-stack monorepo starter",
+  title: "Super Template - Full-stack monorepo starter",
   description:
-    "Production-ready monorepo with NestJS API, Next.js web and admin, Flutter mobile, contract-driven clients, and dev/staging/prod environment layering.",
+    "Production-ready monorepo with NestJS API, Next.js web and admin, Flutter mobile, contract-driven clients, and layered environments.",
 };
 
 export function generateStaticParams() {

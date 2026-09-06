@@ -23,6 +23,19 @@ export const emptyStringToUndefined = z.preprocess(
   z.string().optional(),
 );
 
+/** Empty / missing → undefined; otherwise must be a valid email. */
+export const optionalEmail = z.preprocess(
+  (value) => (value === "" || value === undefined || value === null ? undefined : value),
+  z.email().optional(),
+);
+
+/** Empty / missing → undefined; otherwise must meet min length (seed passwords). */
+export const optionalSecretMin = (min: number) =>
+  z.preprocess(
+    (value) => (value === "" || value === undefined || value === null ? undefined : value),
+    z.string().min(min).optional(),
+  );
+
 export const isHttpUrl = (value: string): boolean => {
   try {
     new URL(value);

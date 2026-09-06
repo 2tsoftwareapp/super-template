@@ -91,16 +91,26 @@ async function runUsersSeed(ctx: FeatureSeedContext): Promise<void> {
     return { userId: user.id, organizationId };
   };
 
+  const adminEmail = environmentService.seedAdminEmail;
+  const adminPassword = environmentService.seedAdminPassword;
+  const userEmail = environmentService.seedUserEmail;
+  const userPassword = environmentService.seedUserPassword;
+  if (!adminEmail || !adminPassword || !userEmail || !userPassword) {
+    throw new Error(
+      "SEED_ADMIN_EMAIL, SEED_ADMIN_PASSWORD, SEED_USER_EMAIL, and SEED_USER_PASSWORD are required to run db:seed",
+    );
+  }
+
   const { userId: adminUserId, organizationId: adminOrganizationId } = await ensureUser({
-    email: environmentService.seedAdminEmail,
+    email: adminEmail,
     displayName: "Seed Admin",
-    password: environmentService.seedAdminPassword,
+    password: adminPassword,
     roleName: ROLE_NAMES.SUPER_ADMIN,
   });
   const { userId: regularUserId, organizationId: regularOrganizationId } = await ensureUser({
-    email: environmentService.seedUserEmail,
+    email: userEmail,
     displayName: "Seed User",
-    password: environmentService.seedUserPassword,
+    password: userPassword,
     roleName: ROLE_NAMES.USER,
   });
 

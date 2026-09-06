@@ -6,6 +6,8 @@ import {
   durationString,
   emptyStringToUndefined,
   everyOriginIsHttps,
+  optionalEmail,
+  optionalSecretMin,
 } from "./env-utils";
 import { DEV_PLACEHOLDER_MFA_KEY, DEV_PLACEHOLDER_SECRETS } from "./env.constants";
 
@@ -108,11 +110,12 @@ export const envSchema = z
     COOKIE_SECURE: booleanFromString.default(false),
     COOKIE_DOMAIN: emptyStringToUndefined,
     COOKIE_SAMESITE: z.enum(["lax", "strict", "none"]).default("lax"),
-    // Seed credentials are used by bootstrap data and e2e setup only.
-    SEED_ADMIN_EMAIL: z.email(),
-    SEED_ADMIN_PASSWORD: z.string().min(8),
-    SEED_USER_EMAIL: z.email(),
-    SEED_USER_PASSWORD: z.string().min(8),
+    // Seed credentials are CLI/bootstrap only — optional so staging/production can boot
+    // without them. `db:seed` still requires all four (checked in the users seeder).
+    SEED_ADMIN_EMAIL: optionalEmail,
+    SEED_ADMIN_PASSWORD: optionalSecretMin(8),
+    SEED_USER_EMAIL: optionalEmail,
+    SEED_USER_PASSWORD: optionalSecretMin(8),
     // Optional Firebase credentials for push notification delivery.
     FCM_PROJECT_ID: emptyStringToUndefined,
     FCM_CLIENT_EMAIL: emptyStringToUndefined,
@@ -205,6 +208,20 @@ export const envSchema = z
           code: "custom",
           path: ["ADMIN_ORIGIN"],
           message: "must use https in staging/production when set",
+        });
+      }
+      if (env.STORAGE_DRIVER === "local") {
+        ctx.addIssue({
+          code: "custom",
+          path: ["STORAGE_DRIVER"],
+          message: "must be s3 in staging/production (local filesystem is not durable)",
+        });
+      }
+      if (env.STORAGE_DRIVER === "s3" && !env.S3_BUCKET) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["S3_BUCKET"],
+          message: "required when STORAGE_DRIVER=s3",
         });
       }
     }

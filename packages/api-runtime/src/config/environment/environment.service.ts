@@ -101,19 +101,19 @@ export class EnvironmentService {
     return this.env.REDIS_URL;
   }
 
-  get seedAdminEmail(): string {
+  get seedAdminEmail(): string | undefined {
     return this.env.SEED_ADMIN_EMAIL;
   }
 
-  get seedAdminPassword(): string {
+  get seedAdminPassword(): string | undefined {
     return this.env.SEED_ADMIN_PASSWORD;
   }
 
-  get seedUserEmail(): string {
+  get seedUserEmail(): string | undefined {
     return this.env.SEED_USER_EMAIL;
   }
 
-  get seedUserPassword(): string {
+  get seedUserPassword(): string | undefined {
     return this.env.SEED_USER_PASSWORD;
   }
 

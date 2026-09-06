@@ -1,37 +1,13 @@
 import "server-only";
 import { loadEnvFiles } from "@repo/env-loader";
-import { z } from "zod";
+
+import { webServerEnvSchema } from "./server-env.schema";
 
 loadEnvFiles();
 
-const appEnvSchema = z
-  .enum(["development", "test", "staging", "production"])
-  .default("development");
+export { webServerEnvSchema } from "./server-env.schema";
 
-const booleanFromString = z.preprocess((value) => {
-  if (typeof value === "boolean") return value;
-  if (value === "true") return true;
-  if (value === "false") return false;
-  return value;
-}, z.boolean());
-
-const emptyStringToUndefined = z.preprocess(
-  (value) => (value === "" ? undefined : value),
-  z.string().optional(),
-);
-
-const serverEnvSchema = z.object({
-  API_INTERNAL_URL: z.url(),
-  WEB_ORIGIN: z.string().min(1),
-  COOKIE_DOMAIN: emptyStringToUndefined,
-  COOKIE_SAMESITE: z.enum(["lax", "strict", "none"]).default("lax"),
-  CSRF_SECRET: emptyStringToUndefined,
-  COOKIE_SECURE: booleanFromString.optional(),
-  APP_ENV: appEnvSchema,
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-});
-
-export const serverEnv = serverEnvSchema.parse({
+export const serverEnv = webServerEnvSchema.parse({
   API_INTERNAL_URL: process.env.API_INTERNAL_URL,
   WEB_ORIGIN: process.env.WEB_ORIGIN,
   COOKIE_DOMAIN: process.env.COOKIE_DOMAIN,

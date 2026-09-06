@@ -31,13 +31,15 @@ const baseEnv: Record<string, unknown> = {
 };
 
 // Overrides that turn baseEnv into a valid production configuration: real (non
-// placeholder) secrets from baseEnv, secure cookies, and https public URLs.
+// placeholder) secrets from baseEnv, secure cookies, https public URLs, and S3.
 const secureProdOverrides: Record<string, unknown> = {
   APP_ENV: "production",
   COOKIE_SECURE: "true",
   WEB_ORIGIN: "https://app.example.com",
   NEXT_PUBLIC_WEB_URL: "https://app.example.com",
   API_INTERNAL_URL: "https://api.internal.example.com",
+  STORAGE_DRIVER: "s3",
+  S3_BUCKET: "app-uploads",
 };
 
 const secureStagingOverrides: Record<string, unknown> = {
@@ -47,6 +49,8 @@ const secureStagingOverrides: Record<string, unknown> = {
   NEXT_PUBLIC_WEB_URL: "https://staging.example.com",
   API_INTERNAL_URL: "https://api.staging.internal.example.com",
   ADMIN_ORIGIN: "https://admin.staging.example.com",
+  STORAGE_DRIVER: "s3",
+  S3_BUCKET: "staging-uploads",
 };
 
 describe("validateEnvironment", () => {
@@ -241,5 +245,49 @@ describe("validateEnvironment", () => {
       DATABASE_SKIP_RLS_CHECK: "true",
     });
     expect(env.DATABASE_SKIP_RLS_CHECK).toBe(true);
+  });
+
+  it("allows production boot without SEED_* credentials", () => {
+    const {
+      SEED_ADMIN_EMAIL: _a,
+      SEED_ADMIN_PASSWORD: _b,
+      SEED_USER_EMAIL: _c,
+      SEED_USER_PASSWORD: _d,
+      ...withoutSeed
+    } = baseEnv;
+
+    const env = validateEnvironment({ ...withoutSeed, ...secureProdOverrides });
+    expect(env.SEED_ADMIN_EMAIL).toBeUndefined();
+    expect(env.SEED_ADMIN_PASSWORD).toBeUndefined();
+  });
+
+  it("treats empty SEED_* strings as undefined", () => {
+    const env = validateEnvironment({
+      ...baseEnv,
+      SEED_ADMIN_EMAIL: "",
+      SEED_ADMIN_PASSWORD: "",
+    });
+    expect(env.SEED_ADMIN_EMAIL).toBeUndefined();
+    expect(env.SEED_ADMIN_PASSWORD).toBeUndefined();
+  });
+
+  it("rejects STORAGE_DRIVER=local in production", () => {
+    expect(() =>
+      validateEnvironment({
+        ...baseEnv,
+        ...secureProdOverrides,
+        STORAGE_DRIVER: "local",
+      }),
+    ).toThrow(/STORAGE_DRIVER/);
+  });
+
+  it("rejects s3 without S3_BUCKET in staging", () => {
+    expect(() =>
+      validateEnvironment({
+        ...baseEnv,
+        ...secureStagingOverrides,
+        S3_BUCKET: "",
+      }),
+    ).toThrow(/S3_BUCKET/);
   });
 });
