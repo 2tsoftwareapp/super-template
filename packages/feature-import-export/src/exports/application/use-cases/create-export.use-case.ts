@@ -8,7 +8,7 @@ import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 
 import type { CreateExportCommand } from "../exports.types";
 
-import { ImportExportAdapterRegistry } from "../../../infrastructure/import-export-adapter.registry";
+import { ImportExportAdapterRegistry } from "../../../application/services/import-export-adapter.registry";
 import { ExportsMapper } from "../exports.mapper";
 import {
   EXPORT_JOBS_REPOSITORY,
