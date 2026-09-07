@@ -4,7 +4,6 @@ import { APP_LOGGER } from "@repo/api-kernel";
 import { DATABASE } from "@repo/database-runtime";
 import { OutboxDispatcher } from "@repo/feature-outbox/dispatcher";
 import { OutboxHandlerRegistry } from "@repo/feature-outbox/registry";
-import { OutboxRepository } from "@repo/feature-outbox/repository";
 import {
   OUTBOX_HANDLER_REGISTRY,
   OUTBOX_REPOSITORY,
@@ -148,8 +147,6 @@ const buildHarness = async (
       }),
     ],
   })
-    .overrideProvider(OutboxRepository)
-    .useValue(repository)
     .overrideProvider(OUTBOX_REPOSITORY)
     .useValue(repository)
     .compile();

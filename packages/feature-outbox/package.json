@@ -10,8 +10,7 @@
     "./schema": "./src/infrastructure/persistence/outbox-messages.ts",
     "./testing": "./src/testing/index.ts",
     "./dispatcher": "./src/application/outbox-dispatcher.service.ts",
-    "./registry": "./src/application/outbox-handler.registry.ts",
-    "./repository": "./src/infrastructure/outbox.repository.ts"
+    "./registry": "./src/application/outbox-handler.registry.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",

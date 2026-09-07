@@ -16,7 +16,48 @@ permissions:
 # skip the other (lint/typecheck/test/build).
 
 jobs:
+  changes:
+    name: Detect changed areas
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      api_e2e: ${{ steps.filter.outputs.api_e2e }}
+      mobile: ${{ steps.filter.outputs.mobile }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Detect changed areas
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend:
+              - 'apps/api/**'
+              - 'packages/*/**'
+              - 'scripts/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'turbo.json'
+              - 'tsconfig.json'
+              - '.github/workflows/**'
+            api_e2e:
+              - 'apps/api/**'
+              - 'packages/api-*/**'
+              - 'packages/database-runtime/**'
+              - 'packages/feature-*/**'
+              - 'packages/config/**'
+              - 'packages/observability/**'
+              - 'infra/**'
+              - 'scripts/**'
+              - 'pnpm-lock.yaml'
+            mobile:
+              - 'apps/mobile/**'
+              - 'packages/mobile_core/**'
+
   generated:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
     name: Verify generated docs and contracts
     runs-on: ubuntu-latest
 
@@ -81,6 +122,8 @@ jobs:
         run: pnpm run generate:check
 
   quality:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
     name: Lint, typecheck, test and build
     runs-on: ubuntu-latest
 
@@ -142,7 +185,7 @@ jobs:
           echo "DATABASE_URL=postgresql://fullstack_starter_app:fullstack_starter_app@localhost:65432/fullstack_starter" >> "$GITHUB_ENV"
 
       - name: Lint
-        run: pnpm run lint
+        run: pnpm run lint:policy && pnpm exec turbo run lint --filter=...[origin/${{ github.base_ref || 'main' }}]
 
       - name: Format check
         run: pnpm run format:check
@@ -154,16 +197,18 @@ jobs:
         run: bash scripts/check-source-policy.sh
 
       - name: Typecheck
-        run: pnpm -r typecheck
+        run: pnpm exec turbo run typecheck --filter=...[origin/${{ github.base_ref || 'main' }}]
 
       - name: Build
-        run: pnpm build
+        run: pnpm exec turbo run build --filter=...[origin/${{ github.base_ref || 'main' }}]
 
       - name: Test
         # api mail-template packaging asserts against dist/; build must run first.
-        run: pnpm -r test
+        run: pnpm exec turbo run test --filter=...[origin/${{ github.base_ref || 'main' }}]
 
   api-e2e:
+    needs: changes
+    if: needs.changes.outputs.api_e2e == 'true'
     name: API e2e
     runs-on: ubuntu-latest
 
@@ -253,8 +298,9 @@ jobs:
           test/sso.e2e.spec.ts
           test/tenant-isolation.e2e.spec.ts
 
-
   mobile:
+    needs: changes
+    if: needs.changes.outputs.mobile == 'true'
     name: Mobile analyze and test
     runs-on: ubuntu-latest
     steps:
