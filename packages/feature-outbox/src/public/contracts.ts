@@ -1,7 +1,6 @@
 /** Public contracts for @repo/feature-outbox. */
 export { OutboxDispatcher } from "../application/outbox-dispatcher.service";
 export { OutboxHandlerRegistry } from "../application/outbox-handler.registry";
-export { OutboxRepository } from "../infrastructure/outbox.repository";
 export { type OutboxHandlerSlot, OutboxModule, type OutboxModuleOptions } from "../outbox.module";
 export { OUTBOX_APPENDER, type OutboxAppenderPort } from "./outbox-appender.port";
 export {
