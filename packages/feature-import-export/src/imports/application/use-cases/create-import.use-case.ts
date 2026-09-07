@@ -9,7 +9,7 @@ import { FileAccessService } from "@repo/feature-upload/contracts";
 import type { ImportValidationError } from "../../../public/contracts";
 import type { CreateImportCommand, ImportJobView } from "../imports.types";
 
-import { ImportExportAdapterRegistry } from "../../../infrastructure/import-export-adapter.registry";
+import { ImportExportAdapterRegistry } from "../../../application/services/import-export-adapter.registry";
 import { MAX_IMPORT_ROWS } from "../../domain/import-types";
 import {
   IMPORT_JOBS_REPOSITORY,
@@ -49,7 +49,6 @@ export class CreateImportUseCase {
 
     const organizationId = file.organizationId;
 
-    // Resolve adapter before creating any DB records
     this.importExportAdapters.resolve(input.type);
 
     const importPermissions = this.importExportAdapters.getImportPermissions(input.type);
@@ -76,10 +75,7 @@ export class CreateImportUseCase {
       async (tx) => {
         const idempotentResult = input.idempotencyKey
           ? await this.importJobsRepository.createIdempotent(
-              {
-                ...jobValues,
-                idempotencyKey: input.idempotencyKey,
-              },
+              { ...jobValues, idempotencyKey: input.idempotencyKey },
               tx,
             )
           : null;
