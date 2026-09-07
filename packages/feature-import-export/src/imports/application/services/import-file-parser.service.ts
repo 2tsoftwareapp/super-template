@@ -3,7 +3,7 @@ import { OBJECT_STORAGE, type ObjectStorage } from "@repo/feature-upload/contrac
 
 import type { ImportValidationError } from "../../../public/contracts";
 
-import { ImportExportAdapterRegistry } from "../../../infrastructure/import-export-adapter.registry";
+import { ImportExportAdapterRegistry } from "../../../application/services/import-export-adapter.registry";
 
 @Injectable()
 export class ImportFileParserService {

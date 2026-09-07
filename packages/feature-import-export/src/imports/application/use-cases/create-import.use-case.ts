@@ -9,7 +9,7 @@ import { FileAccessService } from "@repo/feature-upload/contracts";
 import type { ImportValidationError } from "../../../public/contracts";
 import type { CreateImportCommand, ImportJobView } from "../imports.types";
 
-import { ImportExportAdapterRegistry } from "../../../infrastructure/import-export-adapter.registry";
+import { ImportExportAdapterRegistry } from "../../../application/services/import-export-adapter.registry";
 import { MAX_IMPORT_ROWS } from "../../domain/import-types";
 import {
   IMPORT_JOBS_REPOSITORY,
