@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { OBJECT_STORAGE, type ObjectStorage } from "@repo/feature-upload/contracts";
 
-import type { ImportValidationError } from "../../../public/contracts";
+import type { ImportValidationError } from "../../../application/ports/import-export-adapter.port";
 
 import { ImportExportAdapterRegistry } from "../../../application/services/import-export-adapter.registry";
 

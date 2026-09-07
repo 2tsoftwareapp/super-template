@@ -7,7 +7,7 @@ import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { FileAccessService } from "@repo/feature-upload/contracts";
 
-import type { ImportValidationError } from "../../../public/contracts";
+import type { ImportValidationError } from "../../../application/ports/import-export-adapter.port";
 import type { ImportJobView } from "../imports.types";
 
 import { ImportExportAdapterRegistry } from "../../../application/services/import-export-adapter.registry";

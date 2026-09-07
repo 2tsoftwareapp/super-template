@@ -1,6 +1,6 @@
 import type { TransactionExecutor } from "@repo/api-kernel";
 
-import type { ImportValidationError } from "../../../public/contracts";
+import type { ImportValidationError } from "../../../application/ports/import-export-adapter.port";
 
 export interface ImportJobRecord {
   id: string;
