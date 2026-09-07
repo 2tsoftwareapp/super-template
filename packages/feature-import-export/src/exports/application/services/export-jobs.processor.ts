@@ -47,6 +47,8 @@ export class ExportJobsProcessor {
     this.processing = true;
 
     try {
+      // Atomic claim: PENDING -> PROCESSING with FOR UPDATE SKIP LOCKED, so
+      // concurrent instances each take disjoint jobs and never double-export.
       const jobs = await this.exportJobsRepository.claimPending(CLAIM_BATCH_SIZE);
 
       for (const job of jobs) {
@@ -84,6 +86,7 @@ export class ExportJobsProcessor {
     }
 
     if (!job.organizationId) {
+      // Schema guarantees NOT NULL; defensive guard for the port's nullable type.
       throw new Error(`Export job ${job.id} has no organization`);
     }
     const organizationId = job.organizationId;
@@ -93,6 +96,9 @@ export class ExportJobsProcessor {
     try {
       const adapter = this.importExportAdapters.resolve(job.type);
 
+      // The user who created the job is long gone (no request context), so set
+      // the tenant context explicitly for the pool-backed adapter queries and
+      // the completion transaction's RLS policies.
       const rows = await this.tenantContextService.runAsync(
         { tenantId: organizationId, userId: job.createdById },
         async () => {
