@@ -13,7 +13,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import type { ImportValidationError } from "../../public/import-export-adapter.port";
+import type { ImportValidationError } from "../../application/ports/import-export-adapter.port";
 
 import { importExportJobStatusEnum } from "./import-export-enums";
 
