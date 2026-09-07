@@ -1,5 +1,5 @@
-export { ImportExportAdapterRegistry } from "../application/services/import-export-adapter.registry";
 export * from "../application/ports/import-export-adapter.port";
+export { ImportExportAdapterRegistry } from "../application/services/import-export-adapter.registry";
 export { EXPORT_JOBS_REPOSITORY } from "../exports/application/ports/export-jobs.repository.port";
 /** Public contracts for @repo/feature-import-export. */
 export { CreateExportUseCase } from "../exports/application/use-cases/create-export.use-case";
