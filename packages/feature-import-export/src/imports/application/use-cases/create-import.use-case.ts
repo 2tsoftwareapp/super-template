@@ -49,6 +49,7 @@ export class CreateImportUseCase {
 
     const organizationId = file.organizationId;
 
+    // Resolve adapter before creating any DB records
     this.importExportAdapters.resolve(input.type);
 
     const importPermissions = this.importExportAdapters.getImportPermissions(input.type);
@@ -75,7 +76,10 @@ export class CreateImportUseCase {
       async (tx) => {
         const idempotentResult = input.idempotencyKey
           ? await this.importJobsRepository.createIdempotent(
-              { ...jobValues, idempotencyKey: input.idempotencyKey },
+              {
+                ...jobValues,
+                idempotencyKey: input.idempotencyKey,
+              },
               tx,
             )
           : null;
