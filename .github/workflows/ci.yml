@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 # Generate/contract verification and source-quality gates run as independent
 # parallel jobs so a failure in one (e.g. generate:check) can never silently
@@ -126,7 +127,6 @@ jobs:
     if: needs.changes.outputs.backend == 'true'
     name: Lint, typecheck, test and build
     runs-on: ubuntu-latest
-
     services:
       postgres:
         image: postgres:18.2
@@ -145,6 +145,7 @@ jobs:
     env:
       POSTGRES_HOST: localhost
       POSTGRES_PORT: "65432"
+      TURBO_FILTER: ...[origin/${{ github.base_ref || 'main' }}]
       POSTGRES_EXPOSED_PORT: "65432"
       POSTGRES_DB: fullstack_starter
       POSTGRES_USER: postgres
@@ -156,6 +157,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -168,6 +171,14 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Restore Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo/cache
+          key: ${{ runner.os }}-turbo-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.ref }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ hashFiles('pnpm-lock.yaml') }}-
 
       - name: Wait for Postgres
         run: |
