@@ -1,14 +1,13 @@
 import { Module } from "@nestjs/common";
-import { ScheduleModule } from "@nestjs/schedule";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { EnvironmentService, LoggingModule, RedisThrottlerStorage } from "@repo/api-runtime";
 import { AppConfigModule } from "@repo/api-runtime";
+import { composedSchema, featureModules } from "@repo/app-composition";
 import { DatabaseModule } from "@repo/database-runtime";
 
-import { composedSchema, featureModules } from "@repo/app-composition";
-
 /**
- * Technical runtime + composed feature modules. No business logic lives here.
+ * HTTP runtime + composed feature modules. Scheduled execution belongs to the
+ * standalone worker host and is intentionally not initialized here.
  */
 @Module({
   imports: [
@@ -28,7 +27,6 @@ import { composedSchema, featureModules } from "@repo/app-composition";
         storage: new RedisThrottlerStorage(environmentService),
       }),
     }),
-    ScheduleModule.forRoot(),
     DatabaseModule.forRoot({ schema: composedSchema }),
     ...featureModules,
   ],

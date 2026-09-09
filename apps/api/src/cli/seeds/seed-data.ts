@@ -4,9 +4,9 @@ import type { DatabaseClient } from "@repo/database-runtime";
 import { WORKER_DISPATCH_CONTEXT } from "@repo/api-kernel";
 import { EnvironmentService } from "@repo/api-runtime";
 import { TenantContextService } from "@repo/api-runtime";
+import { composedAuthorization, composedSeeders } from "@repo/app-composition";
 import { DATABASE } from "@repo/database-runtime";
 
-import { composedAuthorization, composedSeeders } from "@repo/app-composition";
 import { type SeedContext, toFeatureSeedContext } from "./seed-context";
 
 export const seedDatabase = async (app: INestApplicationContext): Promise<void> => {

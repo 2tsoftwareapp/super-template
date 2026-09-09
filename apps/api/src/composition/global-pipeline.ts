@@ -15,12 +15,11 @@ import {
   ResponseEnvelopeInterceptor,
   TenantContextService,
 } from "@repo/api-runtime";
-import { ErrorReporterService } from "@repo/observability";
-
 import {
   composedHttpPipelineGuards,
   composedHttpPipelineInterceptors,
 } from "@repo/app-composition";
+import { ErrorReporterService } from "@repo/observability";
 
 /**
  * Ordering slots for generic (host-owned) guard providers. Feature guards keep

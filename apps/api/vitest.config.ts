@@ -32,6 +32,8 @@ export default defineConfig({
       packageSubpathAlias("api-kernel"),
       packageAlias("api-plugin-kit"),
       packageSubpathAlias("api-plugin-kit"),
+      packageAlias("app-composition"),
+      packageSubpathAlias("app-composition"),
       packageAlias("api-runtime"),
       packageSubpathAlias("api-runtime"),
       packageAlias("database-runtime"),
