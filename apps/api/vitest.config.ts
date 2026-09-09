@@ -25,6 +25,7 @@ export default defineConfig({
     },
   },
   resolve: {
+    dedupe: ["@nestjs/common", "@nestjs/core", "@nestjs/schedule"],
     alias: [
       packageAlias("api-contract"),
       packageSubpathAlias("api-contract"),
