@@ -256,6 +256,9 @@ importers:
       '@repo/api-runtime':
         specifier: workspace:*
         version: link:../../packages/api-runtime
+      '@repo/app-composition':
+        specifier: workspace:*
+        version: link:../../packages/app-composition
       '@repo/database-runtime':
         specifier: workspace:*
         version: link:../../packages/database-runtime
@@ -699,6 +702,91 @@ importers:
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/app-composition:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/core':
+        specifier: 11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.27)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/feature-access-control':
+        specifier: workspace:*
+        version: link:../feature-access-control
+      '@repo/feature-activities':
+        specifier: workspace:*
+        version: link:../feature-activities
+      '@repo/feature-audit':
+        specifier: workspace:*
+        version: link:../feature-audit
+      '@repo/feature-audit-export':
+        specifier: workspace:*
+        version: link:../feature-audit-export
+      '@repo/feature-auth':
+        specifier: workspace:*
+        version: link:../feature-auth
+      '@repo/feature-health':
+        specifier: workspace:*
+        version: link:../feature-health
+      '@repo/feature-import-export':
+        specifier: workspace:*
+        version: link:../feature-import-export
+      '@repo/feature-jobs':
+        specifier: workspace:*
+        version: link:../feature-jobs
+      '@repo/feature-mail':
+        specifier: workspace:*
+        version: link:../feature-mail
+      '@repo/feature-mfa':
+        specifier: workspace:*
+        version: link:../feature-mfa
+      '@repo/feature-notifications':
+        specifier: workspace:*
+        version: link:../feature-notifications
+      '@repo/feature-organization-management':
+        specifier: workspace:*
+        version: link:../feature-organization-management
+      '@repo/feature-organizations':
+        specifier: workspace:*
+        version: link:../feature-organizations
+      '@repo/feature-outbox':
+        specifier: workspace:*
+        version: link:../feature-outbox
+      '@repo/feature-settings':
+        specifier: workspace:*
+        version: link:../feature-settings
+      '@repo/feature-sso':
+        specifier: workspace:*
+        version: link:../feature-sso
+      '@repo/feature-upload':
+        specifier: workspace:*
+        version: link:../feature-upload
+      '@repo/feature-user-management':
+        specifier: workspace:*
+        version: link:../feature-user-management
+      '@repo/feature-user-preferences':
+        specifier: workspace:*
+        version: link:../feature-user-preferences
+      '@repo/feature-users':
+        specifier: workspace:*
+        version: link:../feature-users
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
       typescript:
         specifier: 5.9.3
         version: 5.9.3

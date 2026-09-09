@@ -34,6 +34,7 @@
     "@nestjs/throttler": "6.5.0",
     "@repo/api-kernel": "workspace:*",
     "@repo/api-plugin-kit": "workspace:*",
+    "@repo/app-composition": "workspace:*",
     "@repo/api-runtime": "workspace:*",
     "@repo/database-runtime": "workspace:*",
     "@repo/env-loader": "workspace:*",

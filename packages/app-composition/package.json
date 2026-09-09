@@ -1,0 +1,47 @@
+{
+  "name": "@repo/app-composition",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@nestjs/common": "11.1.27",
+    "@nestjs/core": "11.1.27",
+    "@repo/api-plugin-kit": "workspace:*",
+    "@repo/feature-access-control": "workspace:*",
+    "@repo/feature-activities": "workspace:*",
+    "@repo/feature-audit": "workspace:*",
+    "@repo/feature-audit-export": "workspace:*",
+    "@repo/feature-auth": "workspace:*",
+    "@repo/feature-health": "workspace:*",
+    "@repo/feature-import-export": "workspace:*",
+    "@repo/feature-jobs": "workspace:*",
+    "@repo/feature-mail": "workspace:*",
+    "@repo/feature-mfa": "workspace:*",
+    "@repo/feature-notifications": "workspace:*",
+    "@repo/feature-organization-management": "workspace:*",
+    "@repo/feature-organizations": "workspace:*",
+    "@repo/feature-outbox": "workspace:*",
+    "@repo/feature-settings": "workspace:*",
+    "@repo/feature-sso": "workspace:*",
+    "@repo/feature-upload": "workspace:*",
+    "@repo/feature-user-management": "workspace:*",
+    "@repo/feature-user-preferences": "workspace:*",
+    "@repo/feature-users": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
+    "@types/node": "24.10.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.9"
+  }
+}

@@ -5,7 +5,7 @@ import { EnvironmentService, LoggingModule, RedisThrottlerStorage } from "@repo/
 import { AppConfigModule } from "@repo/api-runtime";
 import { DatabaseModule } from "@repo/database-runtime";
 
-import { composedSchema, featureModules } from "./composed-schema";
+import { composedSchema, featureModules } from "@repo/app-composition";
 
 /**
  * Technical runtime + composed feature modules. No business logic lives here.

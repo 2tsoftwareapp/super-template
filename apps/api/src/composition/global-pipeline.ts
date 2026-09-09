@@ -17,7 +17,10 @@ import {
 } from "@repo/api-runtime";
 import { ErrorReporterService } from "@repo/observability";
 
-import { composedHttpPipelineGuards, composedHttpPipelineInterceptors } from "./composed-schema";
+import {
+  composedHttpPipelineGuards,
+  composedHttpPipelineInterceptors,
+} from "@repo/app-composition";
 
 /**
  * Ordering slots for generic (host-owned) guard providers. Feature guards keep

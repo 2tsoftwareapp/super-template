@@ -6,7 +6,7 @@ import { EnvironmentService } from "@repo/api-runtime";
 import { TenantContextService } from "@repo/api-runtime";
 import { DATABASE } from "@repo/database-runtime";
 
-import { composedAuthorization, composedSeeders } from "../../composition/composed-schema";
+import { composedAuthorization, composedSeeders } from "@repo/app-composition";
 import { type SeedContext, toFeatureSeedContext } from "./seed-context";
 
 export const seedDatabase = async (app: INestApplicationContext): Promise<void> => {
