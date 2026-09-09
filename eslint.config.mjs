@@ -19,6 +19,7 @@ export default defineConfig([
     "**/vitest.*.config.ts",
     "**/vitest-feature-aliases.mjs",
     "apps/api/webpack.config.js",
+    "apps/worker/webpack.config.js",
     "eslint.config.mjs",
   ]),
 ]);

@@ -1,6 +1,7 @@
 packages:
   - "tools/tsc7"
   - "apps/api"
+  - "apps/worker"
   - "apps/admin"
   - "apps/web"
   - "apps/web/e2e"
