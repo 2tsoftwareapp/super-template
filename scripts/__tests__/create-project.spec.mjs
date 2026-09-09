@@ -13,7 +13,8 @@ import {
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
-import { resolveFeatureSelection } from "../lib/feature-catalog.mjs";
+import { buildFeatureChoices, selectFeaturesInteractively } from "../create-project.mjs";
+import { discoverFeatureCatalog, resolveFeatureSelection } from "../lib/feature-catalog.mjs";
 
 const repoRoot = resolve(import.meta.dirname, "../..");
 const generator = join(repoRoot, "scripts/create-project.mjs");
@@ -48,9 +49,31 @@ test("help exposes the project generator contract", () => {
   const result = runGenerator(["--help"]);
   assert.equal(result.status, 0);
   assert.match(result.stdout, /--features <ids>/);
+  assert.match(result.stdout, /select interactively/);
   assert.match(result.stdout, /--target <dir>/);
   assert.match(result.stdout, /--dry-run/);
   assert.match(result.stdout, /--check/);
+});
+
+test("interactive selector lists discovered packages and returns selected IDs", async () => {
+  const catalog = discoverFeatureCatalog(repoRoot);
+  let promptConfig;
+  const selected = await selectFeaturesInteractively(catalog, async (config) => {
+    promptConfig = config;
+    return ["auth"];
+  });
+
+  assert.deepEqual(selected, ["auth"]);
+  assert.deepEqual(
+    promptConfig.choices.map((choice) => choice.value),
+    catalog.features.map((feature) => feature.id),
+  );
+  assert.equal(promptConfig.choices.length, 20);
+  assert.match(
+    buildFeatureChoices(catalog).find((choice) => choice.value === "auth").description,
+    /requires:/,
+  );
+  assert.ok(resolveFeatureSelection(catalog, selected).resolvedIds.includes("users"));
 });
 
 test("auth generation resolves dependencies and keeps API wiring consistent", () => {
@@ -136,7 +159,8 @@ test("dry-run and invalid selections do not create or mutate targets", () => {
   const missing = runGenerator(["--target", missingTarget, "--skip-install"]);
   assert.notEqual(missing.status, 0);
   assert.equal(existsSync(missingTarget), false);
-  assert.match(missing.stderr, /--features is required/);
+  assert.match(missing.stderr, /interactive terminal/);
+  assert.match(missing.stderr, /--features <ids>/);
 
   const invalidTarget = join(root, "invalid");
   const invalid = runGenerator([

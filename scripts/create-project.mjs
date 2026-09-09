@@ -14,6 +14,7 @@ import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
+import { checkbox } from "@inquirer/prompts";
 import { discoverFeatureCatalog, resolveFeatureSelection } from "./lib/feature-catalog.mjs";
 
 const GENERATOR_VERSION = 1;
@@ -33,10 +34,11 @@ const EXCLUDED_SEGMENTS = new Set([
 const HELP = `Create a customized project from package features.
 
 Usage:
+  node scripts/create-project.mjs --target ../my-project
   node scripts/create-project.mjs --features health,audit --target ../my-project
 
 Options:
-  --features <ids>  Comma-separated or repeated feature IDs (required).
+  --features <ids>  Comma-separated or repeated feature IDs; omit in a TTY to select interactively.
   --target <dir>    New or previously generated project directory (required).
   --source <dir>    Template repository (default: current directory).
   --surfaces <ids>  Requested surfaces (default: api; only api is supported today).
@@ -49,11 +51,12 @@ Options:
 /**
  * Parse the small, explicit CLI surface so target safety can run before any write.
  * @param {string[]} argv
- * @returns {{features: string[], target: string | undefined, source: string, surfaces: string[], dryRun: boolean, check: boolean, skipInstall: boolean, help: boolean}}
+ * @returns {{features: string[], featuresProvided: boolean, target: string | undefined, source: string, surfaces: string[], dryRun: boolean, check: boolean, skipInstall: boolean, help: boolean}}
  */
 function parseArgs(argv) {
   const result = {
     features: [],
+    featuresProvided: false,
     target: undefined,
     source: process.cwd(),
     surfaces: ["api"],
@@ -91,8 +94,10 @@ function parseArgs(argv) {
     if (!value || value.startsWith("--")) {
       throw new Error(`Option "${name}" requires a value.`);
     }
-    if (name === "--features") result.features.push(...value.split(","));
-    else if (name === "--target") result.target = value;
+    if (name === "--features") {
+      result.featuresProvided = true;
+      result.features.push(...value.split(","));
+    } else if (name === "--target") result.target = value;
     else if (name === "--source") result.source = value;
     else if (name === "--surfaces") result.surfaces = value.split(",");
   }
@@ -100,6 +105,47 @@ function parseArgs(argv) {
   result.features = result.features.map((feature) => feature.trim()).filter(Boolean);
   result.surfaces = result.surfaces.map((surface) => surface.trim()).filter(Boolean);
   return result;
+}
+
+/**
+ * Build the interactive choices from the same discovered catalog used by the resolver.
+ * @param {import("./lib/feature-catalog.mjs").FeatureCatalog} catalog
+ * @returns {{name: string, value: string, short: string, description?: string}[]}
+ */
+export function buildFeatureChoices(catalog) {
+  return catalog.features.map((feature) => ({
+    name: feature.id,
+    value: feature.id,
+    short: feature.id,
+    ...(feature.dependsOn.length > 0
+      ? { description: `requires: ${feature.dependsOn.join(", ")}` }
+      : { description: "no direct dependencies" }),
+  }));
+}
+
+/**
+ * Ask the user to choose feature packages while leaving dependency closure to the resolver.
+ * @param {import("./lib/feature-catalog.mjs").FeatureCatalog} catalog
+ * @param {(config: {message: string, choices: ReturnType<typeof buildFeatureChoices>, pageSize: number, instructions: string, required: boolean}) => Promise<string[]>} prompt
+ * @returns {Promise<string[]>}
+ */
+export async function selectFeaturesInteractively(catalog, prompt = checkbox) {
+  try {
+    const selected = await prompt({
+      message: "Select feature packages to include",
+      choices: buildFeatureChoices(catalog),
+      pageSize: 12,
+      instructions: "Use ↑/↓ to navigate, Space to toggle, Enter to confirm",
+      required: true,
+    });
+    if (selected.length === 0) throw new Error("At least one feature must be selected.");
+    return selected;
+  } catch (error) {
+    if (error && typeof error === "object" && "name" in error && error.name === "ExitPromptError") {
+      throw new Error("Feature selection cancelled.");
+    }
+    throw error;
+  }
 }
 
 /**
@@ -332,11 +378,12 @@ function writeAtomic(file, content) {
  * Flow:
  *   1. Parse and validate selection/target boundaries.
  *   2. Discover package manifests and resolve transitive dependencies.
- *   3. Preview or apply the target copy and known file mutations.
- *   4. Optionally link dependencies with pnpm.
- * Trace: PLAN.md#Scope and TASKS.md#T-001 through T-004.
+ *   3. If no scripted selection was supplied, ask for package IDs in an interactive TTY.
+ *   4. Preview or apply the target copy and known file mutations.
+ *   5. Optionally link dependencies with pnpm.
+ * Trace: PLAN.md#Scope and TASKS.md#T-001 through T-004, T-008.
  */
-export function main(argv = process.argv.slice(2)) {
+export async function main(argv = process.argv.slice(2)) {
   const args = parseArgs(argv);
   if (args.help) {
     process.stdout.write(HELP);
@@ -344,10 +391,6 @@ export function main(argv = process.argv.slice(2)) {
   }
   if (args.dryRun && args.check) throw new Error("Use only one of --dry-run or --check.");
   if (!args.target) throw new Error("--target is required.");
-  if (args.features.length === 0) throw new Error("--features is required.");
-  if (new Set(args.features).size !== args.features.length) {
-    throw new Error("A feature ID was selected more than once.");
-  }
   if (args.surfaces.length === 0) throw new Error("--surfaces must contain at least one surface.");
   for (const surface of args.surfaces) {
     if (!SUPPORTED_SURFACES.has(surface)) {
@@ -365,6 +408,20 @@ export function main(argv = process.argv.slice(2)) {
   });
   const { source, target } = targetState;
   const catalog = discoverFeatureCatalog(source);
+  if (args.features.length === 0) {
+    if (args.featuresProvided) {
+      throw new Error("--features must contain at least one feature ID.");
+    }
+    if (!process.stdin.isTTY || !process.stdout.isTTY) {
+      throw new Error(
+        "No feature selection provided. Run in an interactive terminal or pass --features <ids>.",
+      );
+    }
+    args.features = await selectFeaturesInteractively(catalog);
+  }
+  if (new Set(args.features).size !== args.features.length) {
+    throw new Error("A feature ID was selected more than once.");
+  }
   const selection = resolveFeatureSelection(catalog, args.features);
   const mutations = buildMutations({ source, target, selection, surfaces: args.surfaces });
 
@@ -416,10 +473,8 @@ export function main(argv = process.argv.slice(2)) {
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
-  try {
-    main();
-  } catch (error) {
+  main().catch((error) => {
     process.stderr.write(`\nerror: ${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;
-  }
+  });
 }

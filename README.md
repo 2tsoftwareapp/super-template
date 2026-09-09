@@ -132,13 +132,21 @@ Select feature packages from `packages/feature-*` and generate a separate projec
 with the complete transitive dependency closure:
 
 ```bash
-pnpm create:project --features auth,import-export --target ../my-project --skip-install
+pnpm create:project --target ../my-project
+# Use ↑/↓ to navigate, Space to select packages, and Enter to confirm.
 ```
 
 The generator rewrites the API workspace dependencies and composition registry,
 records the requested/resolved IDs in `feature-profile.json`, and supports
-`--dry-run` for preview or `--check` for drift detection. The current generator
-mutates the API surface; unsupported surface requests fail explicitly.
+`--dry-run` for preview or `--check` for drift detection. For CI or other
+non-interactive runs, pass feature IDs explicitly:
+
+```bash
+pnpm create:project --features auth,import-export --target ../my-project --skip-install
+```
+
+The current generator mutates the API surface; unsupported surface requests fail
+explicitly.
 
 <br />
 
