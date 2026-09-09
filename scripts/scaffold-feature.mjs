@@ -16,10 +16,10 @@
  *   node scripts/scaffold-feature.mjs import-export
  *   pnpm scaffold:feature billing
  */
-import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
-import { resolve, relative, dirname } from 'node:path';
+import { mkdirSync, writeFileSync, existsSync } from "node:fs";
+import { resolve, relative, dirname } from "node:path";
 
-const repoRoot = resolve(import.meta.dirname, '..');
+const repoRoot = resolve(import.meta.dirname, "..");
 
 const stdout = (msg) => process.stdout.write(msg);
 const stderr = (msg) => process.stderr.write(`${msg}\n`);
@@ -47,10 +47,13 @@ The id must match /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/ and becomes:
 const KEBAB = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
 
 /** Split a kebab-case id into its word tokens. */
-const words = (id) => id.split('-').filter(Boolean);
+const words = (id) => id.split("-").filter(Boolean);
 
 /** `import-export` -> `ImportExport` (class names). */
-const toPascal = (id) => words(id).map((w) => w[0].toUpperCase() + w.slice(1)).join('');
+const toPascal = (id) =>
+  words(id)
+    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .join("");
 
 /** `import-export` -> `importExport` (valid JS identifier for the manifest const). */
 const toCamel = (id) => {
@@ -88,7 +91,7 @@ const buildFiles = ({ id, pascal, camel }) => {
   },
   "dependencies": {
     "@nestjs/common": "11.1.27",
-    "@repo/api-runtime": "workspace:*",
+    "@repo/api-plugin-kit": "workspace:*",
     "@repo/database-runtime": "workspace:*",
     "drizzle-orm": "0.45.2"
   },
@@ -127,7 +130,7 @@ const buildFiles = ({ id, pascal, camel }) => {
 }
 `;
 
-  const indexTs = `import { defineFeature } from "@repo/api-runtime";
+  const indexTs = `import { defineFeature } from "@repo/api-plugin-kit";
 
 import { ${moduleClass} } from "./${id}.module";
 
@@ -136,7 +139,7 @@ export { ${moduleClass} } from "./${id}.module";
 /**
  * The \`${id}\` feature manifest — the single typed contract the app composes.
  * Enable the feature by adding \`${manifestConst}\` to \`featureManifests\` in
- * \`apps/api/src/features.ts\`; disable it by removing that one line (and the
+ * \`apps/api/src/composition/feature-registry.ts\`; disable it by removing that one line (and the
  * workspace dependency). No kernel code changes either way.
  */
 export const ${manifestConst} = defineFeature({
@@ -168,7 +171,7 @@ export class ${moduleClass} {}
  * must never define them. Declare the tables in this file, export them, then
  * reference them from the manifest's \`schema\` field in \`../index.ts\`. The app
  * merges every feature's schema via \`composeFeatureSchemas\` in
- * \`apps/api/src/features.ts\`, which throws on duplicate table names, so keep
+ * \`apps/api/src/composition/feature-registry.ts\`, which throws on duplicate table names, so keep
  * table names unique across all composed features. Co-locate the SQL migrations
  * that create these tables under \`./migrations/\`.
  */
@@ -179,7 +182,7 @@ export {};
 
 NestJS controllers, application services, and infrastructure for the \`${id}\`
 feature, exposed through the \`${moduleClass}\` in \`../index.ts\` and composed into
-the app via \`apps/api/src/features.ts\`.
+the app via \`apps/api/src/composition/feature-registry.ts\`.
 `;
 
   const adminReadme = `# ${id} — Admin surface
@@ -199,7 +202,7 @@ Web BFF slice (routes + components) for the \`${id}\` feature, wired through a t
 
 The \`${id}\` feature as a **compile-time plugin package** (see ADR 0002). It owns a
 vertical slice across all four surfaces and exports one typed \`FeatureManifest\`
-from \`@repo/api-runtime\` for the backend surface.
+from \`@repo/api-plugin-kit\` for the backend manifest surface.
 
 ## The contract
 
@@ -213,7 +216,7 @@ export const ${manifestConst} = defineFeature({
 \`\`\`
 
 Frontend surfaces are exposed through per-surface entrypoints in this package
-(\`./admin\`, \`./web\`) rather than the backend-only manifest, so \`@repo/api-runtime\`
+(\`./admin\`, \`./web\`) rather than the backend-only manifest, so the plugin kit
 never depends on React or Flutter.
 
 ## Layout
@@ -231,7 +234,7 @@ never depends on React or Flutter.
 
 1. **Add the workspace dependency** to \`apps/api/package.json\`:
    \`"${pkgName}": "workspace:*"\`.
-2. **Register the manifest** in \`apps/api/src/features.ts\`:
+2. **Register the manifest** in \`apps/api/src/composition/feature-registry.ts\`:
    \`\`\`ts
    import { ${manifestConst} } from "${pkgName}";
    export const featureManifests = [${manifestConst}];
@@ -249,23 +252,23 @@ is a deliberate, separate data migration.
 `;
 
   return {
-    'package.json': packageJson,
-    'turbo.json': turboJson,
-    'tsconfig.json': tsconfigJson,
-    'README.md': readme,
-    'src/index.ts': indexTs,
+    "package.json": packageJson,
+    "turbo.json": turboJson,
+    "tsconfig.json": tsconfigJson,
+    "README.md": readme,
+    "src/index.ts": indexTs,
     [`src/${moduleFile}`]: moduleTs,
-    'src/database/schema.ts': schemaTs,
-    'src/database/migrations/.gitkeep': '',
-    'src/api/README.md': apiReadme,
-    'src/admin/README.md': adminReadme,
-    'src/web/README.md': webReadme,
+    "src/database/schema.ts": schemaTs,
+    "src/database/migrations/.gitkeep": "",
+    "src/api/README.md": apiReadme,
+    "src/admin/README.md": adminReadme,
+    "src/web/README.md": webReadme,
   };
 };
 
 const main = () => {
   const argv = process.argv.slice(2);
-  if (argv.includes('-h') || argv.includes('--help')) {
+  if (argv.includes("-h") || argv.includes("--help")) {
     stdout(HELP);
     return;
   }
@@ -275,7 +278,9 @@ const main = () => {
     die(`missing <feature-id>.\n\n${HELP}`);
   }
   if (!KEBAB.test(id)) {
-    die(`invalid feature id "${id}". Use kebab-case: lowercase letters, digits, single hyphens (e.g. "billing", "import-export").`);
+    die(
+      `invalid feature id "${id}". Use kebab-case: lowercase letters, digits, single hyphens (e.g. "billing", "import-export").`,
+    );
   }
 
   const pascal = toPascal(id);
@@ -285,7 +290,9 @@ const main = () => {
   const targetRel = relative(repoRoot, targetDir);
 
   if (existsSync(targetDir)) {
-    die(`target directory already exists: ${targetRel}\nRefusing to overwrite. Delete it first or choose a different id.`);
+    die(
+      `target directory already exists: ${targetRel}\nRefusing to overwrite. Delete it first or choose a different id.`,
+    );
   }
 
   const files = buildFiles({ id, pascal, camel });

@@ -34,6 +34,7 @@
     "generate": "sh ./scripts/generate-contracts.sh",
     "generate:check": "sh ./scripts/generate-check.sh",
     "schema:check": "node scripts/check-schema.mjs",
+    "create:project": "node scripts/create-project.mjs",
     "scaffold:feature": "node scripts/scaffold-feature.mjs",
     "generate:feature-indexes": "node scripts/generate-feature-indexes.mjs",
     "check:feature-indexes": "node scripts/generate-feature-indexes.mjs --check",

@@ -1,0 +1,257 @@
+#!/usr/bin/env node
+import assert from "node:assert/strict";
+import { after, test } from "node:test";
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
+import { join, resolve } from "node:path";
+import { tmpdir } from "node:os";
+import { spawnSync } from "node:child_process";
+import { resolveFeatureSelection } from "../lib/feature-catalog.mjs";
+
+const repoRoot = resolve(import.meta.dirname, "../..");
+const generator = join(repoRoot, "scripts/create-project.mjs");
+const temporaryRoots = [];
+
+function makeTemporaryRoot(label) {
+  const root = join(tmpdir(), `super-template-${label}-${process.pid}-${Date.now()}`);
+  mkdirSync(root, { recursive: true });
+  temporaryRoots.push(root);
+  return root;
+}
+
+function runGenerator(args) {
+  return spawnSync(process.execPath, [generator, ...args], {
+    cwd: repoRoot,
+    encoding: "utf8",
+  });
+}
+
+function registryFeatureIds(target) {
+  return readFileSync(join(target, "apps/api/src/composition/feature-registry.ts"), "utf8")
+    .split("\n")
+    .map((line) => line.match(/from "@repo\/feature-([^"]+)"/)?.[1])
+    .filter(Boolean);
+}
+
+after(() => {
+  for (const root of temporaryRoots) rmSync(root, { recursive: true, force: true });
+});
+
+test("help exposes the project generator contract", () => {
+  const result = runGenerator(["--help"]);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /--features <ids>/);
+  assert.match(result.stdout, /--target <dir>/);
+  assert.match(result.stdout, /--dry-run/);
+  assert.match(result.stdout, /--check/);
+});
+
+test("auth generation resolves dependencies and keeps API wiring consistent", () => {
+  const target = join(makeTemporaryRoot("auth"), "project");
+  const result = runGenerator(["--features", "auth", "--target", target, "--skip-install"]);
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(existsSync(join(target, ".git")), false);
+  assert.equal(existsSync(join(target, "node_modules")), false);
+  assert.equal(existsSync(join(target, ".agent-work")), false);
+
+  const profile = JSON.parse(readFileSync(join(target, "feature-profile.json"), "utf8"));
+  const packageJson = JSON.parse(readFileSync(join(target, "apps/api/package.json"), "utf8"));
+  const packageFeatureIds = Object.keys(packageJson.dependencies)
+    .filter((name) => name.startsWith("@repo/feature-"))
+    .map((name) => name.slice("@repo/feature-".length));
+
+  assert.deepEqual(profile.requestedFeatures, ["auth"]);
+  assert.equal(profile.resolvedFeatures.at(-1), "auth");
+  assert.ok(profile.resolvedFeatures.length > profile.requestedFeatures.length);
+  assert.deepEqual(packageFeatureIds, profile.resolvedFeatures);
+  assert.deepEqual(registryFeatureIds(target), profile.resolvedFeatures);
+
+  const check = runGenerator([
+    "--features",
+    "auth",
+    "--target",
+    target,
+    "--check",
+    "--skip-install",
+  ]);
+  assert.equal(check.status, 0, check.stderr);
+
+  const registry = join(target, "apps/api/src/composition/feature-registry.ts");
+  writeFileSync(registry, `${readFileSync(registry, "utf8")}// deliberate drift\n`);
+  const drift = runGenerator([
+    "--features",
+    "auth",
+    "--target",
+    target,
+    "--check",
+    "--skip-install",
+  ]);
+  assert.notEqual(drift.status, 0);
+  assert.match(drift.stderr, /Generated target is out of date/);
+});
+
+test("representative feature selections produce matching package and registry sets", () => {
+  const root = makeTemporaryRoot("profiles");
+  for (const id of ["health", "auth", "import-export", "notifications"]) {
+    const target = join(root, id);
+    const result = runGenerator(["--features", id, "--target", target, "--skip-install"]);
+    assert.equal(result.status, 0, `${id}: ${result.stderr}`);
+
+    const profile = JSON.parse(readFileSync(join(target, "feature-profile.json"), "utf8"));
+    const packageJson = JSON.parse(readFileSync(join(target, "apps/api/package.json"), "utf8"));
+    const packageFeatureIds = Object.keys(packageJson.dependencies)
+      .filter((name) => name.startsWith("@repo/feature-"))
+      .map((name) => name.slice("@repo/feature-".length));
+
+    assert.deepEqual(packageFeatureIds, profile.resolvedFeatures, id);
+    assert.deepEqual(registryFeatureIds(target), profile.resolvedFeatures, id);
+  }
+});
+
+test("dry-run and invalid selections do not create or mutate targets", () => {
+  const root = makeTemporaryRoot("guards");
+  const dryTarget = join(root, "dry-run");
+  const dryRun = runGenerator([
+    "--features",
+    "auth",
+    "--target",
+    dryTarget,
+    "--dry-run",
+    "--skip-install",
+  ]);
+  assert.equal(dryRun.status, 0, dryRun.stderr);
+  assert.equal(existsSync(dryTarget), false);
+  assert.match(dryRun.stdout, /Auto-added dependencies:/);
+  assert.match(dryRun.stdout, /Would write: apps\/api\/src\/composition\/feature-registry\.ts/);
+
+  const missingTarget = join(root, "missing-features");
+  const missing = runGenerator(["--target", missingTarget, "--skip-install"]);
+  assert.notEqual(missing.status, 0);
+  assert.equal(existsSync(missingTarget), false);
+  assert.match(missing.stderr, /--features is required/);
+
+  const invalidTarget = join(root, "invalid");
+  const invalid = runGenerator([
+    "--features",
+    "does-not-exist",
+    "--target",
+    invalidTarget,
+    "--skip-install",
+  ]);
+  assert.notEqual(invalid.status, 0);
+  assert.equal(existsSync(invalidTarget), false);
+  assert.match(invalid.stderr, /Unknown feature/);
+
+  const duplicateTarget = join(root, "duplicate");
+  const duplicate = runGenerator([
+    "--features",
+    "health,health",
+    "--target",
+    duplicateTarget,
+    "--skip-install",
+  ]);
+  assert.notEqual(duplicate.status, 0);
+  assert.equal(existsSync(duplicateTarget), false);
+  assert.match(duplicate.stderr, /selected more than once/);
+
+  const nonEmpty = join(root, "non-empty");
+  mkdirSync(nonEmpty, { recursive: true });
+  writeFileSync(join(nonEmpty, "marker"), "keep");
+  const refused = runGenerator(["--features", "health", "--target", nonEmpty, "--skip-install"]);
+  assert.notEqual(refused.status, 0);
+  assert.match(refused.stderr, /Refusing to mutate non-empty target/);
+  assert.equal(readFileSync(join(nonEmpty, "marker"), "utf8"), "keep");
+
+  const unsafeLink = join(root, "source-link");
+  symlinkSync(repoRoot, unsafeLink, "dir");
+  const symlinkTarget = runGenerator([
+    "--features",
+    "health",
+    "--target",
+    unsafeLink,
+    "--skip-install",
+  ]);
+  assert.notEqual(symlinkTarget.status, 0);
+  assert.match(symlinkTarget.stderr, /Source and target must be different/);
+});
+
+test("dependency cycles are rejected with the offending edge", () => {
+  const feature = (id, dependsOn) => ({
+    id,
+    packageName: `@repo/feature-${id}`,
+    packageDir: "/tmp",
+    manifestFile: "/tmp/index.ts",
+    manifestExport: `${id}Feature`,
+    dependsOn,
+    packageJson: {},
+  });
+  const features = [feature("alpha", ["beta"]), feature("beta", ["alpha"])];
+  const catalog = {
+    features,
+    byId: new Map(features.map((item) => [item.id, item])),
+    inputOrder: new Map([
+      ["alpha", 0],
+      ["beta", 1],
+    ]),
+  };
+
+  assert.throws(
+    () => resolveFeatureSelection(catalog, ["alpha"]),
+    /Feature dependency cycle detected: alpha -> beta -> alpha/,
+  );
+});
+
+test("unsupported surfaces fail before target creation", () => {
+  const target = join(makeTemporaryRoot("surface"), "project");
+  const result = runGenerator([
+    "--features",
+    "health",
+    "--surfaces",
+    "api,web",
+    "--target",
+    target,
+    "--skip-install",
+  ]);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Surface "web" is not supported/);
+  assert.equal(existsSync(target), false);
+});
+
+test("scaffold fixture uses the canonical plugin kit and registry path", () => {
+  const fixture = makeTemporaryRoot("scaffold");
+  const fixtureScripts = join(fixture, "scripts");
+  mkdirSync(fixtureScripts, { recursive: true });
+  copyFileSync(
+    join(repoRoot, "scripts/scaffold-feature.mjs"),
+    join(fixtureScripts, "scaffold-feature.mjs"),
+  );
+
+  const result = spawnSync(
+    process.execPath,
+    [join(fixtureScripts, "scaffold-feature.mjs"), "billing"],
+    {
+      cwd: fixture,
+      encoding: "utf8",
+    },
+  );
+  assert.equal(result.status, 0, result.stderr);
+
+  const packageJson = JSON.parse(
+    readFileSync(join(fixture, "packages/feature-billing/package.json"), "utf8"),
+  );
+  const index = readFileSync(join(fixture, "packages/feature-billing/src/index.ts"), "utf8");
+  const readme = readFileSync(join(fixture, "packages/feature-billing/README.md"), "utf8");
+  assert.equal(packageJson.dependencies["@repo/api-plugin-kit"], "workspace:*");
+  assert.equal(packageJson.dependencies["@repo/api-runtime"], undefined);
+  assert.match(index, /from "@repo\/api-plugin-kit"/);
+  assert.doesNotMatch(index, /apps\/api\/src\/features\.ts/);
+  assert.doesNotMatch(readme, /apps\/api\/src\/features\.ts/);
+});
