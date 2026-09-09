@@ -19,6 +19,10 @@ export default defineConfig({
     maxWorkers: 1,
     testTimeout: 30000,
     include: ["test/**/*.{test,spec}.ts", "src/cli/**/*.spec.ts"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json-summary"],
+    },
   },
   resolve: {
     alias: [

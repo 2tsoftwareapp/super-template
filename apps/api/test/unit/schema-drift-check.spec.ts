@@ -217,6 +217,37 @@ describe("Schema drift check", () => {
     });
 
     it(
+      "fails when a sealed SQL migration is missing from the legacy journal map",
+      { timeout: 30_000 },
+      () => {
+        const { tempMigrations, cleanup } = createIsolatedEnvironment();
+        try {
+          bootstrapManifest(tempMigrations);
+
+          const newFile = join(tempMigrations, "9999_unmapped.sql");
+          writeFileSync(newFile, "CREATE TABLE test_unmapped (id uuid PRIMARY KEY);\n");
+          execFileSync(
+            "node",
+            [
+              resolve(repoRoot, "scripts/check-schema.mjs"),
+              "--generate",
+              "--migrations",
+              tempMigrations,
+            ],
+            { cwd: repoRoot, stdio: "pipe" },
+          );
+
+          const result = runDriftCheck({ migrationsPath: tempMigrations });
+          expect(result.code).toBe(1);
+          expect(result.stderr).toMatch(/Migration journal/);
+          expect(result.stderr).toMatch(/9999_unmapped\.sql/);
+        } finally {
+          cleanup();
+        }
+      },
+    );
+
+    it(
       "--generate fails when trying to overwrite modified existing checksums",
       { timeout: 30_000 },
       () => {

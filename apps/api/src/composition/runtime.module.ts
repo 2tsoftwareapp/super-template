@@ -17,7 +17,8 @@ import { composedSchema, featureModules } from "./composed-schema";
     ThrottlerModule.forRootAsync({
       inject: [EnvironmentService],
       useFactory: (environmentService: EnvironmentService) => ({
-        skipIf: () => environmentService.isTest,
+        skipIf: () =>
+          environmentService.isTest && !environmentService.values.THROTTLER_ENABLED_IN_TEST,
         throttlers: [
           {
             ttl: environmentService.values.THROTTLER_TTL_MS,

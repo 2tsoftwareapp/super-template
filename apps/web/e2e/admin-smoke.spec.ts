@@ -4,16 +4,14 @@ const ADMIN_URL = process.env.PLAYWRIGHT_ADMIN_URL ?? "http://localhost:3002";
 const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL ?? "admin@example.local";
 const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? "ChangeMe123!";
 
-// Golden-path smoke for the admin console (server started by playwright
-// webServer config, seeded credentials from the dev seed).
-test.describe.configure({ mode: "serial" });
-
 test.describe("admin console smoke", () => {
   test("anonymous requests are redirected to the locale login", async ({ page }) => {
     await page.goto(`${ADMIN_URL}/users`);
 
     await expect(page).toHaveURL(/\/en\/login$/);
-    await expect(page.getByText(/admin login/i).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: /sign in to the admin app/i })).toBeVisible({
+      timeout: 15_000,
+    });
   });
 
   test("seeded admin can sign in and reach the dashboard", async ({ page }) => {

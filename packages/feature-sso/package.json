@@ -4,7 +4,7 @@
   "private": true,
   "type": "commonjs",
   "exports": {
-    ".": "./src/sso.feature.ts",
+    ".": "./src/index.ts",
     "./contracts": "./src/public/contracts.ts",
     "./testing": "./src/testing/index.ts",
     "./schema": "./src/infrastructure/persistence/index.ts"

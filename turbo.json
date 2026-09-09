@@ -243,6 +243,12 @@
     },
     "typecheck": {
       "dependsOn": []
+    },
+    "mobile:check": {
+      "cache": false
+    },
+    "mobile:build": {
+      "cache": false
     }
   }
 }

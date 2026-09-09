@@ -4,7 +4,7 @@
   "private": true,
   "type": "commonjs",
   "exports": {
-    ".": "./src/notifications.feature.ts",
+    ".": "./src/index.ts",
     "./contracts": "./src/public/contracts.ts",
     "./module": "./src/notifications.module.ts",
     "./testing": "./src/testing/index.ts",

@@ -4,7 +4,7 @@
   "private": true,
   "type": "commonjs",
   "exports": {
-    ".": "./src/user-management.feature.ts",
+    ".": "./src/index.ts",
     "./module": "./src/user-management.module.ts"
   },
   "scripts": {

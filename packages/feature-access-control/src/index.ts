@@ -1,4 +1,5 @@
 export * from "./access-control.constants";
+export { accessControlFeature } from "./access-control.feature";
 export { AccessControlModule } from "./access-control.module";
 export { AccessControlService } from "./application/access-control.service";
 export type { AccessProfileView, RoleView as RoleDto } from "./application/access-control.types";

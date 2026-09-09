@@ -6,3 +6,4 @@ export {
   PREFERENCE_THEMES,
 } from "./application/preferences.constants";
 export { PreferencesModule } from "./preferences.module";
+export { userPreferencesFeature } from "./user-preferences.feature";

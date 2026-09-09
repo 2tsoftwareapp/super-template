@@ -12,10 +12,14 @@ has_postgres_e2e_prereqs() {
 pnpm lint
 pnpm typecheck
 pnpm test
-if has_postgres_e2e_prereqs; then
+if [ "${VERIFY_SKIP_API_E2E:-0}" = "1" ]; then
+  printf '%s\n' '[verify] VERIFY_SKIP_API_E2E=1; API e2e verification was intentionally skipped.'
+elif has_postgres_e2e_prereqs; then
   pnpm --filter api test:e2e
 else
-  printf '%s\n' '[verify] Postgres unavailable or credentials rejected; skipping API e2e verification on this machine.'
+  printf '%s\n' '[verify] Postgres unavailable or credentials rejected; API e2e verification is required.' >&2
+  printf '%s\n' '[verify] Use pnpm run verify:offline only for an intentional non-release offline check.' >&2
+  exit 1
 fi
 pnpm build
 if sh scripts/mobile.sh doctor >/dev/null 2>&1; then

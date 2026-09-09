@@ -1,0 +1,9 @@
+{
+  "name": "@repo/mobile-verification",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "mobile:check": "sh ../../scripts/mobile.sh format-check && sh ../../scripts/mobile.sh analyze && sh ../../scripts/mobile.sh test",
+    "mobile:build": "sh ../../scripts/mobile.sh build apk"
+  }
+}
