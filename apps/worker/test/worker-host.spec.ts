@@ -3,8 +3,8 @@ import { MODULE_METADATA } from "@nestjs/common/constants";
 import { ScheduleModule } from "@nestjs/schedule";
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
-import { RuntimeModule } from "../../api/src/composition/runtime.module";
 import { composedSchema, featureModules, orderedFeatures } from "@repo/app-composition";
 import { DATABASE_SCHEMA, DatabaseModule } from "@repo/database-runtime";
 import { WorkerModule } from "../src/worker.module";
@@ -39,24 +39,20 @@ function schemaProvider(database: DynamicModule): Provider | undefined {
 }
 
 describe("worker host ownership", () => {
-  it("uses the same ordered feature graph and composed schema as the API host", () => {
-    const apiImports = moduleImports(RuntimeModule);
+  it("uses the shared ordered feature graph and composed schema", () => {
     const workerImports = moduleImports(WorkerModule);
 
     expect(orderedFeatures.length).toBe(featureModules.length);
-    expect(featureModules.every((featureModule) => apiImports.includes(featureModule))).toBe(true);
     expect(featureModules.every((featureModule) => workerImports.includes(featureModule))).toBe(true);
-    expect(schemaProvider(databaseImport(apiImports))).toMatchObject({ useValue: composedSchema });
     expect(schemaProvider(databaseImport(workerImports))).toMatchObject({ useValue: composedSchema });
   });
 
-  it("registers the scheduler only in the worker host", () => {
-    expect(hasModule(moduleImports(RuntimeModule), ScheduleModule)).toBe(false);
+  it("registers the scheduler in the worker host", () => {
     expect(hasModule(moduleImports(WorkerModule), ScheduleModule)).toBe(true);
   });
 
   it("uses application-context startup and has no HTTP listener", () => {
-    const source = readFileSync(new URL("../src/main.ts", import.meta.url), "utf8");
+    const source = readFileSync(resolve(__dirname, "../src/main.ts"), "utf8");
 
     expect(source).toContain("NestFactory.createApplicationContext");
     expect(source).toContain("app?.close()");

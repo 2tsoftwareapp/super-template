@@ -1,6 +1,5 @@
-import type { Provider, Type } from "@nestjs/common";
+import type { Type } from "@nestjs/common";
 
-import { Reflector } from "@nestjs/core";
 import {
   composeFeatures,
   type FeatureManifest,
@@ -52,37 +51,6 @@ function resolveHandlerImportModules(
     }
   }
   return modules;
-}
-
-/**
- * Normalize a single HTTP pipeline provider to the host's Reflector class.
- */
-function normalizePipelineProvider(provider: Provider): Provider {
-  if (
-    provider &&
-    typeof provider === "object" &&
-    "inject" in provider &&
-    Array.isArray((provider as { inject?: unknown[] }).inject)
-  ) {
-    const inject = (provider as { inject: unknown[] }).inject.map((token) => {
-      if (typeof token === "function" && "name" in token && token.name === "Reflector") {
-        return Reflector;
-      }
-      return token;
-    });
-    return { ...provider, inject } as Provider;
-  }
-  return provider;
-}
-
-/** Normalize all feature HTTP pipeline entries for a host. */
-function normalizePipelineEntries(
-  entries: readonly HttpPipelineProviderEntry[],
-): HttpPipelineProviderEntry[] {
-  return entries.map((entry) => ({
-    order: entry.order,
-    provider: normalizePipelineProvider(entry.provider),
-  }));
 }
 
 /**
@@ -145,10 +113,10 @@ export const composedAuthorization = composed.authorization;
 export const composedOutboxHandlers: readonly OutboxTopicHandlerClass[] =
   composed.outboxHandlerClasses as readonly OutboxTopicHandlerClass[];
 
-/** Ordered HTTP pipeline guard contributions. */
+/** Raw HTTP pipeline guard contributions; each host normalizes host-specific tokens. */
 export const composedHttpPipelineGuards: readonly HttpPipelineProviderEntry[] =
-  normalizePipelineEntries(fullGraph.httpPipelineGuards);
+  fullGraph.httpPipelineGuards;
 
-/** Ordered HTTP pipeline interceptor contributions. */
+/** Raw HTTP pipeline interceptor contributions; each host normalizes host-specific tokens. */
 export const composedHttpPipelineInterceptors: readonly HttpPipelineProviderEntry[] =
-  normalizePipelineEntries(fullGraph.httpPipelineInterceptors);
+  fullGraph.httpPipelineInterceptors;

@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@nestjs/common": "11.1.27",
-    "@nestjs/core": "11.1.27",
     "@repo/api-plugin-kit": "workspace:*",
     "@repo/feature-access-control": "workspace:*",
     "@repo/feature-activities": "workspace:*",
