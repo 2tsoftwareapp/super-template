@@ -15,6 +15,72 @@
 - Set `STORAGE_DRIVER=s3` with `S3_BUCKET` (and credentials) — local filesystem storage is refused when deployed
 - Prefer `?sslmode=require` (or stricter) on managed Postgres connection strings
 
+## API and worker deployment
+
+The backend has two independently runnable processes with different ownership:
+
+| Process | Command                                                    | Owns                                                                       | Network surface             |
+| ------- | ---------------------------------------------------------- | -------------------------------------------------------------------------- | --------------------------- |
+| API     | `pnpm --filter api build && pnpm --filter api start`       | HTTP routes, job/notification management endpoints, and request middleware | `API_PORT` (default `3001`) |
+| Worker  | `pnpm --filter worker build && pnpm --filter worker start` | All nine scheduled callbacks and PostgreSQL-backed processing              | No HTTP listener            |
+
+The worker currently loads the same validated application configuration and
+feature graph as the API. Provide the normal `APP_ENV` and the variables listed
+in `packages/api-runtime/src/config/environment/env.schema.ts`, including the
+restricted `DATABASE_URL`. Production also requires `REDIS_URL`, secure HTTPS
+origins/cookies, and S3 storage according to the existing environment guards.
+Provider credentials are only needed when their delivery or integration path is
+enabled. Do not put secrets in images, manifests, or logs.
+
+### Readiness and failure signals
+
+The worker does not expose an HTTP health endpoint by design. A process
+supervisor should treat the structured `WorkerBootstrap` event below as
+readiness after startup and a non-zero process exit as startup failure:
+
+```json
+{
+  "event": "worker.startup",
+  "status": "ready",
+  "role": "background-worker",
+  "cronJobCount": 9,
+  "appEnv": "production",
+  "pid": 1234
+}
+```
+
+Shutdown emits `worker.shutdown` and `worker.shutdown.complete` after Nest and
+database resources close. Missing or invalid required configuration emits
+`status: "failed"` and exits non-zero. Map these generic process signals to
+the target platform's readiness/liveness mechanism when a deployment platform
+is selected; configure its termination grace period to at least 30 seconds so
+the idempotent shutdown handler can await `app.close()`. This repository does
+not prescribe Kubernetes or Terraform.
+
+### Worker-first cutover
+
+Use this order for a release that moves scheduling out of an existing API
+version:
+
+1. Build and start the worker with the same release and environment. Confirm
+   exactly one `worker.startup` event with `status":"ready"` and
+   `cronJobCount=9`.
+2. Confirm the old API scheduler owner is stopped before enabling the new
+   HTTP-only API deployment. The steady-state invariant is one scheduler owner:
+   the worker.
+3. Smoke the API health endpoints and verify due generic/notification work is
+   processed or retried by the worker.
+4. Scale worker replicas only as needed; PostgreSQL `FOR UPDATE SKIP LOCKED`
+   claims remain the concurrency boundary. No queue-schema migration is needed.
+
+### Rollback
+
+If the worker is unhealthy or processing is not progressing, stop/disable the
+worker deployment first and confirm its process has exited. Only then restore
+the former API scheduler composition and its release. Existing processing rows
+remain protected by the current retry and stale-recovery paths; do not roll
+back database migrations for this host split.
+
 ## Backup restore & migrate rollback (drill)
 
 Treat this as a short runbook you practice on a **non-production** clone before go-live.
