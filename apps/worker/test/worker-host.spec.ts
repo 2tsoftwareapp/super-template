@@ -6,18 +6,21 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { composedSchema, featureModules, orderedFeatures } from "@repo/app-composition";
-import { DATABASE_SCHEMA, DatabaseModule } from "@repo/database-runtime";
+import { DATABASE_RUNTIME_OPTIONS, DATABASE_SCHEMA, DatabaseModule } from "@repo/database-runtime";
+import { databaseRuntimeOptions } from "@repo/app-composition";
 import { WorkerModule } from "../src/worker.module";
 
 type ModuleImport = DynamicModule | object;
 
 function moduleImports(moduleClass: object): readonly ModuleImport[] {
-  return (Reflect.getMetadata(MODULE_METADATA.IMPORTS, moduleClass) ?? []) as readonly ModuleImport[];
+  return (Reflect.getMetadata(MODULE_METADATA.IMPORTS, moduleClass) ??
+    []) as readonly ModuleImport[];
 }
 
 function hasModule(imports: readonly ModuleImport[], moduleClass: object): boolean {
   return imports.some(
-    (entry) => entry === moduleClass || (entry as DynamicModule | undefined)?.module === moduleClass,
+    (entry) =>
+      entry === moduleClass || (entry as DynamicModule | undefined)?.module === moduleClass,
   );
 }
 
@@ -34,7 +37,20 @@ function databaseImport(imports: readonly ModuleImport[]): DynamicModule {
 function schemaProvider(database: DynamicModule): Provider | undefined {
   return database.providers?.find(
     (provider) =>
-      typeof provider === "object" && provider !== null && "provide" in provider && provider.provide === DATABASE_SCHEMA,
+      typeof provider === "object" &&
+      provider !== null &&
+      "provide" in provider &&
+      provider.provide === DATABASE_SCHEMA,
+  );
+}
+
+function runtimeOptionsProvider(database: DynamicModule): Provider | undefined {
+  return database.providers?.find(
+    (provider) =>
+      typeof provider === "object" &&
+      provider !== null &&
+      "provide" in provider &&
+      provider.provide === DATABASE_RUNTIME_OPTIONS,
   );
 }
 
@@ -43,8 +59,15 @@ describe("worker host ownership", () => {
     const workerImports = moduleImports(WorkerModule);
 
     expect(orderedFeatures.length).toBe(featureModules.length);
-    expect(featureModules.every((featureModule) => workerImports.includes(featureModule))).toBe(true);
-    expect(schemaProvider(databaseImport(workerImports))).toMatchObject({ useValue: composedSchema });
+    expect(featureModules.every((featureModule) => workerImports.includes(featureModule))).toBe(
+      true,
+    );
+    expect(schemaProvider(databaseImport(workerImports))).toMatchObject({
+      useValue: composedSchema,
+    });
+    expect(runtimeOptionsProvider(databaseImport(workerImports))).toMatchObject({
+      useValue: databaseRuntimeOptions,
+    });
   });
 
   it("registers the scheduler in the worker host", () => {

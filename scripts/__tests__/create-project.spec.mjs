@@ -35,7 +35,7 @@ function runGenerator(args) {
 }
 
 function registryFeatureIds(target) {
-  return readFileSync(join(target, "apps/api/src/composition/feature-registry.ts"), "utf8")
+  return readFileSync(join(target, "packages/app-composition/src/feature-registry.ts"), "utf8")
     .split("\n")
     .map((line) => line.match(/from "@repo\/feature-([^"]+)"/)?.[1])
     .filter(Boolean);
@@ -68,12 +68,39 @@ test("interactive selector lists discovered packages and returns selected IDs", 
     promptConfig.choices.map((choice) => choice.value),
     catalog.features.map((feature) => feature.id),
   );
-  assert.equal(promptConfig.choices.length, 20);
+  assert.equal(promptConfig.choices.length, 23);
   assert.match(
     buildFeatureChoices(catalog).find((choice) => choice.value === "auth").description,
     /requires:/,
   );
+  assert.match(
+    buildFeatureChoices(catalog).find((choice) => choice.value === "database-read-replica")
+      .description,
+    /eventual reads via replica/,
+  );
   assert.ok(resolveFeatureSelection(catalog, selected).resolvedIds.includes("users"));
+});
+
+test("catalog exposes infrastructure capability metadata and rejects conflicting tenant variants", () => {
+  const catalog = discoverFeatureCatalog(repoRoot);
+  assert.deepEqual(catalog.byId.get("tenant-schema").capability, {
+    family: "tenant-isolation",
+    variant: "schema-per-tenant",
+    conflictsWith: ["tenant-shared-schema"],
+  });
+  assert.deepEqual(catalog.byId.get("database-read-replica").database, {
+    readReplica: true,
+    readConsistency: "eventual",
+  });
+
+  assert.throws(
+    () => resolveFeatureSelection(catalog, ["tenant-shared-schema", "tenant-schema"]),
+    /Conflicting feature capabilities.*tenant-shared-schema.*tenant-schema/,
+  );
+  assert.deepEqual(
+    resolveFeatureSelection(catalog, ["tenant-schema", "database-read-replica"]).resolvedIds,
+    ["database-read-replica", "tenant-schema"],
+  );
 });
 
 test("auth generation resolves dependencies and keeps API wiring consistent", () => {
@@ -87,6 +114,9 @@ test("auth generation resolves dependencies and keeps API wiring consistent", ()
 
   const profile = JSON.parse(readFileSync(join(target, "feature-profile.json"), "utf8"));
   const packageJson = JSON.parse(readFileSync(join(target, "apps/api/package.json"), "utf8"));
+  const compositionPackageJson = JSON.parse(
+    readFileSync(join(target, "packages/app-composition/package.json"), "utf8"),
+  );
   const packageFeatureIds = Object.keys(packageJson.dependencies)
     .filter((name) => name.startsWith("@repo/feature-"))
     .map((name) => name.slice("@repo/feature-".length));
@@ -95,6 +125,12 @@ test("auth generation resolves dependencies and keeps API wiring consistent", ()
   assert.equal(profile.resolvedFeatures.at(-1), "auth");
   assert.ok(profile.resolvedFeatures.length > profile.requestedFeatures.length);
   assert.deepEqual(packageFeatureIds, profile.resolvedFeatures);
+  assert.deepEqual(
+    Object.keys(compositionPackageJson.dependencies)
+      .filter((name) => name.startsWith("@repo/feature-"))
+      .map((name) => name.slice("@repo/feature-".length)),
+    profile.resolvedFeatures,
+  );
   assert.deepEqual(registryFeatureIds(target), profile.resolvedFeatures);
 
   const check = runGenerator([
@@ -107,7 +143,7 @@ test("auth generation resolves dependencies and keeps API wiring consistent", ()
   ]);
   assert.equal(check.status, 0, check.stderr);
 
-  const registry = join(target, "apps/api/src/composition/feature-registry.ts");
+  const registry = join(target, "packages/app-composition/src/feature-registry.ts");
   writeFileSync(registry, `${readFileSync(registry, "utf8")}// deliberate drift\n`);
   const drift = runGenerator([
     "--features",
@@ -130,13 +166,49 @@ test("representative feature selections produce matching package and registry se
 
     const profile = JSON.parse(readFileSync(join(target, "feature-profile.json"), "utf8"));
     const packageJson = JSON.parse(readFileSync(join(target, "apps/api/package.json"), "utf8"));
+    const compositionPackageJson = JSON.parse(
+      readFileSync(join(target, "packages/app-composition/package.json"), "utf8"),
+    );
     const packageFeatureIds = Object.keys(packageJson.dependencies)
       .filter((name) => name.startsWith("@repo/feature-"))
       .map((name) => name.slice("@repo/feature-".length));
 
     assert.deepEqual(packageFeatureIds, profile.resolvedFeatures, id);
+    assert.deepEqual(
+      Object.keys(compositionPackageJson.dependencies)
+        .filter((name) => name.startsWith("@repo/feature-"))
+        .map((name) => name.slice("@repo/feature-".length)),
+      profile.resolvedFeatures,
+      id,
+    );
     assert.deepEqual(registryFeatureIds(target), profile.resolvedFeatures, id);
   }
+});
+
+test("capability aliases generate a reproducible tenant and replica profile", () => {
+  const target = join(makeTemporaryRoot("capability-aliases"), "project");
+  const result = runGenerator([
+    "--features",
+    "health",
+    "--tenant-mode",
+    "schema-per-tenant",
+    "--read-replica",
+    "--target",
+    target,
+    "--skip-install",
+  ]);
+
+  assert.equal(result.status, 0, result.stderr);
+  const profile = JSON.parse(readFileSync(join(target, "feature-profile.json"), "utf8"));
+  assert.deepEqual(profile.capabilities, {
+    selected: ["database-read-replica", "tenant-schema"],
+    tenantMode: "schema-per-tenant",
+    readReplica: true,
+    readConsistency: "eventual",
+  });
+  assert.ok(profile.resolvedFeatures.includes("tenant-schema"));
+  assert.ok(profile.resolvedFeatures.includes("database-read-replica"));
+  assert.deepEqual(registryFeatureIds(target), profile.resolvedFeatures);
 });
 
 test("dry-run and invalid selections do not create or mutate targets", () => {
@@ -153,7 +225,7 @@ test("dry-run and invalid selections do not create or mutate targets", () => {
   assert.equal(dryRun.status, 0, dryRun.stderr);
   assert.equal(existsSync(dryTarget), false);
   assert.match(dryRun.stdout, /Auto-added dependencies:/);
-  assert.match(dryRun.stdout, /Would write: apps\/api\/src\/composition\/feature-registry\.ts/);
+  assert.match(dryRun.stdout, /Would write: packages\/app-composition\/src\/feature-registry\.ts/);
 
   const missingTarget = join(root, "missing-features");
   const missing = runGenerator(["--target", missingTarget, "--skip-install"]);
@@ -173,6 +245,20 @@ test("dry-run and invalid selections do not create or mutate targets", () => {
   assert.notEqual(invalid.status, 0);
   assert.equal(existsSync(invalidTarget), false);
   assert.match(invalid.stderr, /Unknown feature/);
+
+  const conflictingAliasTarget = join(root, "conflicting-alias");
+  const conflictingAlias = runGenerator([
+    "--features",
+    "tenant-shared-schema",
+    "--tenant-mode",
+    "schema-per-tenant",
+    "--target",
+    conflictingAliasTarget,
+    "--skip-install",
+  ]);
+  assert.notEqual(conflictingAlias.status, 0);
+  assert.equal(existsSync(conflictingAliasTarget), false);
+  assert.match(conflictingAlias.stderr, /Conflicting feature capabilities|conflicts with selected/);
 
   const duplicateTarget = join(root, "duplicate");
   const duplicate = runGenerator([

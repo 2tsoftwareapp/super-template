@@ -8,6 +8,7 @@ import {
   everyOriginIsHttps,
   optionalEmail,
   optionalSecretMin,
+  optionalUrl,
 } from "./env-utils";
 import { DEV_PLACEHOLDER_MFA_KEY, DEV_PLACEHOLDER_SECRETS } from "./env.constants";
 
@@ -27,6 +28,10 @@ export const envSchema = z
     // Only required when APP_ENV=test (enforced by the superRefine below); production
     // and dev boots (e.g. the Playwright API server) must not need a test database URL.
     DATABASE_URL_TEST: z.url().optional(),
+    // Optional read-replica endpoints; required at database-runtime startup only
+    // when the generated project selects the database-read-replica capability.
+    DATABASE_URL_READ_REPLICA: optionalUrl,
+    DATABASE_URL_TEST_READ_REPLICA: optionalUrl,
     DATABASE_URL_TEST_ADMIN: emptyStringToUndefined,
     // Public and internal HTTP endpoints.
     API_PORT: z.coerce.number().int().positive().default(3001),

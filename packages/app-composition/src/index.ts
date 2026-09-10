@@ -7,6 +7,7 @@ export {
   composedPermissions,
   composedSchema,
   composedSeeders,
+  databaseRuntimeOptions,
   featureModules,
   orderedFeatures,
 } from "./composed-schema";

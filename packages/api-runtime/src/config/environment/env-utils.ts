@@ -23,6 +23,12 @@ export const emptyStringToUndefined = z.preprocess(
   z.string().optional(),
 );
 
+/** Empty / missing -> undefined; otherwise require a valid URL. */
+export const optionalUrl = z.preprocess(
+  (value) => (value === "" ? undefined : value),
+  z.url().optional(),
+);
+
 /** Empty / missing → undefined; otherwise must be a valid email. */
 export const optionalEmail = z.preprocess(
   (value) => (value === "" || value === undefined || value === null ? undefined : value),

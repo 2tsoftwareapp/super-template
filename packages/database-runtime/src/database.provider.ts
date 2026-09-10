@@ -1,15 +1,31 @@
 import type { Provider } from "@nestjs/common";
 
-import { DATABASE_RUNTIME_ENV, type DatabaseRuntimeEnv, getTenantContext } from "@repo/api-kernel";
+import {
+  DATABASE_RUNTIME_ENV,
+  type DatabaseRuntimeEnv,
+  type DatabaseRuntimeOptions,
+  getTenantContext,
+} from "@repo/api-kernel";
 import { Pool, type PoolClient, type PoolConfig } from "pg";
 
-import { createDatabaseClient } from "./database.types";
+import { createDatabaseClient, createReadReplicaDatabaseClient } from "./database.types";
 import { schema as defaultSchema } from "./schema";
 import { setTenantContextOnPgClient } from "./tenant-context";
 
 export const DATABASE_POOL = Symbol("DATABASE_POOL");
+/** Nest token for the optional tenant-aware read-replica pool. */
+export const DATABASE_READ_REPLICA_POOL = Symbol("DATABASE_READ_REPLICA_POOL");
 export const ADVISORY_LOCK_POOL = Symbol("ADVISORY_LOCK_POOL");
 export const DATABASE = Symbol("DATABASE");
+/** Nest token for the composed tenant and database-topology options. */
+export const DATABASE_RUNTIME_OPTIONS = Symbol("DATABASE_RUNTIME_OPTIONS");
+
+/** Compatibility defaults for registries that do not select infrastructure capabilities. */
+export const DEFAULT_DATABASE_RUNTIME_OPTIONS: DatabaseRuntimeOptions = {
+  tenantMode: "shared-schema",
+  readReplica: false,
+  readConsistency: "strong",
+};
 
 /**
  * Token holding the composed Drizzle schema. The application overrides this via
@@ -28,6 +44,31 @@ type PoolQueryCallback<TResult = unknown> = (
   err: Error | undefined,
   result: TResult | undefined,
 ) => void;
+
+const resolvePrimaryConnectionString = (databaseEnv: DatabaseRuntimeEnv): string => {
+  const connectionString = databaseEnv.isTest
+    ? databaseEnv.databaseUrlTest
+    : databaseEnv.databaseUrl;
+  if (!connectionString) {
+    throw new Error("DATABASE_URL_TEST is required when APP_ENV=test but was not provided");
+  }
+  return connectionString;
+};
+
+const resolveReplicaConnectionString = (databaseEnv: DatabaseRuntimeEnv): string => {
+  const connectionString = databaseEnv.isTest
+    ? databaseEnv.databaseUrlTestReadReplica
+    : databaseEnv.databaseUrlReadReplica;
+  const variable = databaseEnv.isTest
+    ? "DATABASE_URL_TEST_READ_REPLICA"
+    : "DATABASE_URL_READ_REPLICA";
+  if (!connectionString) {
+    throw new Error(
+      `${variable} is required when database-read-replica capability is enabled but was not provided`,
+    );
+  }
+  return connectionString;
+};
 
 function invokeConnectCallback(
   callback: PoolConnectCallback,
@@ -121,14 +162,17 @@ export function createTenantAwareQuery(
   }) as Pool["query"];
 }
 
-export const createTenantAwarePool = (config: PoolConfig): Pool => {
+export const createTenantAwarePool = (
+  config: PoolConfig,
+  options: DatabaseRuntimeOptions = DEFAULT_DATABASE_RUNTIME_OPTIONS,
+): Pool => {
   // Every pool checkout must re-apply tenant GUCs; bypassing this pool with a raw
   // DATABASE_POOL client would leak or drop tenant context across requests.
   const pool = new Pool(config);
   const originalConnect = pool.connect.bind(pool);
 
   const applyTenantContext = async (client: PoolClient): Promise<void> => {
-    await setTenantContextOnPgClient(client, getTenantContext());
+    await setTenantContextOnPgClient(client, getTenantContext(), options);
   };
 
   pool.connect = createTenantAwareConnect(originalConnect, applyTenantContext);
@@ -139,18 +183,31 @@ export const createTenantAwarePool = (config: PoolConfig): Pool => {
 
 export const databaseProviders: Provider[] = [
   {
+    provide: DATABASE_RUNTIME_OPTIONS,
+    useValue: DEFAULT_DATABASE_RUNTIME_OPTIONS,
+  },
+  {
     provide: DATABASE_POOL,
-    inject: [DATABASE_RUNTIME_ENV],
-    useFactory: (databaseEnv: DatabaseRuntimeEnv) => {
-      const connectionString = databaseEnv.isTest
-        ? databaseEnv.databaseUrlTest
-        : databaseEnv.databaseUrl;
-
-      if (!connectionString) {
-        throw new Error("DATABASE_URL_TEST is required when APP_ENV=test but was not provided");
-      }
-
-      return createTenantAwarePool({ connectionString });
+    inject: [DATABASE_RUNTIME_ENV, DATABASE_RUNTIME_OPTIONS],
+    useFactory: (databaseEnv: DatabaseRuntimeEnv, databaseOptions: DatabaseRuntimeOptions) => {
+      return createTenantAwarePool(
+        { connectionString: resolvePrimaryConnectionString(databaseEnv) },
+        databaseOptions,
+      );
+    },
+  },
+  {
+    provide: DATABASE_READ_REPLICA_POOL,
+    inject: [DATABASE_RUNTIME_ENV, DATABASE_RUNTIME_OPTIONS],
+    useFactory: (
+      databaseEnv: DatabaseRuntimeEnv,
+      databaseOptions: DatabaseRuntimeOptions,
+    ): Pool | undefined => {
+      if (!databaseOptions.readReplica) return undefined;
+      return createTenantAwarePool(
+        { connectionString: resolveReplicaConnectionString(databaseEnv) },
+        databaseOptions,
+      );
     },
   },
   {
@@ -159,20 +216,22 @@ export const databaseProviders: Provider[] = [
   },
   {
     provide: DATABASE,
-    inject: [DATABASE_POOL, DATABASE_SCHEMA],
-    useFactory: (pool: Pool, schema: Record<string, unknown>) => createDatabaseClient(pool, schema),
+    inject: [DATABASE_POOL, DATABASE_SCHEMA, DATABASE_RUNTIME_OPTIONS, DATABASE_READ_REPLICA_POOL],
+    useFactory: (
+      pool: Pool,
+      schema: Record<string, unknown>,
+      databaseOptions: DatabaseRuntimeOptions,
+      replicaPool?: Pool,
+    ) =>
+      databaseOptions.readReplica && replicaPool
+        ? createReadReplicaDatabaseClient(pool, replicaPool, schema)
+        : createDatabaseClient(pool, schema),
   },
   {
     provide: ADVISORY_LOCK_POOL,
     inject: [DATABASE_RUNTIME_ENV],
     useFactory: (databaseEnv: DatabaseRuntimeEnv) => {
-      const connectionString = databaseEnv.isTest
-        ? databaseEnv.databaseUrlTest
-        : databaseEnv.databaseUrl;
-
-      if (!connectionString) {
-        throw new Error("DATABASE_URL_TEST is required when APP_ENV=test but was not provided");
-      }
+      const connectionString = resolvePrimaryConnectionString(databaseEnv);
 
       // Dedicated pool for session-level advisory locks.  A small max prevents
       // pool starvation when the main pool connections are held by lock-holder

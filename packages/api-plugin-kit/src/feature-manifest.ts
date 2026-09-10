@@ -1,4 +1,5 @@
 import type { DynamicModule, Provider, Type } from "@nestjs/common";
+import type { DatabaseReadConsistency, DatabaseRuntimeOptions, TenantMode } from "@repo/api-kernel";
 
 /**
  * A feature package participates in the application by exporting exactly one
@@ -77,9 +78,32 @@ export interface FeatureHttpPipeline {
   readonly interceptors?: readonly Provider[];
 }
 
+/** Capability families understood by the application composition layer. */
+export type FeatureCapabilityFamily = "tenant-isolation" | "database-topology";
+
+/** Selector-facing metadata for a package-owned infrastructure capability. */
+export interface FeatureCapability {
+  readonly family: FeatureCapabilityFamily;
+  readonly variant: string;
+  readonly conflictsWith?: readonly string[];
+}
+
+/** Database topology contribution owned by a feature manifest. */
+export interface FeatureDatabaseContribution {
+  readonly tenantMode?: TenantMode;
+  readonly readReplica?: boolean;
+  readonly readConsistency?: DatabaseReadConsistency;
+}
+
 export interface FeatureManifest {
   /** Stable, unique feature id (kebab-case), e.g. `"audit"`, `"identity"`. */
   readonly id: string;
+
+  /** Optional infrastructure capability metadata shown by the project selector. */
+  readonly capability?: FeatureCapability;
+
+  /** Optional database topology contribution composed by the application host. */
+  readonly database?: FeatureDatabaseContribution;
 
   /** The single public NestJS module surface the app wires into `imports[]`. */
   readonly nestModule: Type<unknown> | DynamicModule;
@@ -218,6 +242,8 @@ export interface ComposedFeatures {
    * definitions with injection tokens.
    */
   readonly httpPipelineInterceptors: readonly HttpPipelineProviderEntry[];
+  /** Database topology derived from the selected feature manifests. */
+  readonly database: DatabaseRuntimeOptions;
 }
 
 /**
@@ -226,6 +252,51 @@ export interface ComposedFeatures {
  */
 export function defineFeature(manifest: FeatureManifest): FeatureManifest {
   return manifest;
+}
+
+/**
+ * Derive one database runtime topology from selected feature manifests. Tenant
+ * modes are mutually exclusive; no contribution preserves the current
+ * shared-schema and primary-only behavior.
+ * @param features Selected manifests or their database contributions.
+ * @returns The single database runtime option set for the selected graph.
+ * @throws When selected manifests contribute incompatible tenant modes or read policies.
+ */
+export function composeDatabaseRuntimeOptions(
+  features: readonly Pick<FeatureManifest, "id" | "database">[],
+): DatabaseRuntimeOptions {
+  const tenantModes = features.flatMap((feature) =>
+    feature.database?.tenantMode ? [{ id: feature.id, mode: feature.database.tenantMode }] : [],
+  );
+  const uniqueModes = [...new Map(tenantModes.map((entry) => [entry.mode, entry])).values()];
+  if (uniqueModes.length > 1) {
+    throw new Error(
+      "Conflicting tenant modes: " +
+        tenantModes.map((entry) => entry.id + " (" + entry.mode + ")").join(", ") +
+        ". Select exactly one tenant isolation mode.",
+    );
+  }
+
+  const replicaContributions = features.flatMap((feature) =>
+    feature.database?.readReplica ? [feature.database] : [],
+  );
+  const consistencyValues: DatabaseReadConsistency[] = [
+    ...new Set(
+      replicaContributions.map((contribution) => contribution.readConsistency ?? "eventual"),
+    ),
+  ];
+  if (consistencyValues.length > 1) {
+    throw new Error(
+      "Conflicting database read consistency policies: " + consistencyValues.join(", ") + ".",
+    );
+  }
+
+  const readReplica = replicaContributions.length > 0;
+  return {
+    tenantMode: uniqueModes[0]?.mode ?? "shared-schema",
+    readReplica,
+    readConsistency: readReplica ? (consistencyValues[0] ?? "eventual") : "strong",
+  };
 }
 
 /**
@@ -550,5 +621,6 @@ export function composeFeatures(features: readonly FeatureManifest[]): ComposedF
     outboxHandlerClasses: handlerClasses,
     httpPipelineGuards: guards,
     httpPipelineInterceptors: interceptors,
+    database: composeDatabaseRuntimeOptions(ordered),
   };
 }

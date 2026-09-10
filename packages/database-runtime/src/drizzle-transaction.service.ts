@@ -1,4 +1,9 @@
-import type { TenantContext, TransactionExecutor, TransactionPort } from "@repo/api-kernel";
+import type {
+  DatabaseRuntimeOptions,
+  TenantContext,
+  TransactionExecutor,
+  TransactionPort,
+} from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { TenantContextService } from "@repo/api-kernel";
@@ -6,7 +11,11 @@ import { sql } from "drizzle-orm";
 
 import type { DatabaseClient } from "./database.types";
 
-import { DATABASE } from "./database.provider";
+import {
+  DATABASE,
+  DATABASE_RUNTIME_OPTIONS,
+  DEFAULT_DATABASE_RUNTIME_OPTIONS,
+} from "./database.provider";
 import { toSavepointExecutor } from "./savepoint-executor";
 import { withTenantContext } from "./tenant-context";
 import { runInTransaction } from "./transaction";
@@ -16,6 +25,8 @@ export class DrizzleTransactionService implements TransactionPort {
   constructor(
     @Inject(DATABASE) private readonly database: DatabaseClient,
     private readonly tenantContextService: TenantContextService,
+    @Inject(DATABASE_RUNTIME_OPTIONS)
+    private readonly databaseOptions: DatabaseRuntimeOptions = DEFAULT_DATABASE_RUNTIME_OPTIONS,
   ) {}
 
   async run<T>(fn: (executor: TransactionExecutor) => Promise<T>): Promise<T> {
@@ -30,7 +41,12 @@ export class DrizzleTransactionService implements TransactionPort {
     ctx: TenantContext,
     fn: (executor: TransactionExecutor) => Promise<T>,
   ): Promise<T> {
-    return withTenantContext(this.database, ctx, (tx) => fn(tx as TransactionExecutor));
+    return withTenantContext(
+      this.database,
+      ctx,
+      (tx) => fn(tx as TransactionExecutor),
+      this.databaseOptions,
+    );
   }
 
   async withSavepoint<T>(

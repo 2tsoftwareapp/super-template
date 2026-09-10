@@ -59,12 +59,16 @@ describe("EnvironmentService", () => {
     const service = makeService({
       DATABASE_URL: "postgres://primary/app",
       DATABASE_URL_TEST: "postgres://test/app",
+      DATABASE_URL_READ_REPLICA: "postgres://replica/app",
+      DATABASE_URL_TEST_READ_REPLICA: "postgres://replica/app_test",
       REDIS_URL: "redis://localhost:6379",
       ACCESS_PROFILE_CACHE_TTL_SECONDS: 30,
       SETTINGS_LOOKUP_CACHE_TTL_SECONDS: 5,
     });
     expect(service.databaseUrl).toBe("postgres://primary/app");
     expect(service.databaseUrlTest).toBe("postgres://test/app");
+    expect(service.databaseUrlReadReplica).toBe("postgres://replica/app");
+    expect(service.databaseUrlTestReadReplica).toBe("postgres://replica/app_test");
     expect(service.redisUrl).toBe("redis://localhost:6379");
     expect(service.accessProfileCacheTtlSeconds).toBe(30);
     expect(service.settingsLookupCacheTtlSeconds).toBe(5);

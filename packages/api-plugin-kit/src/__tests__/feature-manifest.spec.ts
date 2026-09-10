@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   collectFeatureModules,
   collectFeatureSeeders,
+  composeDatabaseRuntimeOptions,
   composeFeaturePermissions,
   composeFeatureSchemas,
   composeFeatures,
@@ -22,6 +23,38 @@ describe("defineFeature", () => {
   it("returns the manifest unchanged", () => {
     const manifest: FeatureManifest = { id: "a", nestModule: ModuleA };
     expect(defineFeature(manifest)).toBe(manifest);
+  });
+});
+
+describe("composeDatabaseRuntimeOptions", () => {
+  it("defaults to shared-schema and primary-only", () => {
+    expect(composeDatabaseRuntimeOptions([{ id: "health" }])).toEqual({
+      tenantMode: "shared-schema",
+      readReplica: false,
+      readConsistency: "strong",
+    });
+  });
+
+  it("rejects mutually exclusive tenant modes", () => {
+    expect(() =>
+      composeDatabaseRuntimeOptions([
+        { id: "tenant-shared-schema", database: { tenantMode: "shared-schema" } },
+        { id: "tenant-schema", database: { tenantMode: "schema-per-tenant" } },
+      ]),
+    ).toThrow(/tenant-shared-schema.*tenant-schema/);
+  });
+
+  it("composes the independent replica capability", () => {
+    expect(
+      composeDatabaseRuntimeOptions([
+        { id: "tenant-schema", database: { tenantMode: "schema-per-tenant" } },
+        { id: "database-read-replica", database: { readReplica: true } },
+      ]),
+    ).toEqual({
+      tenantMode: "schema-per-tenant",
+      readReplica: true,
+      readConsistency: "eventual",
+    });
   });
 });
 

@@ -14,7 +14,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@nestjs/common": "11.1.27"
+    "@nestjs/common": "11.1.27",
+    "@repo/api-kernel": "workspace:*"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",

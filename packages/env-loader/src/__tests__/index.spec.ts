@@ -54,6 +54,8 @@ describe("loadEnvFiles precedence", () => {
     "DATABASE_URL",
     "DATABASE_MIGRATE_URL",
     "DATABASE_URL_TEST",
+    "DATABASE_URL_READ_REPLICA",
+    "DATABASE_URL_TEST_READ_REPLICA",
     "DATABASE_URL_TEST_ADMIN",
     "MAIL_PORT",
     "MAILPIT_HTTP_PORT",

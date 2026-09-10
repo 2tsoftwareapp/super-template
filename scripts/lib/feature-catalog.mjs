@@ -13,6 +13,8 @@ const FEATURE_PACKAGE = /^@repo\/feature-[a-z0-9-]+$/;
  * @property {string} manifestFile
  * @property {string} manifestExport
  * @property {string[]} dependsOn
+ * @property {{family: string, variant: string, conflictsWith: string[]} | undefined} capability
+ * @property {{tenantMode?: string, readReplica?: boolean, readConsistency?: string} | undefined} database
  * @property {Record<string, unknown>} packageJson
  */
 
@@ -69,9 +71,77 @@ function stringLiterals(node, label, file) {
 }
 
 /**
+ * Read an optional boolean literal from a manifest property.
+ * @param {ts.Node | undefined} node
+ * @param {string} label
+ * @param {string} file
+ * @returns {boolean | undefined}
+ */
+function optionalBooleanLiteral(node, label, file) {
+  if (!node) return undefined;
+  if (node.kind !== ts.SyntaxKind.TrueKeyword && node.kind !== ts.SyntaxKind.FalseKeyword) {
+    throw new Error(`${file}: ${label} must be a boolean literal.`);
+  }
+  return node.kind === ts.SyntaxKind.TrueKeyword;
+}
+
+/**
+ * Read the selector metadata owned by a feature manifest.
+ * @param {ts.Node | undefined} node
+ * @param {string} file
+ * @returns {{family: string, variant: string, conflictsWith: string[]} | undefined}
+ */
+function parseCapability(node, file) {
+  if (!node) return undefined;
+  if (!ts.isObjectLiteralExpression(node)) {
+    throw new Error(`${file}: capability must be an object literal.`);
+  }
+  const property = (name) =>
+    node.properties.find(
+      (item) =>
+        ts.isPropertyAssignment(item) && ts.isIdentifier(item.name) && item.name.text === name,
+    )?.initializer;
+  return {
+    family: stringLiteral(property("family"), "capability.family", file),
+    variant: stringLiteral(property("variant"), "capability.variant", file),
+    conflictsWith: stringLiterals(property("conflictsWith"), "capability.conflictsWith", file),
+  };
+}
+
+/**
+ * Read database topology metadata owned by a feature manifest.
+ * @param {ts.Node | undefined} node
+ * @param {string} file
+ * @returns {{tenantMode?: string, readReplica?: boolean, readConsistency?: string} | undefined}
+ */
+function parseDatabase(node, file) {
+  if (!node) return undefined;
+  if (!ts.isObjectLiteralExpression(node)) {
+    throw new Error(`${file}: database must be an object literal.`);
+  }
+  const property = (name) =>
+    node.properties.find(
+      (item) =>
+        ts.isPropertyAssignment(item) && ts.isIdentifier(item.name) && item.name.text === name,
+    )?.initializer;
+  const tenantMode = property("tenantMode");
+  const readReplica = property("readReplica");
+  const readConsistency = property("readConsistency");
+  return {
+    ...(tenantMode ? { tenantMode: stringLiteral(tenantMode, "database.tenantMode", file) } : {}),
+    ...(readReplica
+      ? { readReplica: optionalBooleanLiteral(readReplica, "database.readReplica", file) }
+      : {}),
+    ...(readConsistency
+      ? { readConsistency: stringLiteral(readConsistency, "database.readConsistency", file) }
+      : {}),
+  };
+}
+
+/**
  * Parse the one exported `defineFeature` call owned by a package.
  * @param {string} file
- * @returns {{id: string, dependsOn: string[], manifestExport: string} | undefined}
+ * @returns {{id: string, dependsOn: string[], manifestExport: string, capability: object | undefined, database: object | undefined} | undefined}
  */
 function parseManifest(file) {
   const source = ts.createSourceFile(
@@ -117,6 +187,8 @@ function parseManifest(file) {
         id: stringLiteral(property("id"), "id", file),
         dependsOn: stringLiterals(property("dependsOn"), "dependsOn", file),
         manifestExport: declaration.name.text,
+        capability: parseCapability(property("capability"), file),
+        database: parseDatabase(property("database"), file),
       });
     }
   }
@@ -176,6 +248,8 @@ export function discoverFeatureCatalog(repositoryRoot) {
         manifestFile: manifest.file,
         manifestExport: manifest.parsed.manifestExport,
         dependsOn: manifest.parsed.dependsOn,
+        capability: manifest.parsed.capability,
+        database: manifest.parsed.database,
         packageJson,
       };
     })
@@ -222,6 +296,8 @@ export function resolveFeatureSelection(catalog, requestedIds) {
     }
   }
 
+  validateCapabilitySelection(catalog, requested);
+
   const selected = new Set(requested);
   const visiting = new Set();
   const visited = new Set();
@@ -256,10 +332,85 @@ export function resolveFeatureSelection(catalog, requestedIds) {
   for (const id of [...selected].sort(compareByCatalogOrder)) visit(id, []);
 
   const resolvedIds = ordered.map((feature) => feature.id);
+  validateCapabilitySelection(catalog, resolvedIds);
+  const database = composeCatalogDatabaseRuntimeOptions(ordered);
+
   return {
     requestedIds: requested,
     resolvedIds,
     autoAddedIds: resolvedIds.filter((id) => !requested.includes(id)),
     features: ordered,
+    database,
   };
+}
+
+/**
+ * Derive the generator-side profile from the same literal metadata used by the
+ * resolver. Runtime composition performs the authoritative typed validation;
+ * this mirror keeps generated profiles deterministic without loading TypeScript
+ * package code in the CLI process.
+ * @param {FeaturePackage[]} features
+ * @returns {{tenantMode: "shared-schema" | "schema-per-tenant", readReplica: boolean, readConsistency: "strong" | "eventual"}}
+ */
+export function composeCatalogDatabaseRuntimeOptions(features) {
+  const tenantModes = [
+    ...new Set(
+      features.map((feature) => feature.database?.tenantMode).filter((mode) => mode !== undefined),
+    ),
+  ];
+  if (tenantModes.length > 1) {
+    throw new Error(`Conflicting tenant modes: ${tenantModes.join(", ")}. Select one variant.`);
+  }
+
+  const readConsistency = [
+    ...new Set(
+      features
+        .map((feature) => feature.database?.readConsistency)
+        .filter((consistency) => consistency !== undefined),
+    ),
+  ];
+  if (readConsistency.length > 1) {
+    throw new Error(
+      `Conflicting read consistency policies: ${readConsistency.join(", ")}. Select one policy.`,
+    );
+  }
+
+  const readReplica = features.some((feature) => feature.database?.readReplica === true);
+  return {
+    tenantMode: tenantModes[0] ?? "shared-schema",
+    readReplica,
+    readConsistency: readConsistency[0] ?? (readReplica ? "eventual" : "strong"),
+  };
+}
+
+/**
+ * Reject selections that contain more than one variant in a capability family
+ * or explicitly list a manifest conflict.
+ * @param {FeatureCatalog} catalog
+ * @param {string[]} ids
+ */
+function validateCapabilitySelection(catalog, ids) {
+  const selected = ids.map((id) => catalog.byId.get(id)).filter((feature) => feature?.capability);
+  const byFamily = new Map();
+
+  for (const feature of selected) {
+    const capability = feature.capability;
+    const familyFeatures = byFamily.get(capability.family) ?? [];
+    if (familyFeatures.some((other) => other.capability.variant !== capability.variant)) {
+      const conflictingIds = [...familyFeatures, feature].map((item) => item.id);
+      throw new Error(
+        `Conflicting feature capabilities in family "${capability.family}": ${conflictingIds.join(", ")}. Select one variant.`,
+      );
+    }
+    byFamily.set(capability.family, [...familyFeatures, feature]);
+  }
+
+  const selectedIds = new Set(ids);
+  for (const feature of selected) {
+    for (const conflict of feature.capability.conflictsWith ?? []) {
+      if (selectedIds.has(conflict)) {
+        throw new Error(`Feature "${feature.id}" conflicts with selected feature "${conflict}".`);
+      }
+    }
+  }
 }

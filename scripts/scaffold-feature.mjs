@@ -4,7 +4,7 @@
  *
  * A feature plugin owns a vertical slice across all four surfaces (API, database,
  * admin, web) and exports a single typed `FeatureManifest` from `@repo/api-plugin-kit`.
- * The app composes features explicitly in `apps/api/src/composition/feature-registry.ts`;
+ * The app composes features explicitly in `packages/app-composition/src/feature-registry.ts`;
  * there is no kernel edit to add or remove one. See ADR 0002 and the generated README.
  *
  * The generated package mirrors the `@repo/feature-health` add-on exemplar (package
@@ -139,7 +139,7 @@ export { ${moduleClass} } from "./${id}.module";
 /**
  * The \`${id}\` feature manifest — the single typed contract the app composes.
  * Enable the feature by adding \`${manifestConst}\` to \`featureManifests\` in
- * \`apps/api/src/composition/feature-registry.ts\`; disable it by removing that one line (and the
+ * \`packages/app-composition/src/feature-registry.ts\`; disable it by removing that one line (and the
  * workspace dependency). No kernel code changes either way.
  */
 export const ${manifestConst} = defineFeature({
@@ -171,7 +171,7 @@ export class ${moduleClass} {}
  * must never define them. Declare the tables in this file, export them, then
  * reference them from the manifest's \`schema\` field in \`../index.ts\`. The app
  * merges every feature's schema via \`composeFeatureSchemas\` in
- * \`apps/api/src/composition/feature-registry.ts\`, which throws on duplicate table names, so keep
+ * \`packages/app-composition/src/feature-registry.ts\`, which throws on duplicate table names, so keep
  * table names unique across all composed features. Co-locate the SQL migrations
  * that create these tables under \`./migrations/\`.
  */
@@ -182,7 +182,7 @@ export {};
 
 NestJS controllers, application services, and infrastructure for the \`${id}\`
 feature, exposed through the \`${moduleClass}\` in \`../index.ts\` and composed into
-the app via \`apps/api/src/composition/feature-registry.ts\`.
+the app via \`packages/app-composition/src/feature-registry.ts\`.
 `;
 
   const adminReadme = `# ${id} — Admin surface
@@ -232,9 +232,9 @@ never depends on React or Flutter.
 
 ## How the app composes this feature
 
-1. **Add the workspace dependency** to \`apps/api/package.json\`:
+1. **Add the workspace dependency** to \`packages/app-composition/package.json\`:
    \`"${pkgName}": "workspace:*"\`.
-2. **Register the manifest** in \`apps/api/src/composition/feature-registry.ts\`:
+2. **Register the manifest** in \`packages/app-composition/src/feature-registry.ts\`:
    \`\`\`ts
    import { ${manifestConst} } from "${pkgName}";
    export const featureManifests = [${manifestConst}];
@@ -314,9 +314,9 @@ const main = () => {
 
   stdout(
     `\nNext steps — wire it into the app:\n` +
-      `  1. Add the workspace dependency to apps/api/package.json:\n` +
+      `  1. Add the workspace dependency to packages/app-composition/package.json:\n` +
       `       "@repo/feature-${id}": "workspace:*"\n` +
-      `  2. Register the manifest in apps/api/src/composition/feature-registry.ts:\n` +
+      `  2. Register the manifest in packages/app-composition/src/feature-registry.ts:\n` +
       `       import { ${camel}Feature } from "@repo/feature-${id}";\n` +
       `       export const enabledFeatures: readonly FeatureManifest[] = [..., ${camel}Feature];\n` +
       `  3. Install so pnpm links the new package:\n` +

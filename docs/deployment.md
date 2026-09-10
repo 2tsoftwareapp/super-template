@@ -10,6 +10,7 @@
 - Enable HTTPS and `COOKIE_SECURE=true`
 - Disable or protect Swagger in production (`API_DOCS_ENABLED=false`)
 - Point `DATABASE_URL` at a **non-superuser** application role so Postgres RLS is enforced; run migrations with a separate privileged `DATABASE_MIGRATE_URL` (see `docs/database.md`)
+- If the generated `feature-profile.json` selects `database-read-replica`, set `DATABASE_URL_READ_REPLICA` (and the test equivalent where tests run) to a restricted read-only replica URL; startup fails closed when it is missing
 - Do **not** set `DATABASE_SKIP_RLS_CHECK` in staging/production (boot refuses it)
 - Do **not** run `db:seed` / `db:reset` against staging/production unless you explicitly set `ALLOW_PROD_SEED=1` / `ALLOW_PROD_RESET=1`
 - Set `STORAGE_DRIVER=s3` with `S3_BUCKET` (and credentials) — local filesystem storage is refused when deployed
@@ -31,6 +32,16 @@ restricted `DATABASE_URL`. Production also requires `REDIS_URL`, secure HTTPS
 origins/cookies, and S3 storage according to the existing environment guards.
 Provider credentials are only needed when their delivery or integration path is
 enabled. Do not put secrets in images, manifests, or logs.
+
+When `tenant-schema` is selected, API and worker use the same validated
+tenant-schema `search_path` behavior. Provisioning tenant schemas and applying
+feature migrations to each schema is an operator-owned release prerequisite;
+the application startup does not perform that migration fan-out.
+
+When `database-read-replica` is selected, set the replica URL in both API and
+worker environments. Replica reads are eventual and tenant-aware. Mutations,
+transactions, raw SQL, migrations, and advisory locks remain on the primary;
+the runtime does not silently fall back to primary after a replica error.
 
 ### Readiness and failure signals
 
