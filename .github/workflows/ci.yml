@@ -109,7 +109,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: "3.44.2"
           cache: true
 
       - name: Install dependencies
@@ -272,7 +272,6 @@ jobs:
       DATABASE_URL_TEST: postgresql://postgres:postgres@localhost:65432/fullstack_starter_test
       DATABASE_URL_TEST_ADMIN: postgresql://postgres:postgres@localhost:65432/fullstack_starter_test
       REDIS_URL: redis://localhost:6379
-      THROTTLER_TEST_REDIS_URL: redis://localhost:6379
 
     steps:
       - name: Checkout
@@ -427,8 +426,11 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: "3.44.2"
           cache: true
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4

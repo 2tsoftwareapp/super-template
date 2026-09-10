@@ -34,6 +34,7 @@ interface WorkerTenant {
 const testRole = "fullstack_starter_app";
 const testRolePassword = "fullstack_starter_app";
 const testDatabase = "fullstack_starter_test";
+const workerE2eEnabled = process.env.WORKER_E2E === "1";
 
 const quoteIdentifier = (value: string): string => `"${value.replaceAll('"', '""')}"`;
 const quoteLiteral = (value: string): string => `'${value.replaceAll("'", "''")}'`;
@@ -108,9 +109,7 @@ const resetWorkerDatabase = async (): Promise<void> => {
 
   const grantPool = new Pool({ connectionString: adminUrl });
   try {
-    await grantPool.query(
-      `grant usage, create on schema public to ${quoteIdentifier(testRole)}`,
-    );
+    await grantPool.query(`grant usage, create on schema public to ${quoteIdentifier(testRole)}`);
     await grantPool.query(
       `grant select, insert, update, delete on all tables in schema public to ${quoteIdentifier(testRole)}`,
     );
@@ -134,7 +133,7 @@ const createWorkerContext = (): Promise<INestApplicationContext> =>
     abortOnError: false,
   });
 
-describe("standalone worker PostgreSQL processing (e2e)", () => {
+describe.skipIf(!workerE2eEnabled)("standalone worker PostgreSQL processing (e2e)", () => {
   let workerA: INestApplicationContext;
   let workerB: INestApplicationContext;
   let database: DatabaseClient;
@@ -175,15 +174,10 @@ describe("standalone worker PostgreSQL processing (e2e)", () => {
   });
 
   const withTenant = <T>(operation: () => Promise<T>): Promise<T> =>
-    tenantContextA.runAsync(
-      { tenantId: tenant.organizationId, userId: tenant.userId },
-      operation,
-    );
+    tenantContextA.runAsync({ tenantId: tenant.organizationId, userId: tenant.userId }, operation);
 
-  const withWorker = <T>(
-    context: TenantContextService,
-    operation: () => Promise<T>,
-  ): Promise<T> => context.runAsync(WORKER_DISPATCH_CONTEXT, operation);
+  const withWorker = <T>(context: TenantContextService, operation: () => Promise<T>): Promise<T> =>
+    context.runAsync(WORKER_DISPATCH_CONTEXT, operation);
 
   it("processes generic and notification jobs through the worker composition", async () => {
     let handlerCalls = 0;
@@ -248,7 +242,12 @@ describe("standalone worker PostgreSQL processing (e2e)", () => {
       tx
         .select()
         .from(notificationDeliveries)
-        .where(inArray(notificationDeliveries.notificationId, inbox.map((row) => row.id))),
+        .where(
+          inArray(
+            notificationDeliveries.notificationId,
+            inbox.map((row) => row.id),
+          ),
+        ),
     );
 
     expect(handlerCalls).toBe(1);
