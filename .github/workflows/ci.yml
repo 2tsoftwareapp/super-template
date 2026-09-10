@@ -423,7 +423,7 @@ jobs:
   mobile:
     needs: changes
     if: needs.changes.outputs.mobile == 'true'
-    name: Mobile verification and release build
+    name: Mobile analyze and test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
