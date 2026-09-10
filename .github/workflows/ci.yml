@@ -399,6 +399,9 @@ jobs:
       - name: Run database migrations
         run: pnpm --filter api db:migrate
 
+      - name: Build API for browser e2e
+        run: pnpm --filter api build
+
       - name: Set application DATABASE_URL (restricted role from migration 0007)
         run: |
           echo "DATABASE_URL=postgresql://fullstack_starter_app:fullstack_starter_app@localhost:65432/fullstack_starter" >> "$GITHUB_ENV"
