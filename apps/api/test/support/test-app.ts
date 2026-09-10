@@ -175,16 +175,27 @@ export const resetTestDatabase = async (): Promise<void> => {
   }
 };
 
-export const createTestApp = async (): Promise<INestApplication> => {
+/** Options for opting an API E2E suite into production-faithful guards. */
+export interface CreateTestAppOptions {
+  /** Keep the fast default unless a suite explicitly exercises throttling. */
+  overrideThrottler?: boolean;
+}
+
+export const createTestApp = async (
+  options: CreateTestAppOptions = {},
+): Promise<INestApplication> => {
   console.log("[DEBUG] createTestApp: Test.createTestingModule");
-  const moduleRef = await Test.createTestingModule({
+  const testingModule = Test.createTestingModule({
     imports: [AppModule],
-  })
-    .overrideGuard(ThrottlerGuard)
-    .useValue({
+  });
+
+  if (options.overrideThrottler ?? true) {
+    testingModule.overrideGuard(ThrottlerGuard).useValue({
       canActivate: () => true,
-    })
-    .compile();
+    });
+  }
+
+  const moduleRef = await testingModule.compile();
 
   console.log("[DEBUG] createTestApp: moduleRef.createNestApplication");
   const app = moduleRef.createNestApplication({ abortOnError: false });

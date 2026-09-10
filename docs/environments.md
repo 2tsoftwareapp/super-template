@@ -34,10 +34,12 @@ the cascade, to avoid a chicken-and-egg problem.
 # Development (default) — zero setup, uses .env.development + .env.example fallback
 make dev                      # infra + API + Web + Admin
 make dev-api                  # API only
+make dev-worker               # background worker only
 make dev-web                  # Web only
 
 # Run a backend surface as another environment locally
 make dev-api APP_ENV=staging  # loads .env.staging (+ .env.staging.local) layers
+make dev-worker APP_ENV=staging  # background worker only
 
 # Mobile
 make dev-mobile               # env/dev.json
@@ -51,6 +53,31 @@ In shell scripts, source the same layering with:
 ```bash
 APP_ENV=staging . ./scripts/load-env.sh
 ```
+
+### Background worker
+
+Run the worker as a separate process from the API:
+
+```bash
+make dev-worker APP_ENV=development
+pnpm --filter worker build
+pnpm --filter worker start
+```
+
+The worker uses the same environment loader and validation schema as the API,
+but it intentionally does not bind `API_PORT`. It therefore needs the validated
+database and application/provider settings from
+`packages/api-runtime/src/config/environment/env.schema.ts`; `DATABASE_URL` must
+use the restricted application role so PostgreSQL RLS remains enforced. In
+staging/production, the existing deployed-environment checks still apply,
+including non-placeholder secrets, `REDIS_URL`, HTTPS origins, secure cookies,
+and S3 storage.
+
+Worker readiness is reported by the structured `WorkerBootstrap` startup event
+with `role=background-worker`, `status=ready`, and the registered cron count.
+Configuration errors fail startup and set a non-zero process exit code. Since
+there is no worker HTTP listener, a process supervisor must map these logs and
+exit status to its platform-specific readiness/liveness settings.
 
 ## Guard rails (enforced at API boot)
 

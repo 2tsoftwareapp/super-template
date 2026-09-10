@@ -40,6 +40,7 @@ const secureProdOverrides: Record<string, unknown> = {
   API_INTERNAL_URL: "https://api.internal.example.com",
   STORAGE_DRIVER: "s3",
   S3_BUCKET: "app-uploads",
+  REDIS_URL: "redis://localhost:6379",
 };
 
 const secureStagingOverrides: Record<string, unknown> = {
@@ -144,6 +145,16 @@ describe("validateEnvironment", () => {
         COOKIE_SECURE: "false",
       }),
     ).toThrow(/COOKIE_SECURE/);
+  });
+
+  it("requires REDIS_URL in production", () => {
+    expect(() =>
+      validateEnvironment({
+        ...baseEnv,
+        ...secureProdOverrides,
+        REDIS_URL: "",
+      }),
+    ).toThrow(/REDIS_URL is required in production/);
   });
 
   it("rejects insecure cookies in staging", () => {

@@ -6,4 +6,5 @@ export { AUTH_TOKEN_PROVIDER } from "./application/ports/auth-token.provider.por
 export type * from "./application/ports/auth-token.provider.port";
 export { IssueSessionUseCase } from "./application/use-cases/issue-session.use-case";
 export { AuthDataModule } from "./auth-data.module";
+export { authFeature } from "./auth.feature";
 export { AuthModule } from "./auth.module";

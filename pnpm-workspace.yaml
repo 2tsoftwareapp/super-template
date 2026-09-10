@@ -1,9 +1,11 @@
 packages:
   - "tools/tsc7"
   - "apps/api"
+  - "apps/worker"
   - "apps/admin"
   - "apps/web"
   - "apps/web/e2e"
+  - "tools/mobile-verification"
   - "packages/*"
 overrides:
   "@nestjs/common": "11.1.27"

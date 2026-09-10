@@ -15,9 +15,41 @@ import {
   ResponseEnvelopeInterceptor,
   TenantContextService,
 } from "@repo/api-runtime";
+import {
+  composedHttpPipelineGuards,
+  composedHttpPipelineInterceptors,
+} from "@repo/app-composition";
 import { ErrorReporterService } from "@repo/observability";
 
-import { composedHttpPipelineGuards, composedHttpPipelineInterceptors } from "./composed-schema";
+function normalizePipelineProvider(provider: Provider): Provider {
+  if (
+    provider &&
+    typeof provider === "object" &&
+    "inject" in provider &&
+    Array.isArray((provider as { inject?: unknown[] }).inject)
+  ) {
+    const inject = (provider as { inject: unknown[] }).inject.map((token) => {
+      if (typeof token === "function" && "name" in token && token.name === "Reflector") {
+        return Reflector;
+      }
+      return token;
+    });
+    return { ...provider, inject } as Provider;
+  }
+  return provider;
+}
+
+function normalizePipelineEntries(
+  entries: readonly HttpPipelineProviderEntry[],
+): HttpPipelineProviderEntry[] {
+  return entries.map((entry) => ({
+    order: entry.order,
+    provider: normalizePipelineProvider(entry.provider),
+  }));
+}
+
+const hostHttpPipelineGuards = normalizePipelineEntries(composedHttpPipelineGuards);
+const hostHttpPipelineInterceptors = normalizePipelineEntries(composedHttpPipelineInterceptors);
 
 /**
  * Ordering slots for generic (host-owned) guard providers. Feature guards keep
@@ -51,7 +83,7 @@ const GENERIC_GUARD_ORDERS = {
  * feature subsets (omit-feature) using the same merge logic as production.
  */
 export function buildOrderedGuardCatalog(
-  featureGuards: readonly HttpPipelineProviderEntry[] = composedHttpPipelineGuards,
+  featureGuards: readonly HttpPipelineProviderEntry[] = hostHttpPipelineGuards,
 ): HttpPipelineProviderEntry[] {
   const catalog: HttpPipelineProviderEntry[] = [
     ...featureGuards,
@@ -73,7 +105,7 @@ export function buildOrderedGuardCatalog(
 
 /** Flattened guard providers (sorted by order) for Nest registration. */
 export function buildOrderedGuards(
-  featureGuards: readonly HttpPipelineProviderEntry[] = composedHttpPipelineGuards,
+  featureGuards: readonly HttpPipelineProviderEntry[] = hostHttpPipelineGuards,
 ): Provider[] {
   return buildOrderedGuardCatalog(featureGuards).map((entry) => entry.provider);
 }
@@ -105,7 +137,7 @@ export const globalPipelineProviders: Provider[] = [
     useFactory: (reflector: Reflector) => new ResponseEnvelopeInterceptor(reflector),
     inject: [Reflector],
   },
-  ...composedHttpPipelineInterceptors.map((entry) => entry.provider),
+  ...hostHttpPipelineInterceptors.map((entry) => entry.provider),
 
   // --- Global providers ---
   TenantContextService,

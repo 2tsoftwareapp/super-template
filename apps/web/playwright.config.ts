@@ -21,6 +21,7 @@ const adminPort = process.env.ADMIN_PORT ?? "3002";
 const adminURL = process.env.PLAYWRIGHT_ADMIN_URL ?? `http://localhost:${adminPort}`;
 const apiHealthUrl =
   process.env.PLAYWRIGHT_API_HEALTH_URL ?? `http://localhost:${apiPort}/api/v1/health`;
+const apiCommand = process.env.CI ? "pnpm --filter api start" : "pnpm --filter api dev";
 
 const toStringEnv = (env: NodeJS.ProcessEnv): Record<string, string> =>
   Object.fromEntries(
@@ -36,7 +37,7 @@ const webServer: PlaywrightTestConfig["webServer"] = process.env.PLAYWRIGHT_SKIP
   ? undefined
   : [
       {
-        command: "pnpm --filter api dev",
+        command: apiCommand,
         cwd: resolve(__dirname, "../.."),
         url: apiHealthUrl,
         reuseExistingServer: !process.env.CI,

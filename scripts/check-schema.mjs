@@ -73,9 +73,7 @@ try {
   const manifestPath = join(migrations, "meta", INTEGRITY_MANIFEST);
 
   // Compute current checksums for all SQL files.
-  const sqlFiles = (await readdir(migrations))
-    .filter((f) => f.endsWith(".sql"))
-    .sort();
+  const sqlFiles = (await readdir(migrations)).filter((f) => f.endsWith(".sql")).sort();
 
   const currentChecksums = {};
   for (const file of sqlFiles) {
@@ -153,30 +151,46 @@ try {
   failures.push(`Migration integrity check failed: ${err.message}`);
 }
 
-// --- 2. Journal cross-reference (warning only) ---
+// --- 2. Journal cross-reference and legacy mapping ---
 try {
   const journalPath = join(migrations, "meta", "_journal.json");
+  const legacyMapPath = join(migrations, "meta", "legacy-journal-map.json");
   if (existsSync(journalPath)) {
     const journal = JSON.parse(await readFile(journalPath, "utf8"));
     const journalTags = new Set((journal.entries ?? []).map((e) => e.tag));
     const sqlFiles = (await readdir(migrations)).filter((f) => f.endsWith(".sql")).sort();
+    if (!existsSync(legacyMapPath)) {
+      failures.push(
+        `Migration journal mapping not found at ${legacyMapPath}. Add the legacy SQL mapping before changing migration history.`,
+      );
+    }
+
+    const legacyMap = existsSync(legacyMapPath)
+      ? JSON.parse(await readFile(legacyMapPath, "utf8"))
+      : { files: [] };
+    const legacyFiles = new Set(legacyMap.files ?? []);
     const untracked = sqlFiles.filter((f) => {
       const base = f.replace(/\.sql$/, "");
-      return ![...journalTags].some(
+      const journalTracksFile = [...journalTags].some(
         (tag) => tag.startsWith(base.split("_")[0]) || base.startsWith(tag.split("_")[0]),
       );
+      return !journalTracksFile && !legacyFiles.has(f);
     });
     if (untracked.length > 0) {
-      console.warn(
-        `Warning: ${untracked.length} SQL migration file(s) not tracked in _journal.json: ${untracked.join(", ")}`,
-      );
-      console.warn(
-        "The runtime migrator will still apply these; the schema drift check covers the effective result.",
+      const message = `Migration journal: ${untracked.length} SQL migration file(s) are neither in _journal.json nor legacy-journal-map.json: ${untracked.join(", ")}`;
+      if (generateMode) console.warn(`${message}. Update the mapping before committing.`);
+      else failures.push(message);
+    }
+
+    const missingLegacyFiles = [...legacyFiles].filter((file) => !sqlFiles.includes(file));
+    if (missingLegacyFiles.length > 0) {
+      failures.push(
+        `Migration journal: legacy-journal-map.json references missing SQL file(s): ${missingLegacyFiles.join(", ")}`,
       );
     }
   }
-} catch {
-  // journal check is best-effort
+} catch (err) {
+  failures.push(`Migration journal check failed: ${err.message}`);
 }
 
 // --- 3. Canonical schema vs committed snapshot ---
@@ -253,9 +267,7 @@ try {
       const committedRaw = JSON.parse(
         await readFile(join(migrations, committedSnapshotPath), "utf8"),
       );
-      const producedRaw = JSON.parse(
-        await readFile(join(output, producedSnapshotPath), "utf8"),
-      );
+      const producedRaw = JSON.parse(await readFile(join(output, producedSnapshotPath), "utf8"));
       const committedSnapshot = normalizeSnapshot(committedRaw);
       const producedSnapshot = normalizeSnapshot(producedRaw);
       if (JSON.stringify(committedSnapshot) !== JSON.stringify(producedSnapshot)) {

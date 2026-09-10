@@ -30,7 +30,7 @@ run_step "Generate shared config artifacts" pnpm --filter @repo/config generate
 pnpm --filter api openapi:generate
 pnpm --filter api contract:generate
 
-if [ "${SKIP_FLUTTER_GENERATION:-}" = "1" ] || [ "${CI:-}" = "true" ]; then
+if [ "${SKIP_FLUTTER_GENERATION:-}" = "1" ]; then
   printf '[generate] Skip Flutter/Dart client generation\n'
   exit 0
 fi

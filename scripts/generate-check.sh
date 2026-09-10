@@ -9,11 +9,10 @@ set -eu
 ROOT_DIR=$(pwd)
 cd "$ROOT_DIR"
 
-# Paths owned by the generation pipeline. Dart/Flutter output is checked only
-# when its Docker and Dart toolchain is available; otherwise generation keeps
-# the committed client intact and the check intentionally excludes that path.
+# Paths owned by the generation pipeline. The Dart client is part of the
+# contract gate whenever Docker and Dart are available; CI provisions both.
 GENERATED_PATHS="apps/api/openapi.json packages/api-contract/src/generated"
-if [ "${CI:-}" != "true" ] && command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1 && command -v dart >/dev/null 2>&1; then
+if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1 && command -v dart >/dev/null 2>&1; then
   GENERATED_PATHS="$GENERATED_PATHS apps/mobile/lib/generated/api"
 fi
 

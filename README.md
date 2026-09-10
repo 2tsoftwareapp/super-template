@@ -126,6 +126,28 @@ Shared packages: `@repo/web-ui` · `@repo/web-hooks` · `@repo/web-utils` · `@r
 - [x] **Environment layering** — `development` · `staging` · `production` across API, web, admin, and mobile
 - [x] **CI pipeline** — `pnpm run generate:check`, lint, typecheck, tests, build, and Flutter checks (see `.github/workflows/ci.yml`)
 
+### Create a customized project
+
+Select feature packages from `packages/feature-*` and generate a separate project
+with the complete transitive dependency closure:
+
+```bash
+pnpm create:project --target ../my-project
+# Use ↑/↓ to navigate, Space to select packages, and Enter to confirm.
+```
+
+The generator rewrites the API workspace dependencies and composition registry,
+records the requested/resolved IDs in `feature-profile.json`, and supports
+`--dry-run` for preview or `--check` for drift detection. For CI or other
+non-interactive runs, pass feature IDs explicitly:
+
+```bash
+pnpm create:project --features auth,import-export --target ../my-project --skip-install
+```
+
+The current generator mutates the API surface; unsupported surface requests fail
+explicitly.
+
 <br />
 
 ## Documentation

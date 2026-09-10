@@ -36,6 +36,8 @@ export const envSchema = z
     // Shared throttler window/limit across all routes (60s / 120 requests by default).
     THROTTLER_TTL_MS: z.coerce.number().int().positive().default(60_000),
     THROTTLER_LIMIT: z.coerce.number().int().positive().default(120),
+    // Test-only opt-in for the production throttler guard; normal API E2E keeps its fast override.
+    THROTTLER_ENABLED_IN_TEST: booleanFromString.default(false),
     // Max JSON/urlencoded request body size accepted by Express (e.g. "1mb", "500kb").
     API_BODY_LIMIT: z
       .string()
@@ -56,7 +58,7 @@ export const envSchema = z
     API_INTERNAL_URL: z.url(),
     NEXT_PUBLIC_WEB_URL: z.url(),
     NEXT_PUBLIC_API_BASE_PATH: z.string().min(1).default("/api"),
-    // Optional Redis endpoint for shared throttling, cache, and fan-out. Leave empty to keep single-instance behavior.
+    // Redis endpoint for shared throttling, cache, and fan-out; optional only in development/test.
     REDIS_URL: emptyStringToUndefined,
     // Required in production for distributed rate limiting and shared access-profile cache.
     // Uses in-process memory when REDIS_URL is unset (development/test only).
@@ -143,6 +145,14 @@ export const envSchema = z
         code: "custom",
         path: ["SSO_FAKE_PROVIDER_ENABLED"],
         message: "SSO_FAKE_PROVIDER_ENABLED must not be enabled in production",
+      });
+    }
+
+    if (env.APP_ENV === "production" && !env.REDIS_URL) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["REDIS_URL"],
+        message: "REDIS_URL is required in production for shared throttling and caches",
       });
     }
 

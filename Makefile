@@ -3,7 +3,7 @@ SHELL := /bin/bash
 # Active environment. Override per invocation, e.g. `make dev-api APP_ENV=staging`.
 APP_ENV ?= development
 
-.PHONY: help bootstrap dev dev-api dev-web dev-admin dev-mobile dev-mobile-staging dev-mobile-prod infra-up infra-down db-generate db-migrate db-seed db-reset db-studio generate generate-check lint format test test-api test-web test-mobile build verify
+.PHONY: help bootstrap dev dev-api dev-worker dev-web dev-admin dev-mobile dev-mobile-staging dev-mobile-prod infra-up infra-down db-generate db-migrate db-seed db-reset db-studio generate generate-check lint format test test-api test-web test-mobile build verify
 
 help:
 	@printf '%s\n' \
@@ -11,6 +11,7 @@ help:
 		'  bootstrap    Install deps, start infra, migrate, seed, generate contracts' \
 		'  dev          Start API + Web + Admin (docker infra + pnpm dev)' \
 		'  dev-api      Start API only' \
+		'  dev-worker   Start the background worker only' \
 		'  dev-web      Start Web only' \
 		'  dev-admin    Start Admin only' \
 		'  dev-mobile   Run Flutter app (env/dev.json)' \
@@ -42,6 +43,9 @@ dev:
 
 dev-api:
 	APP_ENV=$(APP_ENV) . ./scripts/load-env.sh && pnpm --filter api dev
+
+dev-worker:
+	APP_ENV=$(APP_ENV) . ./scripts/load-env.sh && pnpm --filter worker dev
 
 dev-web:
 	@printf '%s\n' 'Note: Web proxies to API at $${API_INTERNAL_URL:-http://localhost:3001}. Run `make dev-api` in another terminal if login fails.'
@@ -111,4 +115,3 @@ build:
 
 verify:
 	./scripts/verify.sh
-

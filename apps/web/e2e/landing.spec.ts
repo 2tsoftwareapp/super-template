@@ -27,7 +27,7 @@ test.describe("verify email", () => {
   test("shows the error state when the token is missing", async ({ page }) => {
     await page.goto("/en/verify-email");
 
-    await expect(page.getByRole("heading", { name: /verification failed/i })).toBeVisible();
+    await expect(page.getByRole("alert").filter({ hasText: /verification failed/i })).toBeVisible();
     await expect(page.getByText(/missing verification token/i)).toBeVisible();
   });
 });

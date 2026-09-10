@@ -19,8 +19,13 @@ export default defineConfig({
     maxWorkers: 1,
     testTimeout: 30000,
     include: ["test/**/*.{test,spec}.ts", "src/cli/**/*.spec.ts"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json-summary"],
+    },
   },
   resolve: {
+    dedupe: ["@nestjs/common", "@nestjs/core", "@nestjs/schedule"],
     alias: [
       packageAlias("api-contract"),
       packageSubpathAlias("api-contract"),
@@ -28,6 +33,8 @@ export default defineConfig({
       packageSubpathAlias("api-kernel"),
       packageAlias("api-plugin-kit"),
       packageSubpathAlias("api-plugin-kit"),
+      packageAlias("app-composition"),
+      packageSubpathAlias("app-composition"),
       packageAlias("api-runtime"),
       packageSubpathAlias("api-runtime"),
       packageAlias("database-runtime"),

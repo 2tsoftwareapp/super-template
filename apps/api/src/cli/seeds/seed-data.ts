@@ -6,6 +6,8 @@ import { EnvironmentService } from "@repo/api-runtime";
 import { TenantContextService } from "@repo/api-runtime";
 import { DATABASE } from "@repo/database-runtime";
 
+// Keep the local compatibility export so CLI unit tests can replace the composed
+// seeders without loading the full feature graph; it resolves to the shared source.
 import { composedAuthorization, composedSeeders } from "../../composition/composed-schema";
 import { type SeedContext, toFeatureSeedContext } from "./seed-context";
 
