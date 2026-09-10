@@ -406,6 +406,9 @@ jobs:
         run: |
           echo "DATABASE_URL=postgresql://fullstack_starter_app:fullstack_starter_app@localhost:65432/fullstack_starter" >> "$GITHUB_ENV"
 
+      - name: Seed browser e2e database
+        run: pnpm --filter api db:seed
+
       - name: Browser e2e
         run: pnpm --filter web test:e2e
 
