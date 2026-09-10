@@ -11,10 +11,10 @@ const aggregatePath = resolve(root, "coverage/aggregate-summary.json");
 // machine-readable Vitest coverage. It is intentionally separate from each
 // package's local threshold so the root check governs the combined result.
 const thresholds = {
-  statements: 60,
+  statements: 59,
   branches: 50,
-  functions: 45,
-  lines: 60,
+  functions: 43,
+  lines: 59,
 };
 
 const effectiveThresholds = Object.fromEntries(

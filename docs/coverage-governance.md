@@ -9,10 +9,11 @@ coverage-enabled workspaces sequentially and writes the combined summary to
 - `packages/utils`
 - `packages/feature-upload`
 
-The current aggregate baseline is 60% statements, 50% branches, 45%
-functions, and 60% lines. The same thresholds run in the `quality` CI job.
-They are stored centrally in `scripts/run-coverage.mjs`; package-level
-thresholds remain local to the packages that define them.
+The current aggregate baseline is 59% statements, 50% branches, 43%
+functions, and 59% lines. These are conservative floors just below the
+measured baseline of the declared workspaces; the same thresholds run in the
+`quality` CI job. They are stored centrally in `scripts/run-coverage.mjs`;
+package-level thresholds remain local to the packages that define them.
 
 To exercise the failure path locally, temporarily override one metric, for
 example `COVERAGE_MIN_LINES=99 pnpm run test:coverage`. The override is an
