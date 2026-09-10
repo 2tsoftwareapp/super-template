@@ -113,6 +113,9 @@ export const composedAuthorization = composed.authorization;
 export const composedOutboxHandlers: readonly OutboxTopicHandlerClass[] =
   composed.outboxHandlerClasses as readonly OutboxTopicHandlerClass[];
 
+/** Database topology selected by the enabled feature manifests. */
+export const databaseRuntimeOptions = composed.database;
+
 /** Raw HTTP pipeline guard contributions; each host normalizes host-specific tokens. */
 export const composedHttpPipelineGuards: readonly HttpPipelineProviderEntry[] =
   fullGraph.httpPipelineGuards;

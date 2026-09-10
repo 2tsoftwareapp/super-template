@@ -86,6 +86,16 @@ describe("validateEnvironment", () => {
     expect(env.REDIS_URL).toBeUndefined();
   });
 
+  it("accepts optional replica URLs and treats blank values as disabled", () => {
+    const env = validateEnvironment({
+      ...baseEnv,
+      DATABASE_URL_READ_REPLICA: "postgres://replica/app",
+      DATABASE_URL_TEST_READ_REPLICA: "",
+    });
+    expect(env.DATABASE_URL_READ_REPLICA).toBe("postgres://replica/app");
+    expect(env.DATABASE_URL_TEST_READ_REPLICA).toBeUndefined();
+  });
+
   it("throws a descriptive error when a required variable is missing", () => {
     const { POSTGRES_HOST: _omitted, ...withoutHost } = baseEnv;
     expect(() => validateEnvironment(withoutHost)).toThrow(/Invalid environment variables/);

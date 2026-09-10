@@ -127,6 +127,8 @@ const resolveDynamicPorts = (root: string, pinnedPostgresPort?: number): void =>
     process.env.DATABASE_MIGRATE_URL,
     process.env.DATABASE_URL,
     process.env.DATABASE_URL_TEST,
+    process.env.DATABASE_URL_READ_REPLICA,
+    process.env.DATABASE_URL_TEST_READ_REPLICA,
     process.env.DATABASE_URL_TEST_ADMIN,
   ];
   for (const urlStr of dbUrls) {
@@ -161,6 +163,18 @@ const resolveDynamicPorts = (root: string, pinnedPostgresPort?: number): void =>
   if (process.env.DATABASE_URL_TEST) {
     process.env.DATABASE_URL_TEST = updateUrlPort(
       process.env.DATABASE_URL_TEST,
+      resolvedPostgresPort,
+    );
+  }
+  if (process.env.DATABASE_URL_READ_REPLICA) {
+    process.env.DATABASE_URL_READ_REPLICA = updateUrlPort(
+      process.env.DATABASE_URL_READ_REPLICA,
+      resolvedPostgresPort,
+    );
+  }
+  if (process.env.DATABASE_URL_TEST_READ_REPLICA) {
+    process.env.DATABASE_URL_TEST_READ_REPLICA = updateUrlPort(
+      process.env.DATABASE_URL_TEST_READ_REPLICA,
       resolvedPostgresPort,
     );
   }

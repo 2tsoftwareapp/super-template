@@ -74,6 +74,50 @@ Tenant isolation depends on Postgres row-level security. Superusers and roles wi
 
 Production must create an equivalent non-superuser role, rotate its password, and keep migrations on a separate privileged connection.
 
+## Tenant topology modes
+
+The default deployment uses shared-schema tenancy: tenant-owned rows remain in
+the public schema, and PostgreSQL RLS uses `app.tenant_id`, `app.user_id`, and
+`app.bypass_rls` as the policy context. This remains the behavior when no
+tenant capability is selected.
+
+The package-level generator can select exactly one tenant capability:
+
+```sh
+node scripts/create-project.mjs --tenant-mode shared-schema --target ../my-app
+node scripts/create-project.mjs --tenant-mode schema-per-tenant --target ../my-app
+```
+
+`schema-per-tenant` derives a safe schema name from a UUID, such as
+`tenant_550e8400_e29b_41d4_a716_446655440000`, and applies
+`search_path = tenant_<uuid>, public` for a tenant context. A missing tenant
+context uses `public` only, and a non-UUID tenant id fails before SQL runs.
+The generator does not create schemas, grant access, or fan out migrations;
+operators must provision each tenant schema and apply compatible DDL before
+enabling this mode in a deployed environment.
+
+## Read-replica topology
+
+Select the independent read-replica capability with `--read-replica` or by
+checking `database-read-replica` in the package selector:
+
+```sh
+node scripts/create-project.mjs \
+  --tenant-mode shared-schema \
+  --read-replica \
+  --target ../my-app
+```
+
+Configure `DATABASE_URL_READ_REPLICA` for runtime and
+`DATABASE_URL_TEST_READ_REPLICA` for test runs. The selected capability fails
+startup when the relevant URL is absent. Both URLs should use a restricted
+database role and TLS settings appropriate to the environment.
+
+Drizzle select/query/count helpers use the replica with eventual consistency.
+Inserts, updates, deletes, raw `execute`, transactions, migrations, and
+advisory locks stay on the primary. There is no automatic failover or
+read-your-writes guarantee in this version.
+
 ## Transaction Convention
 
 - Repositories accept the default database client or an existing transaction executor

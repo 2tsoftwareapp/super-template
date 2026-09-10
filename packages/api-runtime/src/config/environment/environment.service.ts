@@ -97,6 +97,14 @@ export class EnvironmentService {
     return this.env.DATABASE_URL_TEST;
   }
 
+  get databaseUrlReadReplica(): string | undefined {
+    return this.env.DATABASE_URL_READ_REPLICA;
+  }
+
+  get databaseUrlTestReadReplica(): string | undefined {
+    return this.env.DATABASE_URL_TEST_READ_REPLICA;
+  }
+
   get redisUrl(): string | undefined {
     return this.env.REDIS_URL;
   }

@@ -22,10 +22,14 @@ import { EnvironmentService } from "./environment.service";
       inject: [EnvironmentService],
       useFactory: (environmentService: EnvironmentService): DatabaseRuntimeEnv => {
         const databaseUrlTest = environmentService.databaseUrlTest;
+        const databaseUrlReadReplica = environmentService.databaseUrlReadReplica;
+        const databaseUrlTestReadReplica = environmentService.databaseUrlTestReadReplica;
         return {
           isTest: environmentService.isTest,
           databaseUrl: environmentService.databaseUrl,
           ...(databaseUrlTest === undefined ? {} : { databaseUrlTest }),
+          ...(databaseUrlReadReplica === undefined ? {} : { databaseUrlReadReplica }),
+          ...(databaseUrlTestReadReplica === undefined ? {} : { databaseUrlTestReadReplica }),
           databaseSkipRlsCheck: environmentService.databaseSkipRlsCheck,
         };
       },

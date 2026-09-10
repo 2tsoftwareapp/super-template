@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { EnvironmentService, LoggingModule, RedisThrottlerStorage } from "@repo/api-runtime";
 import { AppConfigModule } from "@repo/api-runtime";
-import { composedSchema, featureModules } from "@repo/app-composition";
+import { composedSchema, databaseRuntimeOptions, featureModules } from "@repo/app-composition";
 import { DatabaseModule } from "@repo/database-runtime";
 
 /**
@@ -27,7 +27,7 @@ import { DatabaseModule } from "@repo/database-runtime";
         storage: new RedisThrottlerStorage(environmentService),
       }),
     }),
-    DatabaseModule.forRoot({ schema: composedSchema }),
+    DatabaseModule.forRoot({ schema: composedSchema, options: databaseRuntimeOptions }),
     ...featureModules,
   ],
 })

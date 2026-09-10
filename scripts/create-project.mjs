@@ -39,6 +39,9 @@ Usage:
 
 Options:
   --features <ids>  Comma-separated or repeated feature IDs; omit in a TTY to select interactively.
+  --tenant-mode <mode>
+                     Select shared-schema or schema-per-tenant tenant isolation.
+  --read-replica     Enable the database-read-replica capability.
   --target <dir>    New or previously generated project directory (required).
   --source <dir>    Template repository (default: current directory).
   --surfaces <ids>  Requested surfaces (default: api; only api is supported today).
@@ -51,12 +54,14 @@ Options:
 /**
  * Parse the small, explicit CLI surface so target safety can run before any write.
  * @param {string[]} argv
- * @returns {{features: string[], featuresProvided: boolean, target: string | undefined, source: string, surfaces: string[], dryRun: boolean, check: boolean, skipInstall: boolean, help: boolean}}
+ * @returns {{features: string[], featuresProvided: boolean, tenantMode: string | undefined, readReplica: boolean, target: string | undefined, source: string, surfaces: string[], dryRun: boolean, check: boolean, skipInstall: boolean, help: boolean}}
  */
 function parseArgs(argv) {
   const result = {
     features: [],
     featuresProvided: false,
+    tenantMode: undefined,
+    readReplica: false,
     target: undefined,
     source: process.cwd(),
     surfaces: ["api"],
@@ -65,7 +70,7 @@ function parseArgs(argv) {
     skipInstall: false,
     help: false,
   };
-  const values = new Set(["--features", "--target", "--source", "--surfaces"]);
+  const values = new Set(["--features", "--target", "--source", "--surfaces", "--tenant-mode"]);
 
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -85,6 +90,10 @@ function parseArgs(argv) {
       result.skipInstall = true;
       continue;
     }
+    if (argument === "--read-replica") {
+      result.readReplica = true;
+      continue;
+    }
 
     const [name, inlineValue] = argument.split("=", 2);
     if (!values.has(name)) {
@@ -100,6 +109,19 @@ function parseArgs(argv) {
     } else if (name === "--target") result.target = value;
     else if (name === "--source") result.source = value;
     else if (name === "--surfaces") result.surfaces = value.split(",");
+    else if (name === "--tenant-mode") {
+      if (!new Set(["shared-schema", "schema-per-tenant"]).has(value)) {
+        throw new Error(
+          `Unsupported tenant mode "${value}". Use shared-schema or schema-per-tenant.`,
+        );
+      }
+      if (result.tenantMode && result.tenantMode !== value) {
+        throw new Error(
+          `Conflicting --tenant-mode values: ${result.tenantMode}, ${value}. Select one mode.`,
+        );
+      }
+      result.tenantMode = value;
+    }
   }
 
   result.features = result.features.map((feature) => feature.trim()).filter(Boolean);
@@ -117,9 +139,15 @@ export function buildFeatureChoices(catalog) {
     name: feature.id,
     value: feature.id,
     short: feature.id,
-    ...(feature.dependsOn.length > 0
-      ? { description: `requires: ${feature.dependsOn.join(", ")}` }
-      : { description: "no direct dependencies" }),
+    description: [
+      ...(feature.dependsOn.length > 0
+        ? [`requires: ${feature.dependsOn.join(", ")}`]
+        : ["no direct dependencies"]),
+      ...(feature.capability
+        ? [`capability: ${feature.capability.family}/${feature.capability.variant}`]
+        : []),
+      ...(feature.database?.readReplica ? ["eventual reads via replica"] : []),
+    ].join("; "),
   }));
 }
 
@@ -234,12 +262,12 @@ function copyTemplate(source, target) {
 }
 
 /**
- * Read and update the API app package dependencies from the resolved closure.
+ * Read and update a workspace package's feature dependencies from the resolved closure.
  * @param {string} content
  * @param {import("./lib/feature-catalog.mjs").FeaturePackage[]} features
  * @returns {string}
  */
-function buildApiPackageJson(content, features) {
+function buildFeaturePackageJson(content, features) {
   const packageJson = JSON.parse(content);
   const dependencies = packageJson.dependencies ?? {};
   for (const dependency of Object.keys(dependencies)) {
@@ -251,7 +279,7 @@ function buildApiPackageJson(content, features) {
 }
 
 /**
- * Build the explicit API registry from the resolved manifest order.
+ * Build the explicit shared application registry from the resolved manifest order.
  * @param {string} content
  * @param {import("./lib/feature-catalog.mjs").FeaturePackage[]} features
  * @returns {string}
@@ -261,7 +289,9 @@ function buildFeatureRegistry(content, features) {
   const featureImport = /^import \{ [A-Za-z_$][\w$]* \} from "@repo\/feature-[^"]+";$/;
   const firstFeatureImport = lines.findIndex((line) => featureImport.test(line));
   if (firstFeatureImport < 0) {
-    throw new Error("Cannot find feature imports in apps/api/src/composition/feature-registry.ts.");
+    throw new Error(
+      "Cannot find feature imports in packages/app-composition/src/feature-registry.ts.",
+    );
   }
   const withoutFeatureImports = lines.filter((line) => !featureImport.test(line));
   withoutFeatureImports.splice(
@@ -301,6 +331,14 @@ function buildFeatureProfile(selection) {
       requestedFeatures: selection.requestedIds,
       resolvedFeatures: selection.resolvedIds,
       surfaces: selection.surfaces,
+      capabilities: {
+        selected: selection.features
+          .filter((feature) => feature.capability)
+          .map((feature) => feature.id),
+        tenantMode: selection.database.tenantMode,
+        readReplica: selection.database.readReplica,
+        readConsistency: selection.database.readConsistency,
+      },
     },
     null,
     2,
@@ -314,9 +352,11 @@ function buildFeatureProfile(selection) {
  */
 function buildMutations(input) {
   const apiPackagePath = join(input.target, "apps/api/package.json");
-  const registryPath = join(input.target, "apps/api/src/composition/feature-registry.ts");
+  const compositionPackagePath = join(input.target, "packages/app-composition/package.json");
+  const registryPath = join(input.target, "packages/app-composition/src/feature-registry.ts");
   const sourceApiPackagePath = join(input.source, "apps/api/package.json");
-  const sourceRegistryPath = join(input.source, "apps/api/src/composition/feature-registry.ts");
+  const sourceCompositionPackagePath = join(input.source, "packages/app-composition/package.json");
+  const sourceRegistryPath = join(input.source, "packages/app-composition/src/feature-registry.ts");
   // Derive the desired state from the immutable template source. Reading an
   // existing target here would make `--check` compare a target against its own
   // drift and would silently preserve stale generated feature wiring.
@@ -325,17 +365,26 @@ function buildMutations(input) {
   return [
     {
       path: apiPackagePath,
-      content: buildApiPackageJson(packageContent, input.selection.features),
+      content: buildFeaturePackageJson(packageContent, input.selection.features),
       reason: "align API workspace feature dependencies with the resolved closure",
+    },
+    {
+      path: compositionPackagePath,
+      content: buildFeaturePackageJson(
+        readFileSync(sourceCompositionPackagePath, "utf8"),
+        input.selection.features,
+      ),
+      reason: "align shared composition package dependencies with the resolved closure",
     },
     {
       path: registryPath,
       content: buildFeatureRegistry(registryContent, input.selection.features),
-      reason: "align explicit API manifest imports and order with the resolved closure",
+      reason: "align explicit shared manifest imports and order with the resolved closure",
     },
     {
       path: join(input.target, "feature-profile.json"),
       content: buildFeatureProfile({
+        ...input.selection,
         requestedIds: input.selection.requestedIds,
         resolvedIds: input.selection.resolvedIds,
         surfaces: input.surfaces,
@@ -408,6 +457,14 @@ export async function main(argv = process.argv.slice(2)) {
   });
   const { source, target } = targetState;
   const catalog = discoverFeatureCatalog(source);
+  const aliasedFeatures = [];
+  if (args.tenantMode) {
+    aliasedFeatures.push(
+      args.tenantMode === "shared-schema" ? "tenant-shared-schema" : "tenant-schema",
+    );
+  }
+  if (args.readReplica) aliasedFeatures.push("database-read-replica");
+  args.features.push(...aliasedFeatures);
   if (args.features.length === 0) {
     if (args.featuresProvided) {
       throw new Error("--features must contain at least one feature ID.");

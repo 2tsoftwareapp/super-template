@@ -1,17 +1,24 @@
-import type { PlatformTransactionPort, TransactionExecutor } from "@repo/api-kernel";
+import type {
+  DatabaseRuntimeOptions,
+  PlatformTransactionPort,
+  TransactionExecutor,
+} from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { sql } from "drizzle-orm";
 
 import type { DatabaseClient } from "./database.types";
 
-import { DATABASE } from "./database.provider";
+import { DATABASE, DATABASE_RUNTIME_OPTIONS } from "./database.provider";
 import { toSavepointExecutor } from "./savepoint-executor";
 import { withTenantContext } from "./tenant-context";
 
 @Injectable()
 export class DrizzlePlatformTransactionService implements PlatformTransactionPort {
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+  constructor(
+    @Inject(DATABASE) private readonly database: DatabaseClient,
+    @Inject(DATABASE_RUNTIME_OPTIONS) private readonly databaseOptions: DatabaseRuntimeOptions,
+  ) {}
 
   async run<T>(fn: (executor: TransactionExecutor) => Promise<T>): Promise<T> {
     return withTenantContext(
@@ -22,6 +29,7 @@ export class DrizzlePlatformTransactionService implements PlatformTransactionPor
         bypassRls: true,
       },
       (tx) => fn(tx as TransactionExecutor),
+      this.databaseOptions,
     );
   }
 

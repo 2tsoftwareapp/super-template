@@ -9,6 +9,7 @@ import {
 } from "@nestjs/common";
 import {
   ADVISORY_LOCK_PORT,
+  type DatabaseRuntimeOptions,
   PLATFORM_TRANSACTION_PORT,
   TenantContextService,
   TRANSACTION_PORT,
@@ -18,8 +19,11 @@ import { DatabaseRlsGuard } from "./database-rls.guard";
 import {
   ADVISORY_LOCK_POOL,
   DATABASE_POOL,
+  DATABASE_READ_REPLICA_POOL,
+  DATABASE_RUNTIME_OPTIONS,
   DATABASE_SCHEMA,
   databaseProviders,
+  DEFAULT_DATABASE_RUNTIME_OPTIONS,
 } from "./database.provider";
 import { DrizzlePlatformTransactionService } from "./drizzle-platform-transaction.service";
 import { DrizzleTransactionService } from "./drizzle-transaction.service";
@@ -53,23 +57,33 @@ export class DatabaseModule implements OnApplicationShutdown {
   /**
    * Compose the database runtime with an application-supplied schema. The schema
    * is the merged contribution of every enabled feature package (see
-   * `composeFeatures` in `@repo/api-plugin-kit`). Omitting `forRoot` uses the
-   * empty runtime default — the API host must always pass the composed schema.
+   * `composeFeatures` in `@repo/api-plugin-kit`). The runtime options are
+   * derived from the same graph and must be passed by every application host.
    */
-  static forRoot(options: { schema: Record<string, unknown> }): DynamicModule {
+  static forRoot(options: {
+    schema: Record<string, unknown>;
+    options?: DatabaseRuntimeOptions;
+  }): DynamicModule {
     return {
       module: DatabaseModule,
-      providers: [{ provide: DATABASE_SCHEMA, useValue: options.schema }],
-      exports: [DATABASE_SCHEMA],
+      providers: [
+        { provide: DATABASE_SCHEMA, useValue: options.schema },
+        {
+          provide: DATABASE_RUNTIME_OPTIONS,
+          useValue: options.options ?? DEFAULT_DATABASE_RUNTIME_OPTIONS,
+        },
+      ],
+      exports: [DATABASE_SCHEMA, DATABASE_RUNTIME_OPTIONS],
     };
   }
 
   constructor(
     @Inject(DATABASE_POOL) private readonly pool: Pool,
+    @Inject(DATABASE_READ_REPLICA_POOL) private readonly replicaPool: Pool | undefined,
     @Inject(ADVISORY_LOCK_POOL) private readonly advisoryLockPool: Pool,
   ) {}
 
   async onApplicationShutdown(): Promise<void> {
-    await Promise.all([this.pool.end(), this.advisoryLockPool.end()]);
+    await Promise.all([this.pool.end(), this.replicaPool?.end(), this.advisoryLockPool.end()]);
   }
 }

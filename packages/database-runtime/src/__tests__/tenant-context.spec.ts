@@ -3,7 +3,32 @@ import { describe, expect, it, vi } from "vitest";
 import { tenantContextForJob, WORKER_DISPATCH_CONTEXT } from "@repo/api-kernel";
 import type { DatabaseExecutor } from "../database.types";
 
-import { setTenantContextOnExecutor, setTenantContextOnPgClient } from "../tenant-context";
+import {
+  resolveTenantSchemaName,
+  resolveTenantSearchPath,
+  setTenantContextOnExecutor,
+  setTenantContextOnPgClient,
+} from "../tenant-context";
+
+const schemaRuntimeOptions = {
+  tenantMode: "schema-per-tenant" as const,
+  readReplica: false,
+  readConsistency: "strong" as const,
+};
+
+describe("schema-per-tenant naming", () => {
+  it("maps a UUID to a safe tenant schema and keeps public as the fallback", () => {
+    expect(resolveTenantSchemaName("550e8400-e29b-41d4-a716-446655440000")).toBe(
+      "tenant_550e8400_e29b_41d4_a716_446655440000",
+    );
+    expect(resolveTenantSearchPath("", "schema-per-tenant")).toBe("public");
+  });
+
+  it("rejects non-UUID tenant identifiers before building search_path", () => {
+    expect(() => resolveTenantSchemaName("org-1")).toThrow(/expected a UUID/);
+    expect(() => resolveTenantSearchPath("org-1", "schema-per-tenant")).toThrow(/expected a UUID/);
+  });
+});
 
 describe("tenantContextForJob", () => {
   it("maps a job with an organization and actor", () => {
@@ -46,6 +71,22 @@ describe("setTenantContextOnExecutor", () => {
 
     expect(execute).toHaveBeenCalledTimes(1);
   });
+
+  it("adds a tenant search_path only for schema-per-tenant mode", async () => {
+    const execute = vi.fn().mockResolvedValue(undefined);
+    const executor = { execute } as unknown as DatabaseExecutor;
+
+    await setTenantContextOnExecutor(
+      executor,
+      {
+        tenantId: "550e8400-e29b-41d4-a716-446655440000",
+        userId: "user-1",
+      },
+      schemaRuntimeOptions,
+    );
+
+    expect(execute).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("setTenantContextOnPgClient", () => {
@@ -78,5 +119,40 @@ describe("setTenantContextOnPgClient", () => {
       expect.stringContaining("set_config('app.tenant_id', $1, false)"),
       ["", "", "false"],
     );
+  });
+
+  it("sets a public-plus-tenant search_path in schema-per-tenant mode", async () => {
+    const query = vi.fn().mockResolvedValue(undefined);
+    const client = { query } as never;
+
+    await setTenantContextOnPgClient(
+      client,
+      { tenantId: "550e8400-e29b-41d4-a716-446655440000", userId: "user-1" },
+      schemaRuntimeOptions,
+    );
+
+    expect(query).toHaveBeenCalledWith(
+      expect.stringContaining("set_config('search_path', $4, false)"),
+      [
+        "550e8400-e29b-41d4-a716-446655440000",
+        "user-1",
+        "false",
+        "tenant_550e8400_e29b_41d4_a716_446655440000, public",
+      ],
+    );
+  });
+
+  it("rejects an invalid tenant before sending any SQL", async () => {
+    const query = vi.fn().mockResolvedValue(undefined);
+    const client = { query } as never;
+
+    await expect(
+      setTenantContextOnPgClient(
+        client,
+        { tenantId: "org-1", userId: "user-1" },
+        schemaRuntimeOptions,
+      ),
+    ).rejects.toThrow(/expected a UUID/);
+    expect(query).not.toHaveBeenCalled();
   });
 });
