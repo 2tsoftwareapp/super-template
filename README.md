@@ -145,6 +145,10 @@ non-interactive runs, pass feature IDs explicitly:
 pnpm create:project --features auth,import-export --target ../my-project --skip-install
 ```
 
+Generated feature selection is immutable for an existing target. A later run
+with a different selection fails before writing; create a new target when the
+feature set must change. This protects user-owned files from generator cleanup.
+
 The current generator mutates the API surface; unsupported surface requests fail
 explicitly.
 
