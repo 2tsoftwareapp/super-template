@@ -1,6 +1,6 @@
+import type { DatabaseRuntimeOptions } from "@repo/api-kernel";
 import type { Pool } from "pg";
 
-import type { DatabaseRuntimeOptions } from "@repo/api-kernel";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { withReplicas } from "drizzle-orm/pg-core";
 

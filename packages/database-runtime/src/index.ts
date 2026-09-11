@@ -16,8 +16,8 @@ export {
 } from "./database.types";
 export type {
   DatabaseClient,
-  DatabasePrimaryClient,
   DatabaseExecutor,
+  DatabasePrimaryClient,
   DatabaseTransaction,
   ReadReplicaDatabaseClient,
 } from "./database.types";

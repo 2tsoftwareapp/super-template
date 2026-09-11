@@ -1,10 +1,9 @@
+import { Inject, Injectable } from "@nestjs/common";
 import {
-  getPrimaryDatabaseClient,
   type DatabaseClient,
   type DatabaseExecutor,
+  getPrimaryDatabaseClient,
 } from "@repo/database-runtime";
-
-import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE } from "@repo/database-runtime";
 import { and, desc, eq, gt, isNull, sql } from "drizzle-orm";
 

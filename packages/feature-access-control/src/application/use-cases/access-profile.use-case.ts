@@ -2,7 +2,7 @@ import type { TransactionExecutor } from "@repo/api-kernel";
 
 import { Inject, Injectable, Optional } from "@nestjs/common";
 import { AccessProfileCache } from "@repo/api-runtime";
-import { DATABASE, getPrimaryDatabaseClient, type DatabaseClient } from "@repo/database-runtime";
+import { DATABASE, type DatabaseClient, getPrimaryDatabaseClient } from "@repo/database-runtime";
 
 import type { AccessProfileView } from "../access-control.types";
 
