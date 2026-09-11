@@ -69,7 +69,7 @@ export class DatabaseRlsGuard implements OnModuleInit {
         `${connectionName} connects as "${capabilities.currentUser}", which bypasses row-level security ` +
           `(rolsuper=${capabilities.isSuperuser}, rolbypassrls=${capabilities.bypassesRls}). ` +
           "Use the restricted application role from migration 0007_app_database_role.sql " +
-          "(for example fullstack_starter_app) for DATABASE_URL, and keep a privileged " +
+          `(for example fullstack_starter_app) for ${connectionName}, and keep a privileged ` +
           "DATABASE_MIGRATE_URL for migrations and db:reset.",
       );
     }

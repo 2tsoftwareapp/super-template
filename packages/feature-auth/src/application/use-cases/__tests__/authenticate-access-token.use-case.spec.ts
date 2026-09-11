@@ -58,6 +58,10 @@ function createHarness(sessionRow: ReturnType<typeof session>) {
 }
 
 describe("AuthenticateAccessTokenUseCase strong reads", () => {
+  // This suite proves the use case asks for strong reads on the ports it owns.
+  // That the strong ports actually bypass the replica is proven by
+  // UsersRepository.findByIdStrong in @repo/feature-users and end to end by
+  // apps/api/test/tenant-isolation.e2e.spec.ts.
   it("rejects a revoked session using the repository's strong session read", async () => {
     const { useCase, authSessionRepository, usersRepository, accessControlService } = createHarness(
       session({ revokedAt: new Date() }),
@@ -69,7 +73,7 @@ describe("AuthenticateAccessTokenUseCase strong reads", () => {
     expect(accessControlService.getAccessProfileStrong).not.toHaveBeenCalled();
   });
 
-  it("uses strong user and permission reads after token rotation", async () => {
+  it("uses strong user and permission reads for a valid access token", async () => {
     const { useCase, usersRepository, accessControlService } = createHarness(session());
 
     await expect(useCase.execute("rotated-access-token")).resolves.toMatchObject({
