@@ -35,12 +35,12 @@ consistency; mutations, raw SQL, transactions, migrations, and advisory locks
 remain on the primary pool. The runtime does not silently fall back to the
 primary after a replica error.
 
-`DATABASE_PRIMARY` is the explicit client for security-sensitive repositories.
-Auth sessions, user status, organization context, access-control permissions,
-and MFA state use it so revocation, rotation, and permission decisions are not
-served from a lagging replica. The feature composition layer rejects
-`readReplica: true` with `readConsistency: "strong"`; strong reads must use
-`DATABASE_PRIMARY`.
+`getPrimaryDatabaseClient()` is the explicit selector for security-sensitive
+repositories. Auth sessions, user status, organization context, access-control
+permissions, and MFA state resolve the primary through it, so revocation,
+rotation, and permission decisions are not served from a lagging replica. The
+feature composition layer rejects `readReplica: true` with
+`readConsistency: "strong"`; strong reads must use this primary path.
 
 When a replica is configured, `DatabaseRlsGuard` checks both the primary and
 replica roles during module initialization and rejects superuser or

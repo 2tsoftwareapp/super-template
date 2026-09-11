@@ -5,7 +5,7 @@
 - API and worker use the same environment loader and validation schema.
 - The worker requires `DATABASE_URL` and uses the restricted application role for PostgreSQL RLS.
 - The optional replica uses independent `DATABASE_URL_READ_REPLICA` and `DATABASE_URL_TEST_READ_REPLICA` endpoints; primary port resolution does not rewrite them.
-- Security-sensitive repositories use `DATABASE_PRIMARY`; a strong read policy cannot be composed with replica routing.
+- Security-sensitive repositories pin to the primary through `getPrimaryDatabaseClient()`; a strong read policy cannot be composed with replica routing.
 - API-specific listener settings are not used to create a worker listener.
 - Provider credentials are only required by the enabled integration path.
 
@@ -34,7 +34,7 @@ When `database-read-replica` is selected, the runtime checks the primary and
 replica roles at startup and rejects a superuser or `BYPASSRLS` role on either
 pool. Eligible default reads are eventual; auth sessions, user status,
 organization context, access-control permissions, and MFA state are pinned to
-the primary through `DATABASE_PRIMARY`. Source: `packages/database-runtime/src/database.provider.ts`,
+the primary through `getPrimaryDatabaseClient()`. Source: `packages/database-runtime/src/database.types.ts`,
 `packages/database-runtime/src/database-rls.guard.ts`, and the security
 repository constructors under `packages/feature-*/src/infrastructure/`.
 

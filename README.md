@@ -214,9 +214,9 @@ rewrite the primary URL, but it never rewrites replica hosts or ports.
 
 Eligible default reads use the replica with eventual consistency. Mutations,
 transactions, raw SQL, migrations, advisory locks, and security-sensitive
-auth/users/organizations/access-control/MFA repositories use the primary via
-`DATABASE_PRIMARY`. The runtime checks every configured pool at startup and
-rejects superuser or `BYPASSRLS` roles. A `readReplica=true` plus
+auth/users/organizations/access-control/MFA repositories resolve the primary
+via `getPrimaryDatabaseClient()`. The runtime checks every configured pool at
+startup and rejects superuser or `BYPASSRLS` roles. A `readReplica=true` plus
 `readConsistency=strong` composition is rejected before startup because strong
 routing is primary-only.
 

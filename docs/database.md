@@ -186,9 +186,9 @@ replica URLs are independent endpoints; primary port discovery in
 Drizzle select/query/count helpers use the replica with eventual consistency.
 Inserts, updates, deletes, raw `execute`, transactions, migrations, and
 advisory locks stay on the primary. Security-sensitive auth session, user,
-organization, access-control, and MFA repositories use the exported
-`DATABASE_PRIMARY` client, so revocation, rotation, status, and permission
-decisions do not depend on replica lag. There is no automatic failover or
+organization, access-control, and MFA repositories resolve the primary through
+the exported `getPrimaryDatabaseClient()` helper, so revocation, rotation,
+status, and permission decisions do not depend on replica lag. There is no automatic failover or
 general read-your-writes guarantee for eventual consumers in this version.
 
 `readConsistency: "strong"` cannot be composed with `readReplica: true`; the

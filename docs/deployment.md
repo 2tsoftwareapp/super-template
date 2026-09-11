@@ -45,8 +45,8 @@ worker environments. Replica reads are eventual and tenant-aware. Mutations,
 transactions, raw SQL, migrations, and advisory locks remain on the primary;
 the runtime does not silently fall back to primary after a replica error.
 Auth sessions, user status, organization context, access-control permissions,
-and MFA security state are always read through `DATABASE_PRIMARY` on the
-primary. The feature resolver rejects `readReplica=true` with
+and MFA security state are always read through `getPrimaryDatabaseClient()` on
+the primary. The feature resolver rejects `readReplica=true` with
 `readConsistency="strong"`; strong consumers must use this primary path.
 
 For real topology validation, run the opt-in suite after providing migrated

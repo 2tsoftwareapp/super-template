@@ -96,7 +96,7 @@ Deploy API and worker as separate process targets from the same release. API bin
 - **Tenant/data safety:** worker uses the restricted database role and dispatch context; integration tests exercise RLS-safe reads.
 - **Lifecycle:** worker emits structured startup, failure, shutdown, and shutdown-complete events.
 - **HTTP pipeline:** API host resolves host-local Nest `Reflector` tokens for feature contributions.
-- **Database consistency:** `DATABASE` may route eligible reads to the configured replica; `DATABASE_PRIMARY` pins auth/session, user, organization, access-control, and MFA repositories to the primary. The feature resolver rejects unsupported strong-plus-replica composition. Source: `packages/database-runtime/src/database.types.ts`, `packages/api-plugin-kit/src/feature-manifest.ts`.
+- **Database consistency:** `DATABASE` may route eligible reads to the configured replica; `getPrimaryDatabaseClient()` pins auth/session, user, organization, access-control, and MFA repositories to the primary. The feature resolver rejects unsupported strong-plus-replica composition. Source: `packages/database-runtime/src/database.types.ts`, `packages/api-plugin-kit/src/feature-manifest.ts`.
 
 ## 9. Architecture decisions
 
@@ -129,7 +129,7 @@ See [ADR-003](decisions/ADR-003-standalone-worker-host.md).
 - **Scheduler owner:** the one deployed process allowed to initialize scheduled callbacks.
 - **Composition:** shared registry/schema/module graph exported by `@repo/app-composition`.
 - **Stale recovery:** existing repository behavior that requeues or fails abandoned processing rows.
-- **Strong read:** a read issued through the primary-pinned `DATABASE_PRIMARY` client; security-sensitive decisions use this path.
+- **Strong read:** a read issued through the primary-pinned client returned by `getPrimaryDatabaseClient()`; security-sensitive decisions use this path.
 - **Eventual read:** an eligible read issued through the optional replica-backed `DATABASE` client and subject to replication lag.
 
 Sources: `docs/adr/0003-standalone-worker-host.md`, `apps/api/src/**`, `apps/worker/src/**`, `packages/app-composition/src/**`, `apps/worker/test/**`.
