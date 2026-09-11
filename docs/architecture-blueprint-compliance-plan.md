@@ -61,7 +61,9 @@ packages/feature-upload/
 │   ├── domain/
 │   │   ├── entities/index.ts
 │   │   ├── value-objects/index.ts
-│   │   �│   │   �│   │   �│ │   └── events/index.ts
+│   │   ├── index.ts
+│   │   ├── policies/index.ts
+│   │   └── events/index.ts
 │   ├── application/
 │   │   ├── commands/index.ts
 │   │   ├── queries/index.ts

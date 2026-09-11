@@ -1,7 +1,7 @@
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { DATABASE } from "@repo/database-runtime";
+import { DATABASE, getPrimaryDatabaseClient } from "@repo/database-runtime";
 import { eq, inArray, sql } from "drizzle-orm";
 
 import type { CreatePermissionValues } from "../application/ports/access-control.repository.port";
@@ -10,13 +10,20 @@ import { permissions, rolePermissions } from "./persistence";
 
 @Injectable()
 export class AccessControlPermissionPersistence {
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+  private readonly primaryDatabase: DatabaseClient;
 
-  async findAllPermissions(executor: DatabaseExecutor = this.database) {
+  constructor(@Inject(DATABASE) database: DatabaseClient) {
+    this.primaryDatabase = getPrimaryDatabaseClient(database);
+  }
+
+  async findAllPermissions(executor: DatabaseExecutor = this.primaryDatabase) {
     return executor.select().from(permissions).orderBy(permissions.name);
   }
 
-  async findPermissionsForRoleIds(roleIds: string[], executor: DatabaseExecutor = this.database) {
+  async findPermissionsForRoleIds(
+    roleIds: string[],
+    executor: DatabaseExecutor = this.primaryDatabase,
+  ) {
     if (roleIds.length === 0) return [];
     return executor
       .select({
@@ -33,20 +40,26 @@ export class AccessControlPermissionPersistence {
       .orderBy(permissions.name);
   }
 
-  async findPermissionsByIds(permissionIds: string[], executor: DatabaseExecutor = this.database) {
+  async findPermissionsByIds(
+    permissionIds: string[],
+    executor: DatabaseExecutor = this.primaryDatabase,
+  ) {
     if (permissionIds.length === 0) return [];
     return executor.select().from(permissions).where(inArray(permissions.id, permissionIds));
   }
 
   async findPermissionsByNames(
     permissionNames: string[],
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     if (permissionNames.length === 0) return [];
     return executor.select().from(permissions).where(inArray(permissions.name, permissionNames));
   }
 
-  async findPermissionById(permissionId: string, executor: DatabaseExecutor = this.database) {
+  async findPermissionById(
+    permissionId: string,
+    executor: DatabaseExecutor = this.primaryDatabase,
+  ) {
     const [permission] = await executor
       .select()
       .from(permissions)
@@ -55,7 +68,10 @@ export class AccessControlPermissionPersistence {
     return permission ?? null;
   }
 
-  async findPermissionIdsForRole(roleId: string, executor: DatabaseExecutor = this.database) {
+  async findPermissionIdsForRole(
+    roleId: string,
+    executor: DatabaseExecutor = this.primaryDatabase,
+  ) {
     const rows = await executor
       .select({ permissionId: rolePermissions.permissionId })
       .from(rolePermissions)
@@ -70,7 +86,7 @@ export class AccessControlPermissionPersistence {
       isSystem?: boolean;
       scope: "platform" | "organization";
     }[],
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     await executor
       .insert(permissions)
@@ -85,7 +101,7 @@ export class AccessControlPermissionPersistence {
   async replaceRolePermissions(
     roleId: string,
     permissionIds: string[],
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<void> {
     await executor.delete(rolePermissions).where(eq(rolePermissions.roleId, roleId));
     if (permissionIds.length > 0) {
@@ -97,7 +113,7 @@ export class AccessControlPermissionPersistence {
 
   async createPermission(
     values: CreatePermissionValues,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     const [permission] = await executor.insert(permissions).values(values).returning();
     return permission ?? null;
@@ -106,7 +122,7 @@ export class AccessControlPermissionPersistence {
   async updatePermission(
     permissionId: string,
     values: Partial<typeof permissions.$inferInsert>,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     const [permission] = await executor
       .update(permissions)
@@ -118,7 +134,7 @@ export class AccessControlPermissionPersistence {
 
   async deletePermission(
     permissionId: string,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<void> {
     await executor.delete(permissions).where(eq(permissions.id, permissionId));
   }

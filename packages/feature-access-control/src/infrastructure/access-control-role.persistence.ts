@@ -1,7 +1,7 @@
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { DATABASE } from "@repo/database-runtime";
+import { DATABASE, getPrimaryDatabaseClient } from "@repo/database-runtime";
 import { and, count, eq, ilike, inArray, isNotNull, isNull, or, type SQL } from "drizzle-orm";
 
 import type { RoleRecord } from "../application/ports/access-control.repository.port";
@@ -11,7 +11,11 @@ import { roles } from "./persistence";
 
 @Injectable()
 export class AccessControlRolePersistence {
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+  private readonly primaryDatabase: DatabaseClient;
+
+  constructor(@Inject(DATABASE) database: DatabaseClient) {
+    this.primaryDatabase = getPrimaryDatabaseClient(database);
+  }
 
   async findRolesPaginated(
     params: {
@@ -22,7 +26,7 @@ export class AccessControlRolePersistence {
       scope?: "platform" | "organization" | undefined;
       manageableByOrg?: string | null | undefined;
     },
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<{ rows: RoleRecord[]; total: number }> {
     const filters: SQL[] = [];
     if (params.manageableByOrg !== undefined) {
@@ -65,14 +69,14 @@ export class AccessControlRolePersistence {
     return { rows, total: Number(totals[0]?.total ?? 0) };
   }
 
-  async findAllRoles(executor: DatabaseExecutor = this.database) {
+  async findAllRoles(executor: DatabaseExecutor = this.primaryDatabase) {
     return executor.select().from(roles).orderBy(roles.name);
   }
 
   async findManageableRolesForActor(
     organizationId: string | null,
     includePlatformRoles: boolean,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     if (includePlatformRoles) {
       return executor
@@ -98,7 +102,7 @@ export class AccessControlRolePersistence {
       .orderBy(roles.name);
   }
 
-  async findRoleById(roleId: string, executor: DatabaseExecutor = this.database) {
+  async findRoleById(roleId: string, executor: DatabaseExecutor = this.primaryDatabase) {
     const [role] = await executor.select().from(roles).where(eq(roles.id, roleId)).limit(1);
     return role ?? null;
   }
@@ -113,12 +117,12 @@ export class AccessControlRolePersistence {
     return role ?? null;
   }
 
-  async findRolesByIds(roleIds: string[], executor: DatabaseExecutor = this.database) {
+  async findRolesByIds(roleIds: string[], executor: DatabaseExecutor = this.primaryDatabase) {
     if (roleIds.length === 0) return [];
     return executor.select().from(roles).where(inArray(roles.id, roleIds));
   }
 
-  async findRolesByNames(roleNames: string[], executor: DatabaseExecutor = this.database) {
+  async findRolesByNames(roleNames: string[], executor: DatabaseExecutor = this.primaryDatabase) {
     if (roleNames.length === 0) return [];
     return executor.select().from(roles).where(inArray(roles.name, roleNames));
   }
@@ -126,7 +130,7 @@ export class AccessControlRolePersistence {
   async findRoleByName(
     name: string,
     organizationId: string | null = null,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     const [role] = await executor
       .select()
@@ -148,7 +152,7 @@ export class AccessControlRolePersistence {
       organizationId?: string | null;
       isSystem?: boolean;
     }[],
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     await executor.insert(roles).values(roleValues).onConflictDoNothing();
     return this.findRolesByNames(
@@ -157,7 +161,10 @@ export class AccessControlRolePersistence {
     );
   }
 
-  async createRole(values: typeof roles.$inferInsert, executor: DatabaseExecutor = this.database) {
+  async createRole(
+    values: typeof roles.$inferInsert,
+    executor: DatabaseExecutor = this.primaryDatabase,
+  ) {
     const [role] = await executor.insert(roles).values(values).onConflictDoNothing().returning();
     return role ?? null;
   }
@@ -165,7 +172,7 @@ export class AccessControlRolePersistence {
   async updateRole(
     roleId: string,
     values: Partial<typeof roles.$inferInsert>,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     const [role] = await executor
       .update(roles)
@@ -175,13 +182,16 @@ export class AccessControlRolePersistence {
     return role ?? null;
   }
 
-  async deleteRole(roleId: string, executor: DatabaseExecutor = this.database): Promise<void> {
+  async deleteRole(
+    roleId: string,
+    executor: DatabaseExecutor = this.primaryDatabase,
+  ): Promise<void> {
     await executor.delete(roles).where(eq(roles.id, roleId));
   }
 
   async deleteByOrganizationId(
     organizationId: string,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<void> {
     await executor.delete(roles).where(eq(roles.organizationId, organizationId));
   }
@@ -190,7 +200,7 @@ export class AccessControlRolePersistence {
     name: string,
     description: string,
     organizationId: string,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     const [role] = await executor
       .insert(roles)

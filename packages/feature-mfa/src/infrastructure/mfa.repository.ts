@@ -1,7 +1,7 @@
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { DATABASE, type DatabaseClient } from "@repo/database-runtime";
+import { DATABASE, type DatabaseClient, getPrimaryDatabaseClient } from "@repo/database-runtime";
 import { and, eq, gt, isNull, sql } from "drizzle-orm";
 
 import type { MfaRepositoryPort } from "../application/ports/mfa.repository.port";
@@ -10,9 +10,13 @@ import { mfaChallenges, userRecoveryCodes, userTwoFactorSecrets } from "./persis
 
 @Injectable()
 export class MfaRepository implements MfaRepositoryPort {
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+  private readonly primaryDatabase: DatabaseClient;
 
-  async findSecretByUserId(userId: string, executor: DatabaseExecutor = this.database) {
+  constructor(@Inject(DATABASE) database: DatabaseClient) {
+    this.primaryDatabase = getPrimaryDatabaseClient(database);
+  }
+
+  async findSecretByUserId(userId: string, executor: DatabaseExecutor = this.primaryDatabase) {
     const [secret] = await executor
       .select()
       .from(userTwoFactorSecrets)
@@ -24,7 +28,7 @@ export class MfaRepository implements MfaRepositoryPort {
 
   async upsertPendingSecret(
     values: typeof userTwoFactorSecrets.$inferInsert,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     const [secret] = await executor
       .insert(userTwoFactorSecrets)
@@ -45,7 +49,7 @@ export class MfaRepository implements MfaRepositoryPort {
     return secret ?? null;
   }
 
-  async confirmSecret(userId: string, executor: DatabaseExecutor = this.database) {
+  async confirmSecret(userId: string, executor: DatabaseExecutor = this.primaryDatabase) {
     const [secret] = await executor
       .update(userTwoFactorSecrets)
       .set({
@@ -59,14 +63,14 @@ export class MfaRepository implements MfaRepositoryPort {
     return secret ?? null;
   }
 
-  async deleteSecret(userId: string, executor: DatabaseExecutor = this.database) {
+  async deleteSecret(userId: string, executor: DatabaseExecutor = this.primaryDatabase) {
     await executor.delete(userTwoFactorSecrets).where(eq(userTwoFactorSecrets.userId, userId));
   }
 
   async replaceRecoveryCodes(
     userId: string,
     codeHashes: string[],
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     await executor.delete(userRecoveryCodes).where(eq(userRecoveryCodes.userId, userId));
 
@@ -85,7 +89,7 @@ export class MfaRepository implements MfaRepositoryPort {
   async findUnusedRecoveryCodeByHash(
     userId: string,
     codeHash: string,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     const [code] = await executor
       .select()
@@ -109,7 +113,7 @@ export class MfaRepository implements MfaRepositoryPort {
    */
   async consumeRecoveryCode(
     id: string,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<boolean> {
     const updated = await executor
       .update(userRecoveryCodes)
@@ -122,7 +126,7 @@ export class MfaRepository implements MfaRepositoryPort {
 
   async createChallenge(
     values: typeof mfaChallenges.$inferInsert,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     const [challenge] = await executor.insert(mfaChallenges).values(values).returning();
 
@@ -131,7 +135,7 @@ export class MfaRepository implements MfaRepositoryPort {
 
   async findValidChallengeByTokenHash(
     tokenHash: string,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     const [challenge] = await executor
       .select()
@@ -148,7 +152,7 @@ export class MfaRepository implements MfaRepositoryPort {
     return challenge ?? null;
   }
 
-  async incrementChallengeAttempts(id: string, executor: DatabaseExecutor = this.database) {
+  async incrementChallengeAttempts(id: string, executor: DatabaseExecutor = this.primaryDatabase) {
     const [challenge] = await executor
       .update(mfaChallenges)
       .set({ attempts: sql`${mfaChallenges.attempts} + 1` })
@@ -163,7 +167,10 @@ export class MfaRepository implements MfaRepositoryPort {
    * Returns false when another concurrent request already consumed it, so the
    * caller must treat a false result as "this one-time challenge is gone".
    */
-  async consumeChallenge(id: string, executor: DatabaseExecutor = this.database): Promise<boolean> {
+  async consumeChallenge(
+    id: string,
+    executor: DatabaseExecutor = this.primaryDatabase,
+  ): Promise<boolean> {
     const updated = await executor
       .update(mfaChallenges)
       .set({ consumedAt: new Date() })

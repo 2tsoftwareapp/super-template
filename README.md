@@ -121,6 +121,7 @@ Shared packages: `@repo/web-ui` · `@repo/web-hooks` · `@repo/web-utils` · `@r
 
 - [x] **Contract-first API** — OpenAPI from NestJS; TypeScript + Dart clients via `make generate`
 - [x] **Authentication** — JWT rotation, Argon2id, CSRF, RBAC, TOTP MFA, OIDC SSO backend (Google / Apple / GitHub; configure credentials + UI)
+- [x] **Tenant database topology** — PostgreSQL RLS, optional eventual read replica, and primary-pinned security decisions
 - [x] **Admin dashboard** — users, roles, jobs, mail, imports/exports, audit logs, SSE notifications
 - [x] **Flutter mobile** — Material 3 design system, 20+ widgets, in-app UI Kit gallery, optional FCM push
 - [x] **Environment layering** — `development` · `staging` · `production` across API, web, admin, and mobile
@@ -151,6 +152,13 @@ feature set must change. This protects user-owned files from generator cleanup.
 
 The current generator mutates the API surface; unsupported surface requests fail
 explicitly.
+
+Existing generated targets are profile-immutable: if a later selection changes
+the recorded feature closure, tenant mode, replica capability, or surface, the
+generator fails before writing and asks you to create a new target. This avoids
+deleting or silently leaving stale files that may have been edited by the
+target owner. Re-running with the same profile remains supported, and
+`--check` applies the same profile guard.
 
 <br />
 
@@ -183,7 +191,7 @@ super-template/
 │   ├── api-kernel/       Framework-free ports, errors, types
 │   ├── api-plugin-kit/   FeatureManifest + compose helpers
 │   ├── api-runtime/      Nest HTTP runtime (env, guards, filters)
-│   ├── database-runtime/ Drizzle pool, RLS, transactions
+│   ├── database-runtime/ Drizzle pools, RLS, transactions, primary pinning
 │   ├── feature-*/        Compile-time capability plugins
 │   ├── api-contract/     Generated OpenAPI client
 │   ├── env-loader/       Layered .env loading
@@ -192,6 +200,45 @@ super-template/
 ├── scripts/              bootstrap · dev · verify
 └── docs/
 ```
+
+</details>
+
+<details>
+<summary><strong>Database topology</strong></summary>
+
+The default runtime uses `DATABASE_URL` for the restricted primary database
+role. Selecting `database-read-replica` adds
+`DATABASE_URL_READ_REPLICA` (and `DATABASE_URL_TEST_READ_REPLICA` for tests).
+These replica URLs are independent endpoints: primary port discovery may
+rewrite the primary URL, but it never rewrites replica hosts or ports.
+
+Eligible default reads use the replica with eventual consistency. Mutations,
+transactions, raw SQL, migrations, advisory locks, and security-sensitive
+auth/users/organizations/access-control/MFA repositories resolve the primary
+via `getPrimaryDatabaseClient()`. The runtime checks every configured pool at
+startup and rejects superuser or `BYPASSRLS` roles. A `readReplica=true` plus
+`readConsistency=strong` composition is rejected before startup because strong
+routing is primary-only.
+
+For the real PostgreSQL topology suite, provide a migrated restricted-role
+primary/replica pair and a privileged admin URL targeting the primary:
+
+```bash
+DATABASE_TOPOLOGY_PRIMARY_URL='postgresql://app@primary/app' \
+DATABASE_TOPOLOGY_REPLICA_URL='postgresql://app@replica/app' \
+DATABASE_TOPOLOGY_ADMIN_URL='postgresql://admin@primary/app' \
+pnpm --filter api exec vitest run test/database-topology.e2e.spec.ts
+```
+
+The suite exercises tenant A/B RLS isolation, endpoint separation, immediate
+primary visibility after auth rotation/revocation, and an optional privileged
+replica negative case using `DATABASE_TOPOLOGY_PRIVILEGED_REPLICA_URL`.
+Without the three required topology URLs, Vitest skips the file; the optional
+negative case is skipped when its URL is absent. This is separate from
+`pnpm test:e2e:preflight`, which requires `DATABASE_URL_TEST` and a restricted
+test role. Never commit connection strings or credentials.
+
+→ [docs/database.md](docs/database.md) · [docs/deployment.md](docs/deployment.md)
 
 </details>
 

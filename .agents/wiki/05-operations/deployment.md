@@ -1,6 +1,6 @@
 # Deployment and operations — API and worker
 
-- **Environments:** development, staging, production · **Last-synced:** `6c3ad242`
+- **Environments:** development, staging, production · **Last-synced:** `f50b62e8`
 
 ## Deployment
 
@@ -8,6 +8,7 @@
 - **Build & release:** API: `pnpm --filter api build && pnpm --filter api start`. Worker: `pnpm --filter worker build && pnpm --filter worker start`.
 - **Rollback:** stop/disable the worker and confirm exit; only then restore the former API scheduler composition. No database rollback is required.
 - **Config & secrets:** inject the normal validated environment, including restricted `DATABASE_URL`; never commit or log secret values.
+- **Database topology:** when selected, provide independent restricted primary and replica URLs; startup checks both pool roles and rejects superuser/`BYPASSRLS` capabilities.
 
 ## Ownership and cutover
 
@@ -32,7 +33,7 @@
 ### Worker does not become ready
 
 1. Inspect `worker.startup` failure details and environment validation output.
-2. Confirm `DATABASE_URL` and provider settings without printing secret values.
+2. Confirm `DATABASE_URL`, `DATABASE_URL_READ_REPLICA` when selected, and provider settings without printing secret values.
 3. If processing is not progressing, keep the worker disabled and use the rollback order above.
 
 ### Processing backlog grows
@@ -48,5 +49,12 @@ Database backup/restore procedure is outside this worker sync. Existing queue ro
 ## Security operations
 
 Use the restricted database role, preserve RLS, inject secrets through the target platform, and keep the worker free of an HTTP listener. Source: `docs/environments.md`, `apps/worker/test/worker-processing.e2e.spec.ts`.
+
+Primary port resolution is local-only for the primary URL; it does not rewrite
+replica hosts or ports. Default replica reads are eventual, while auth/session,
+user, organization, access-control, and MFA security decisions use the primary
+client. `readReplica=true` with `readConsistency="strong"` is rejected during
+feature composition. Source: `docs/database.md`, `packages/env-loader/src/index.ts`,
+`packages/api-plugin-kit/src/feature-manifest.ts`.
 
 Sources: `docs/deployment.md`, `docs/environments.md`, `apps/worker/src/main.ts`, `apps/api/package.json`, `apps/worker/package.json`.

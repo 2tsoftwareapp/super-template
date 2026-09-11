@@ -11,6 +11,8 @@
 - Disable or protect Swagger in production (`API_DOCS_ENABLED=false`)
 - Point `DATABASE_URL` at a **non-superuser** application role so Postgres RLS is enforced; run migrations with a separate privileged `DATABASE_MIGRATE_URL` (see `docs/database.md`)
 - If the generated `feature-profile.json` selects `database-read-replica`, set `DATABASE_URL_READ_REPLICA` (and the test equivalent where tests run) to a restricted read-only replica URL; startup fails closed when it is missing
+- Keep primary and replica connection strings independently provisioned. Primary port resolution can adjust `DATABASE_URL` for a local conflict, but does not rewrite `DATABASE_URL_READ_REPLICA` or `DATABASE_URL_TEST_READ_REPLICA`.
+- The startup RLS capability guard checks every configured runtime pool; a superuser or `BYPASSRLS` role on either primary or replica is rejected. Keep `DATABASE_MIGRATE_URL` privileged and out of runtime pools.
 - Do **not** set `DATABASE_SKIP_RLS_CHECK` in staging/production (boot refuses it)
 - Do **not** run `db:seed` / `db:reset` against staging/production unless you explicitly set `ALLOW_PROD_SEED=1` / `ALLOW_PROD_RESET=1`
 - Set `STORAGE_DRIVER=s3` with `S3_BUCKET` (and credentials) — local filesystem storage is refused when deployed
@@ -42,6 +44,26 @@ When `database-read-replica` is selected, set the replica URL in both API and
 worker environments. Replica reads are eventual and tenant-aware. Mutations,
 transactions, raw SQL, migrations, and advisory locks remain on the primary;
 the runtime does not silently fall back to primary after a replica error.
+Auth sessions, user status, organization context, access-control permissions,
+and MFA security state are always read through `getPrimaryDatabaseClient()` on
+the primary. The feature resolver rejects `readReplica=true` with
+`readConsistency="strong"`; strong consumers must use this primary path.
+
+For real topology validation, run the opt-in suite after providing migrated
+restricted-role endpoints and a privileged primary admin URL:
+
+```bash
+DATABASE_TOPOLOGY_PRIMARY_URL='postgresql://app@primary/app' \
+DATABASE_TOPOLOGY_REPLICA_URL='postgresql://app@replica/app' \
+DATABASE_TOPOLOGY_ADMIN_URL='postgresql://admin@primary/app' \
+pnpm --filter api exec vitest run test/database-topology.e2e.spec.ts
+```
+
+The suite checks tenant A/B isolation, endpoint separation, and primary auth
+visibility after rotation/revocation. It skips when the three topology URLs
+are missing; its optional privileged-replica test also requires
+`DATABASE_TOPOLOGY_PRIVILEGED_REPLICA_URL`. `pnpm test:e2e:preflight` remains a
+separate check requiring `DATABASE_URL_TEST` and a restricted test role.
 
 ### Readiness and failure signals
 

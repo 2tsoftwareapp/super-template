@@ -4,6 +4,7 @@
 
 - NestJS API and background-processing worker share a deterministic feature composition graph.
 - `apps/api` owns HTTP routes; `apps/worker` owns scheduled PostgreSQL processing.
+- PostgreSQL may use an independent eventual read replica; RLS startup checks and security-sensitive reads remain primary-bound.
 - Start locally with `make dev-api` and `make dev-worker`, or use the package commands in `05-operations/deployment.md`.
 - The main operational invariant is one deployed scheduler owner: the worker.
 - This wiki was initialized during the worker-host change; unrelated enterprise documents remain visible as gaps.
@@ -45,6 +46,7 @@
 | FR-002 | Generic and notification jobs retain PostgreSQL claim/retry behavior | Architecture §6; deployment runbook | `apps/worker/test/worker-processing.e2e.spec.ts` |
 | NFR-001 | Worker has no HTTP listener and shuts down cleanly | Architecture §7; ADR-003 | worker host test, `lsof`, SIGTERM smoke |
 | NFR-002 | API remains available after scheduler removal | Architecture §6 | API health smoke and API e2e suite |
+| NFR-003 | Replica topology preserves tenant/security boundaries | Architecture §2, §8; deployment operations | `database-rls.guard.spec.ts`, env-loader/provider tests, opt-in topology E2E |
 
 Sources: `package.json`, `pnpm-workspace.yaml`, `.agents/PRJ_REFERENCE.md`, and session `Task-23-notification-worker-separation`.
-Last-synced: `6c3ad242` (change-set baseline; final task commit follows this sync).
+Last-synced: `f50b62e8`.

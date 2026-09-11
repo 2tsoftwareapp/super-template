@@ -1,7 +1,7 @@
 # Architecture — Super Template
 
 - **Status:** partial — this sync documents the API/worker host split; business requirements and full system views are not present in the source set.
-- **Last-synced:** `6c3ad242`
+- **Last-synced:** `f50b62e8`
 
 ## 1. Introduction and goals
 
@@ -21,6 +21,7 @@ The system is a NestJS API plus a standalone Nest application-context worker. Bo
 - PostgreSQL remains the queue and concurrency boundary; existing `FOR UPDATE SKIP LOCKED`, retry, and stale recovery behavior is preserved. Source: `docs/adr/0003-standalone-worker-host.md`.
 - `ScheduleModule.forRoot()` is owned by `apps/worker`; API runtime does not import it. Source: `apps/api/src/composition/runtime.module.ts`, `apps/worker/src/worker.module.ts`.
 - No deployment platform is selected in this repository. Platform-specific liveness/readiness configuration is a documented gap. Source: `docs/deployment.md`.
+- The optional database replica is an independent eventual-read endpoint; primary-pinned security decisions and RLS role checks remain explicit runtime boundaries. Source: `packages/database-runtime/src/database.provider.ts`, `packages/database-runtime/src/database-rls.guard.ts`.
 
 ## 3. Context and scope
 
@@ -95,6 +96,7 @@ Deploy API and worker as separate process targets from the same release. API bin
 - **Tenant/data safety:** worker uses the restricted database role and dispatch context; integration tests exercise RLS-safe reads.
 - **Lifecycle:** worker emits structured startup, failure, shutdown, and shutdown-complete events.
 - **HTTP pipeline:** API host resolves host-local Nest `Reflector` tokens for feature contributions.
+- **Database consistency:** `DATABASE` may route eligible reads to the configured replica; `getPrimaryDatabaseClient()` pins auth/session, user, organization, access-control, and MFA repositories to the primary. The feature resolver rejects unsupported strong-plus-replica composition. Source: `packages/database-runtime/src/database.types.ts`, `packages/api-plugin-kit/src/feature-manifest.ts`.
 
 ## 9. Architecture decisions
 
@@ -111,6 +113,7 @@ See [ADR-003](decisions/ADR-003-standalone-worker-host.md).
 | NFR-001 | Isolation | API starts without scheduler initialization → worker remains sole cron owner | API/worker smoke and host tests |
 | NFR-002 | Concurrency | Two workers claim the same due set → claimed ID intersection is empty | PostgreSQL e2e asserts empty overlap and full union |
 | NFR-003 | Operability | Worker receives SIGTERM → Nest/database resources close and completion event is logged | direct process smoke |
+| NFR-004 | Data/security | Replica role is privileged or a security decision follows replica lag → startup rejects the role or the repository reads primary state | `database-rls.guard.spec.ts`, provider tests, opt-in topology E2E |
 
 ## 11. Risks and technical debt
 
@@ -126,5 +129,7 @@ See [ADR-003](decisions/ADR-003-standalone-worker-host.md).
 - **Scheduler owner:** the one deployed process allowed to initialize scheduled callbacks.
 - **Composition:** shared registry/schema/module graph exported by `@repo/app-composition`.
 - **Stale recovery:** existing repository behavior that requeues or fails abandoned processing rows.
+- **Strong read:** a read issued through the primary-pinned client returned by `getPrimaryDatabaseClient()`; security-sensitive decisions use this path.
+- **Eventual read:** an eligible read issued through the optional replica-backed `DATABASE` client and subject to replication lag.
 
 Sources: `docs/adr/0003-standalone-worker-host.md`, `apps/api/src/**`, `apps/worker/src/**`, `packages/app-composition/src/**`, `apps/worker/test/**`.

@@ -18,3 +18,13 @@ from the real process env (or an explicit override), never from the file cascade
 
 Commit `.env.example` / `.env.development` / `.env.*.example`; personal secrets
 go in `.env.local` (gitignored). Validate with `pnpm run env:doctor`.
+
+## PostgreSQL endpoint behavior
+
+Primary port resolution may adjust `DATABASE_URL`,
+`DATABASE_MIGRATE_URL`, and the primary test/admin variants when a local
+PostgreSQL port is occupied or explicitly pinned. It deliberately does not
+discover or rewrite `DATABASE_URL_READ_REPLICA` or
+`DATABASE_URL_TEST_READ_REPLICA`: replica hosts and ports are independently
+managed endpoints and remain byte-for-byte unchanged by primary port
+selection. Regression coverage is in `src/__tests__/index.spec.ts`.
