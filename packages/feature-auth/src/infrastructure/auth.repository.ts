@@ -1,6 +1,9 @@
-import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
-
 import { Inject, Injectable } from "@nestjs/common";
+import {
+  type DatabaseClient,
+  type DatabaseExecutor,
+  getPrimaryDatabaseClient,
+} from "@repo/database-runtime";
 import { DATABASE } from "@repo/database-runtime";
 import { and, desc, eq, gt, isNull, sql } from "drizzle-orm";
 
@@ -10,7 +13,11 @@ import { authSessions, emailVerificationTokens, passwordResetTokens } from "./pe
 
 @Injectable()
 export class AuthRepository implements AuthSessionRepositoryPort {
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+  private readonly primaryDatabase: DatabaseClient;
+
+  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {
+    this.primaryDatabase = getPrimaryDatabaseClient(database);
+  }
 
   async createSession(
     values: typeof authSessions.$inferInsert,
@@ -20,7 +27,7 @@ export class AuthRepository implements AuthSessionRepositoryPort {
     return session ?? null;
   }
 
-  async findSessionById(sessionId: string, executor: DatabaseExecutor = this.database) {
+  async findSessionById(sessionId: string, executor: DatabaseExecutor = this.primaryDatabase) {
     const [session] = await executor
       .select()
       .from(authSessions)
@@ -32,7 +39,7 @@ export class AuthRepository implements AuthSessionRepositoryPort {
   async findSessionForUser(
     sessionId: string,
     userId: string,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     const [session] = await executor
       .select()

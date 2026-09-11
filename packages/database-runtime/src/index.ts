@@ -9,10 +9,15 @@ export {
   databaseProviders,
   DEFAULT_DATABASE_RUNTIME_OPTIONS,
 } from "./database.provider";
-export { createDatabaseClient, createReadReplicaDatabaseClient } from "./database.types";
+export {
+  createDatabaseClient,
+  createReadReplicaDatabaseClient,
+  getPrimaryDatabaseClient,
+} from "./database.types";
 export type {
   DatabaseClient,
   DatabaseExecutor,
+  DatabasePrimaryClient,
   DatabaseTransaction,
   ReadReplicaDatabaseClient,
 } from "./database.types";

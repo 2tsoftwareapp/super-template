@@ -211,6 +211,63 @@ test("capability aliases generate a reproducible tenant and replica profile", ()
   assert.deepEqual(registryFeatureIds(target), profile.resolvedFeatures);
 });
 
+test("existing generated targets use immutable feature selection", () => {
+  const root = makeTemporaryRoot("immutable-selection");
+  const broadTarget = join(root, "broad");
+  const broad = runGenerator(["--features", "auth", "--target", broadTarget, "--skip-install"]);
+  assert.equal(broad.status, 0, broad.stderr);
+  const userFile = join(broadTarget, "README.user.md");
+  writeFileSync(userFile, "keep this user-owned file\n");
+
+  const broadToNarrow = runGenerator([
+    "--features",
+    "health",
+    "--target",
+    broadTarget,
+    "--skip-install",
+  ]);
+  assert.notEqual(broadToNarrow.status, 0);
+  assert.match(broadToNarrow.stderr, /immutable feature selection/);
+  assert.equal(readFileSync(userFile, "utf8"), "keep this user-owned file\n");
+
+  const narrowTarget = join(root, "narrow");
+  const narrow = runGenerator(["--features", "health", "--target", narrowTarget, "--skip-install"]);
+  assert.equal(narrow.status, 0, narrow.stderr);
+  const narrowToBroad = runGenerator([
+    "--features",
+    "auth",
+    "--target",
+    narrowTarget,
+    "--check",
+    "--skip-install",
+  ]);
+  assert.notEqual(narrowToBroad.status, 0);
+  assert.match(narrowToBroad.stderr, /immutable feature selection/);
+
+  // A different request that resolves to the same closure must still be rejected:
+  // feature-profile.json records the request as well as the closure, so accepting
+  // it would rewrite the profile and break the immutability guarantee.
+  const sameClosureTarget = join(root, "same-closure");
+  const sameClosure = runGenerator([
+    "--features",
+    "auth",
+    "--target",
+    sameClosureTarget,
+    "--skip-install",
+  ]);
+  assert.equal(sameClosure.status, 0, sameClosure.stderr);
+
+  const sameClosureRerun = runGenerator([
+    "--features",
+    "auth,users",
+    "--target",
+    sameClosureTarget,
+    "--skip-install",
+  ]);
+  assert.notEqual(sameClosureRerun.status, 0);
+  assert.match(sameClosureRerun.stderr, /immutable feature selection/);
+});
+
 test("dry-run and invalid selections do not create or mutate targets", () => {
   const root = makeTemporaryRoot("guards");
   const dryTarget = join(root, "dry-run");

@@ -48,3 +48,6 @@ packages/extension/artifacts/
 
 # Local tool junk
 .freebuff/
+
+# WorkBuddy AI — local workspace state (memory, sessions)
+.workbuddy-ai/

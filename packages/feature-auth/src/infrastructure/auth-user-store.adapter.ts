@@ -25,6 +25,10 @@ export class AuthUserStoreAdapter implements AuthUserStore {
     return this.usersRepository.findById(userId, executor);
   }
 
+  findByIdStrong(userId: string): Promise<AuthUserRecord | null> {
+    return this.usersRepository.findByIdStrong(userId);
+  }
+
   findByEmail(email: string, executor?: unknown): Promise<AuthUserRecord | null> {
     return this.usersRepository.findByEmail(email, executor);
   }

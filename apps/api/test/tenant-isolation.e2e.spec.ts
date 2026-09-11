@@ -66,6 +66,20 @@ describe("Tenant isolation (e2e)", () => {
     });
   });
 
+  it("rejects an access token immediately after its session is revoked", async () => {
+    const session = await loginAs(app, "user@example.local", "ChangeMe123!");
+
+    await request(app.getHttpServer())
+      .post("/api/v1/auth/logout")
+      .set(bearer(session.accessToken))
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .get("/api/v1/auth/me")
+      .set(bearer(session.accessToken))
+      .expect(401);
+  });
+
   it("prevents an org-scoped ADMIN from reading users in another organization", async () => {
     const superAdminSession = await loginAs(app, "admin@example.local", "ChangeMe123!");
     const seededUserSession = await loginAs(app, "user@example.local", "ChangeMe123!");

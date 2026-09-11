@@ -409,6 +409,50 @@ function checkMutations(mutations) {
 }
 
 /**
+ * Keep generated feature selection immutable after the first generation.
+ * Existing targets may contain user-owned files, so changing the selection in
+ * place is rejected before any generator-owned file is written.
+ *
+ * Both halves of the recorded selection are compared. Two different requests can
+ * resolve to the same closure (for example `auth` and `auth,users`), and
+ * `feature-profile.json` records the request as well as the closure, so
+ * comparing only the closure would let a different request rewrite the profile.
+ * @param {string} target
+ * @param {{requestedIds: string[], resolvedIds: string[]}} selection
+ */
+function assertImmutableFeatureSelection(target, selection) {
+  if (!existsSync(join(target, "feature-profile.json"))) return;
+  let profile;
+  try {
+    profile = JSON.parse(readFileSync(join(target, "feature-profile.json"), "utf8"));
+  } catch {
+    throw new Error(
+      `Cannot parse existing feature-profile.json in ${target}. Repair it manually or create a new target.`,
+    );
+  }
+  const previousRequested = Array.isArray(profile.requestedFeatures)
+    ? profile.requestedFeatures
+    : null;
+  const previousResolved = Array.isArray(profile.resolvedFeatures) ? profile.resolvedFeatures : null;
+  if (!previousRequested || !previousResolved) {
+    throw new Error(
+      `Existing target ${target} has no valid requestedFeatures and resolvedFeatures in feature-profile.json. Create a new target.`,
+    );
+  }
+  const sameRequested =
+    JSON.stringify(previousRequested) === JSON.stringify(selection.requestedIds);
+  const sameResolved = JSON.stringify(previousResolved) === JSON.stringify(selection.resolvedIds);
+  if (!sameRequested || !sameResolved) {
+    throw new Error(
+      `Existing generated target has immutable feature selection ` +
+        `(requested [${previousRequested.join(", ")}], resolved [${previousResolved.join(", ")}]), ` +
+        `but requested [${selection.requestedIds.join(", ")}] resolving to [${selection.resolvedIds.join(", ")}]. ` +
+        "Create a new target for a different selection; user-owned files are never reconciled in place.",
+    );
+  }
+}
+
+/**
  * Write a file through an adjacent temporary name so a failed serialization
  * cannot leave a half-written generated registry or package manifest.
  * @param {string} file
@@ -480,6 +524,9 @@ export async function main(argv = process.argv.slice(2)) {
     throw new Error("A feature ID was selected more than once.");
   }
   const selection = resolveFeatureSelection(catalog, args.features);
+  if (targetState.exists) {
+    assertImmutableFeatureSelection(target, selection);
+  }
   const mutations = buildMutations({ source, target, selection, surfaces: args.surfaces });
 
   process.stdout.write(`Requested features: ${selection.requestedIds.join(", ")}\n`);

@@ -1,6 +1,9 @@
-import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
-
 import { Inject, Injectable } from "@nestjs/common";
+import {
+  type DatabaseClient,
+  type DatabaseExecutor,
+  getPrimaryDatabaseClient,
+} from "@repo/database-runtime";
 import { DATABASE } from "@repo/database-runtime";
 import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 
@@ -21,7 +24,11 @@ const USER_SORT_FIELDS = {
 
 @Injectable()
 export class UsersRepository implements UsersRepositoryPort, UserLookup {
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+  private readonly primaryDatabase: DatabaseClient;
+
+  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {
+    this.primaryDatabase = getPrimaryDatabaseClient(database);
+  }
 
   async create(values: typeof users.$inferInsert, executor: DatabaseExecutor = this.database) {
     const [user] = await executor.insert(users).values(values).returning();
@@ -41,6 +48,10 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
       .limit(1);
 
     return user ?? null;
+  }
+
+  async findByIdStrong(userId: string) {
+    return this.findById(userId, this.primaryDatabase);
   }
 
   async findByEmail(email: string, executor: DatabaseExecutor = this.database) {

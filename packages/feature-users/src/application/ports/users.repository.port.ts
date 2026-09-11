@@ -47,6 +47,8 @@ export interface UsersCoreListQuery {
 export interface UsersRepositoryPort {
   create(values: CreateUserInput, executor?: TransactionExecutor): Promise<UserRecord>;
   findById(userId: string, executor?: TransactionExecutor): Promise<UserRecord | null>;
+  /** Strong primary read for authentication and authorization decisions. */
+  findByIdStrong(userId: string): Promise<UserRecord | null>;
   findByEmail(email: string, executor?: TransactionExecutor): Promise<UserRecord | null>;
   update(
     userId: string,

@@ -34,6 +34,10 @@ export class AccessControlService {
     return this.accessProfileUseCase.getAccessProfile(userId, organizationId);
   }
 
+  getAccessProfileStrong(userId: string, organizationId?: string | null) {
+    return this.accessProfileUseCase.getAccessProfileStrong(userId, organizationId);
+  }
+
   invalidateAccessProfile(userId: string) {
     return this.accessProfileUseCase.invalidateAccessProfile(userId);
   }
