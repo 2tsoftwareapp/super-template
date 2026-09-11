@@ -153,7 +153,14 @@ describe("database replica providers", () => {
   it("routes select helpers to the replica and raw execution to primary", async () => {
     const primaryPool = new Pool({ connectionString: "postgres://primary/app" });
     const replicaPool = new Pool({ connectionString: "postgres://replica/app" });
-    const database = createReadReplicaDatabaseClient(primaryPool, replicaPool, {});
+    const database = createReadReplicaDatabaseClient(
+      primaryPool,
+      replicaPool,
+      {},
+      {
+        readConsistency: "eventual",
+      },
+    );
 
     const replicaSelect = vi.spyOn(database.$replicas[0]!, "select");
     const primaryExecute = vi.spyOn(database.$primary, "execute");
@@ -171,7 +178,14 @@ describe("database replica providers", () => {
   it("routes mutation builders and transactions to primary", async () => {
     const primaryPool = new Pool({ connectionString: "postgres://primary/app" });
     const replicaPool = new Pool({ connectionString: "postgres://replica/app" });
-    const database = createReadReplicaDatabaseClient(primaryPool, replicaPool, {});
+    const database = createReadReplicaDatabaseClient(
+      primaryPool,
+      replicaPool,
+      {},
+      {
+        readConsistency: "eventual",
+      },
+    );
 
     const primaryInsert = vi.spyOn(database.$primary, "insert");
     const primaryUpdate = vi.spyOn(database.$primary, "update");
@@ -189,6 +203,23 @@ describe("database replica providers", () => {
     expect(primaryUpdate).toHaveBeenCalledTimes(1);
     expect(primaryDelete).toHaveBeenCalledTimes(1);
     expect(primaryTransaction).toHaveBeenCalledTimes(1);
+    await Promise.all([primaryPool.end(), replicaPool.end()]);
+  });
+
+  it("fails closed if a strong policy reaches replica client composition", async () => {
+    const primaryPool = new Pool({ connectionString: "postgres://primary/app" });
+    const replicaPool = new Pool({ connectionString: "postgres://replica/app" });
+
+    expect(() =>
+      createReadReplicaDatabaseClient(
+        primaryPool,
+        replicaPool,
+        {},
+        {
+          readConsistency: "strong",
+        },
+      ),
+    ).toThrow(/Strong read consistency cannot use a read-replica client/);
     await Promise.all([primaryPool.end(), replicaPool.end()]);
   });
 

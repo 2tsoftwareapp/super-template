@@ -211,4 +211,53 @@ describe("loadEnvFiles precedence", () => {
       delete (globalThis as any).__mockExecSync;
     }
   });
+
+  it("keeps an explicitly configured replica host and port independent", () => {
+    dir = mkdtempSync(join(tmpdir(), "envloader-replica-"));
+    writeFileSync(join(dir, "pnpm-workspace.yaml"), "packages: []\n");
+    writeFileSync(
+      join(dir, ".env"),
+      "POSTGRES_EXPOSED_PORT=5432\n" +
+        "DATABASE_URL=postgresql://primary:pass@127.0.0.1:5432/app\n" +
+        "DATABASE_URL_READ_REPLICA=postgresql://replica:pass@replica.internal:6432/app\n",
+    );
+
+    (globalThis as any).__mockExecSync = (cmd: any) => {
+      const cmdStr = String(cmd);
+      if (cmdStr.includes("ps --services")) return "";
+      if (cmdStr.includes("listen(5432")) throw new Error("Port 5432 in use");
+      return Buffer.from("");
+    };
+
+    try {
+      loadEnvFiles({ cwd: dir, appEnv: "development" });
+      expect(process.env.POSTGRES_EXPOSED_PORT).toBe("5433");
+      expect(process.env.DATABASE_URL).toBe("postgresql://primary:pass@127.0.0.1:5433/app");
+      expect(process.env.DATABASE_URL_READ_REPLICA).toBe(
+        "postgresql://replica:pass@replica.internal:6432/app",
+      );
+    } finally {
+      delete (globalThis as any).__mockExecSync;
+    }
+  });
+
+  it("honors a pinned primary port without rewriting the replica endpoint", () => {
+    dir = mkdtempSync(join(tmpdir(), "envloader-pinned-"));
+    writeFileSync(join(dir, "pnpm-workspace.yaml"), "packages: []\n");
+    writeFileSync(
+      join(dir, ".env"),
+      "DATABASE_URL=postgresql://primary:pass@localhost:65432/app\n" +
+        "DATABASE_URL_READ_REPLICA=postgresql://replica:pass@localhost:65433/app\n",
+    );
+
+    try {
+      loadEnvFiles({ cwd: dir, appEnv: "development", pinnedPostgresPort: 65432 });
+      expect(process.env.DATABASE_URL).toBe("postgresql://primary:pass@localhost:65432/app");
+      expect(process.env.DATABASE_URL_READ_REPLICA).toBe(
+        "postgresql://replica:pass@localhost:65433/app",
+      );
+    } finally {
+      delete (globalThis as any).__mockExecSync;
+    }
+  });
 });

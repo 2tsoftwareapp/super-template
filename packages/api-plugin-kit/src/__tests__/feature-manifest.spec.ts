@@ -56,6 +56,25 @@ describe("composeDatabaseRuntimeOptions", () => {
       readConsistency: "eventual",
     });
   });
+
+  it("rejects a strong policy combined with replica routing", () => {
+    expect(() =>
+      composeDatabaseRuntimeOptions([
+        { id: "database-read-replica", database: { readReplica: true, readConsistency: "strong" } },
+      ]),
+    ).toThrow(/Strong read consistency is incompatible with readReplica=true/);
+  });
+
+  it("preserves the eventual policy as part of the composed selector", () => {
+    expect(
+      composeDatabaseRuntimeOptions([
+        {
+          id: "database-read-replica",
+          database: { readReplica: true, readConsistency: "eventual" },
+        },
+      ]),
+    ).toMatchObject({ readReplica: true, readConsistency: "eventual" });
+  });
 });
 
 describe("composeFeatureSchemas", () => {

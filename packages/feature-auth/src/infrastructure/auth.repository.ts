@@ -1,4 +1,8 @@
-import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
+import {
+  getPrimaryDatabaseClient,
+  type DatabaseClient,
+  type DatabaseExecutor,
+} from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE } from "@repo/database-runtime";
@@ -10,7 +14,11 @@ import { authSessions, emailVerificationTokens, passwordResetTokens } from "./pe
 
 @Injectable()
 export class AuthRepository implements AuthSessionRepositoryPort {
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+  private readonly primaryDatabase: DatabaseClient;
+
+  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {
+    this.primaryDatabase = getPrimaryDatabaseClient(database);
+  }
 
   async createSession(
     values: typeof authSessions.$inferInsert,
@@ -20,7 +28,7 @@ export class AuthRepository implements AuthSessionRepositoryPort {
     return session ?? null;
   }
 
-  async findSessionById(sessionId: string, executor: DatabaseExecutor = this.database) {
+  async findSessionById(sessionId: string, executor: DatabaseExecutor = this.primaryDatabase) {
     const [session] = await executor
       .select()
       .from(authSessions)
@@ -32,7 +40,7 @@ export class AuthRepository implements AuthSessionRepositoryPort {
   async findSessionForUser(
     sessionId: string,
     userId: string,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     const [session] = await executor
       .select()

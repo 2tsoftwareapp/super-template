@@ -292,6 +292,11 @@ export function composeDatabaseRuntimeOptions(
   }
 
   const readReplica = replicaContributions.length > 0;
+  if (readReplica && consistencyValues[0] === "strong") {
+    throw new Error(
+      "Strong read consistency is incompatible with readReplica=true. Use an explicit primary read path or select eventual consistency.",
+    );
+  }
   return {
     tenantMode: uniqueModes[0]?.mode ?? "shared-schema",
     readReplica,

@@ -224,7 +224,7 @@ export const databaseProviders: Provider[] = [
       replicaPool?: Pool,
     ) =>
       databaseOptions.readReplica && replicaPool
-        ? createReadReplicaDatabaseClient(pool, replicaPool, schema)
+        ? createReadReplicaDatabaseClient(pool, replicaPool, schema, databaseOptions)
         : createDatabaseClient(pool, schema),
   },
   {

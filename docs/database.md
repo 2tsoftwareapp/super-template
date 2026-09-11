@@ -118,6 +118,16 @@ Inserts, updates, deletes, raw `execute`, transactions, migrations, and
 advisory locks stay on the primary. There is no automatic failover or
 read-your-writes guarantee in this version.
 
+The live topology suite is opt-in because it requires a separately reachable
+replica and a restricted test role on both endpoints:
+
+```sh
+RUN_DATABASE_TOPOLOGY_E2E=1 pnpm --filter api test:e2e -- database-topology.e2e.spec.ts
+```
+
+Without those external PostgreSQL endpoints, the deterministic provider,
+environment, and unit tests are the available verification boundary.
+
 ## Transaction Convention
 
 - Repositories accept the default database client or an existing transaction executor

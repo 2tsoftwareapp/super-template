@@ -123,15 +123,17 @@ const resolveDynamicPorts = (root: string, pinnedPostgresPort?: number): void =>
   if (process.env.POSTGRES_PORT) {
     postgresPort = Number(process.env.POSTGRES_PORT);
   }
-  const dbUrls = [
+  // Replica URLs are independently managed endpoints. They may use a
+  // different host and port, so they are intentionally excluded from primary
+  // dynamic-port discovery and rewriting. Local replica resolution must be an
+  // explicit future option rather than an implicit topology mutation.
+  const primaryDbUrls = [
     process.env.DATABASE_MIGRATE_URL,
     process.env.DATABASE_URL,
     process.env.DATABASE_URL_TEST,
-    process.env.DATABASE_URL_READ_REPLICA,
-    process.env.DATABASE_URL_TEST_READ_REPLICA,
     process.env.DATABASE_URL_TEST_ADMIN,
   ];
-  for (const urlStr of dbUrls) {
+  for (const urlStr of primaryDbUrls) {
     if (urlStr) {
       try {
         const url = new URL(urlStr);
@@ -163,18 +165,6 @@ const resolveDynamicPorts = (root: string, pinnedPostgresPort?: number): void =>
   if (process.env.DATABASE_URL_TEST) {
     process.env.DATABASE_URL_TEST = updateUrlPort(
       process.env.DATABASE_URL_TEST,
-      resolvedPostgresPort,
-    );
-  }
-  if (process.env.DATABASE_URL_READ_REPLICA) {
-    process.env.DATABASE_URL_READ_REPLICA = updateUrlPort(
-      process.env.DATABASE_URL_READ_REPLICA,
-      resolvedPostgresPort,
-    );
-  }
-  if (process.env.DATABASE_URL_TEST_READ_REPLICA) {
-    process.env.DATABASE_URL_TEST_READ_REPLICA = updateUrlPort(
-      process.env.DATABASE_URL_TEST_READ_REPLICA,
       resolvedPostgresPort,
     );
   }

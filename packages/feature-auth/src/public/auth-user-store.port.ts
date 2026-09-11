@@ -33,6 +33,8 @@ export type AuthUserUpdateInput = Partial<AuthUserCreateInput>;
 export interface AuthUserStore {
   create(values: AuthUserCreateInput, executor?: TransactionExecutor): Promise<AuthUserRecord>;
   findById(userId: string, executor?: TransactionExecutor): Promise<AuthUserRecord | null>;
+  /** Strong primary read for authentication and authorization decisions. */
+  findByIdStrong(userId: string): Promise<AuthUserRecord | null>;
   findByEmail(email: string, executor?: TransactionExecutor): Promise<AuthUserRecord | null>;
   update(
     userId: string,

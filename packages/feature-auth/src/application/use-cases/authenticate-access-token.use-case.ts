@@ -46,7 +46,7 @@ export class AuthenticateAccessTokenUseCase {
     }
     const [session, user] = await Promise.all([
       this.authSessionRepository.findSessionForUser(payload.sid, payload.sub),
-      this.usersRepository.findById(payload.sub),
+      this.usersRepository.findByIdStrong(payload.sub),
     ]);
 
     assertSessionUsable(session);
@@ -75,7 +75,10 @@ export class AuthenticateAccessTokenUseCase {
       user.id,
       payload.oid,
     );
-    const accessProfile = await this.accessControlService.getAccessProfile(user.id, organizationId);
+    const accessProfile = await this.accessControlService.getAccessProfileStrong(
+      user.id,
+      organizationId,
+    );
 
     return {
       userId: user.id,

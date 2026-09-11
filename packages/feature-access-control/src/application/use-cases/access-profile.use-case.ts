@@ -1,7 +1,8 @@
 import type { TransactionExecutor } from "@repo/api-kernel";
 
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Optional } from "@nestjs/common";
 import { AccessProfileCache } from "@repo/api-runtime";
+import { DATABASE, getPrimaryDatabaseClient, type DatabaseClient } from "@repo/database-runtime";
 
 import type { AccessProfileView } from "../access-control.types";
 
@@ -16,7 +17,12 @@ export class AccessProfileUseCase {
     @Inject(ACCESS_CONTROL_REPOSITORY)
     private readonly accessControlRepository: AccessControlRepositoryPort,
     private readonly accessProfileCache: AccessProfileCache,
-  ) {}
+    @Optional() @Inject(DATABASE) database?: DatabaseClient,
+  ) {
+    this.primaryDatabase = database ? getPrimaryDatabaseClient(database) : undefined;
+  }
+
+  private readonly primaryDatabase: DatabaseClient | undefined;
 
   async getAccessProfile(
     userId: string,
@@ -41,6 +47,33 @@ export class AccessProfileUseCase {
     await this.accessProfileCache.set(userId, profile, organizationId);
 
     return profile;
+  }
+
+  /**
+   * Read permissions directly from primary storage and bypass the profile
+   * cache. This is required when the result authorizes the current request.
+   */
+  async getAccessProfileStrong(
+    userId: string,
+    organizationId?: string | null,
+  ): Promise<AccessProfileView> {
+    if (!this.primaryDatabase) {
+      throw new Error("Strong access-profile reads require the database runtime provider.");
+    }
+    const [roles, permissions] = await Promise.all([
+      this.accessControlRepository.findRoleNamesForUser(
+        userId,
+        organizationId,
+        this.primaryDatabase,
+      ),
+      this.accessControlRepository.findPermissionNamesForUser(
+        userId,
+        organizationId,
+        this.primaryDatabase,
+      ),
+    ]);
+
+    return { roles, permissions };
   }
 
   async invalidateAccessProfile(userId: string): Promise<void> {
