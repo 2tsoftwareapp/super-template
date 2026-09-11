@@ -412,10 +412,15 @@ function checkMutations(mutations) {
  * Keep generated feature selection immutable after the first generation.
  * Existing targets may contain user-owned files, so changing the selection in
  * place is rejected before any generator-owned file is written.
+ *
+ * Both halves of the recorded selection are compared. Two different requests can
+ * resolve to the same closure (for example `auth` and `auth,users`), and
+ * `feature-profile.json` records the request as well as the closure, so
+ * comparing only the closure would let a different request rewrite the profile.
  * @param {string} target
- * @param {string[]} resolvedIds
+ * @param {{requestedIds: string[], resolvedIds: string[]}} selection
  */
-function assertImmutableFeatureSelection(target, resolvedIds) {
+function assertImmutableFeatureSelection(target, selection) {
   if (!existsSync(join(target, "feature-profile.json"))) return;
   let profile;
   try {
@@ -425,16 +430,24 @@ function assertImmutableFeatureSelection(target, resolvedIds) {
       `Cannot parse existing feature-profile.json in ${target}. Repair it manually or create a new target.`,
     );
   }
-  const previous = Array.isArray(profile.resolvedFeatures) ? profile.resolvedFeatures : null;
-  if (!previous) {
+  const previousRequested = Array.isArray(profile.requestedFeatures)
+    ? profile.requestedFeatures
+    : null;
+  const previousResolved = Array.isArray(profile.resolvedFeatures) ? profile.resolvedFeatures : null;
+  if (!previousRequested || !previousResolved) {
     throw new Error(
-      `Existing target ${target} has no valid resolvedFeatures in feature-profile.json. Create a new target.`,
+      `Existing target ${target} has no valid requestedFeatures and resolvedFeatures in feature-profile.json. Create a new target.`,
     );
   }
-  if (JSON.stringify(previous) !== JSON.stringify(resolvedIds)) {
+  const sameRequested =
+    JSON.stringify(previousRequested) === JSON.stringify(selection.requestedIds);
+  const sameResolved = JSON.stringify(previousResolved) === JSON.stringify(selection.resolvedIds);
+  if (!sameRequested || !sameResolved) {
     throw new Error(
-      `Existing generated target has immutable feature selection [${previous.join(", ")}], ` +
-        `but [${resolvedIds.join(", ")}] was requested. Create a new target for a different selection; user-owned files are never reconciled in place.`,
+      `Existing generated target has immutable feature selection ` +
+        `(requested [${previousRequested.join(", ")}], resolved [${previousResolved.join(", ")}]), ` +
+        `but requested [${selection.requestedIds.join(", ")}] resolving to [${selection.resolvedIds.join(", ")}]. ` +
+        "Create a new target for a different selection; user-owned files are never reconciled in place.",
     );
   }
 }
@@ -512,7 +525,7 @@ export async function main(argv = process.argv.slice(2)) {
   }
   const selection = resolveFeatureSelection(catalog, args.features);
   if (targetState.exists) {
-    assertImmutableFeatureSelection(target, selection.resolvedIds);
+    assertImmutableFeatureSelection(target, selection);
   }
   const mutations = buildMutations({ source, target, selection, surfaces: args.surfaces });
 

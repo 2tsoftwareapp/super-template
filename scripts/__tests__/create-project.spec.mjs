@@ -243,6 +243,29 @@ test("existing generated targets use immutable feature selection", () => {
   ]);
   assert.notEqual(narrowToBroad.status, 0);
   assert.match(narrowToBroad.stderr, /immutable feature selection/);
+
+  // A different request that resolves to the same closure must still be rejected:
+  // feature-profile.json records the request as well as the closure, so accepting
+  // it would rewrite the profile and break the immutability guarantee.
+  const sameClosureTarget = join(root, "same-closure");
+  const sameClosure = runGenerator([
+    "--features",
+    "auth",
+    "--target",
+    sameClosureTarget,
+    "--skip-install",
+  ]);
+  assert.equal(sameClosure.status, 0, sameClosure.stderr);
+
+  const sameClosureRerun = runGenerator([
+    "--features",
+    "auth,users",
+    "--target",
+    sameClosureTarget,
+    "--skip-install",
+  ]);
+  assert.notEqual(sameClosureRerun.status, 0);
+  assert.match(sameClosureRerun.stderr, /immutable feature selection/);
 });
 
 test("dry-run and invalid selections do not create or mutate targets", () => {
