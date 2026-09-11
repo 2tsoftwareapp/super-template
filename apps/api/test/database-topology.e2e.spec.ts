@@ -46,26 +46,45 @@ describe.skipIf(!enabled)("Database topology (e2e)", () => {
     ]);
     const tenantA = userMe.body.data.organizationId as string;
     const tenantB = adminMe.body.data.organizationId as string;
+    expect(tenantA).not.toBe(tenantB);
 
+    // m_organizations carries no tenant policy, so isolation has to be asserted on
+    // an RLS-protected table. Seed one row per tenant and read it back under each
+    // tenant context, so the check does not depend on pre-existing seed rows.
     for (const pool of [primary, replica]) {
       const client = await pool.connect();
       try {
-        await client.query("select set_config('app.user_id', $1, false)", [userSession.userId]);
-        await client.query("select set_config('app.bypass_rls', 'false', false)");
+        await client.query("begin");
+        await client.query("select set_config('app.bypass_rls', 'false', true)");
+        await client.query("select set_config('app.user_id', $1, true)", [userSession.userId]);
 
-        await client.query("select set_config('app.tenant_id', $1, false)", [tenantA]);
-        const tenantARows = await client.query<{ id: string }>(
-          "select id::text from m_organizations order by id",
+        await client.query("select set_config('app.tenant_id', $1, true)", [tenantA]);
+        await client.query(
+          `insert into t_notifications (user_id, type, title, body, organization_id)
+           values ($1, 'TOPOLOGY_ISOLATION', $2, $2, $3)`,
+          [userSession.userId, "tenant-a", tenantA],
         );
-        expect(tenantARows.rows.map((row) => row.id)).toContain(tenantA);
-        expect(tenantARows.rows.map((row) => row.id)).not.toContain(tenantB);
 
-        await client.query("select set_config('app.tenant_id', $1, false)", [tenantB]);
-        const tenantBRows = await client.query<{ id: string }>(
-          "select id::text from m_organizations order by id",
+        await client.query("select set_config('app.tenant_id', $1, true)", [tenantB]);
+        await client.query(
+          `insert into t_notifications (user_id, type, title, body, organization_id)
+           values ($1, 'TOPOLOGY_ISOLATION', $2, $2, $3)`,
+          [adminSession.userId, "tenant-b", tenantB],
         );
-        expect(tenantBRows.rows.map((row) => row.id)).not.toContain(tenantA);
+
+        await client.query("select set_config('app.tenant_id', $1, true)", [tenantA]);
+        const tenantARows = await client.query<{ title: string }>(
+          "select title from t_notifications where type = 'TOPOLOGY_ISOLATION' order by title",
+        );
+        expect(tenantARows.rows.map((row) => row.title)).toEqual(["tenant-a"]);
+
+        await client.query("select set_config('app.tenant_id', $1, true)", [tenantB]);
+        const tenantBRows = await client.query<{ title: string }>(
+          "select title from t_notifications where type = 'TOPOLOGY_ISOLATION' order by title",
+        );
+        expect(tenantBRows.rows.map((row) => row.title)).toEqual(["tenant-b"]);
       } finally {
+        await client.query("rollback");
         client.release();
       }
     }
