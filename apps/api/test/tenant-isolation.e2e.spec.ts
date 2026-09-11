@@ -72,7 +72,7 @@ describe("Tenant isolation (e2e)", () => {
     await request(app.getHttpServer())
       .post("/api/v1/auth/logout")
       .set(bearer(session.accessToken))
-      .expect(204);
+      .expect(201);
 
     await request(app.getHttpServer())
       .get("/api/v1/auth/me")
