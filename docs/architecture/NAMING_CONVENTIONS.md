@@ -139,9 +139,14 @@ These reflect the current schema and are the standard for new columns:
 - **Columns are `snake_case`** in SQL and `camelCase` as Drizzle fields:
   `password_hash` → `passwordHash`, `email_verified_at` → `emailVerifiedAt`.
 - **Primary key is `id`** — `uuid("id").defaultRandom().primaryKey()`.
-  Junction (`r_`) tables use a **composite primary key** of their two foreign
-  keys instead (e.g. `primaryKey({ columns: [userId, roleId] })`) and carry no
-  `id`.
+  Two documented exceptions:
+  - **Junction (`r_`) tables** use a **composite primary key** of their two
+    foreign keys instead (e.g. `primaryKey({ columns: [userId, roleId] })`) and
+    carry no `id`.
+  - **Four natural-key tables**, where the natural key already carries the right
+    cardinality: `m_user_preferences` (`user_id`),
+    `m_user_two_factor_secrets` (`user_id`), `m_application_settings` (`key`),
+    `t_storage_objects` (`storage_key`).
 - **Foreign keys are `<entity>_id`**: `user_id`, `organization_id`, `role_id`,
   `session_id`, `actor_id`, `created_by_id`.
 - **Timestamps are `created_at` / `updated_at`**, both
@@ -161,6 +166,25 @@ These reflect the current schema and are the standard for new columns:
 - **Index / constraint names** describe the table and columns:
   `users_email_active_unique`, `jobs_status_scheduled_at_idx`,
   `audit_logs_org_created_idx`.
+
+### 2.4 Row-level security — policy naming and coverage
+
+RLS follows the table, so two rules hold:
+
+- **Policy names keep the pre-prefix base name.** The policy on `m_files` is
+  `files_tenant_isolation`; the policy on `w_jobs` is `jobs_tenant_isolation`.
+  Migration `0037_table_naming_convention_prefixes.sql` renamed only the
+  physical table — policies, indexes, and foreign keys bind by OID and were
+  deliberately left alone. Do not "fix" these names to match the prefix; a
+  rename would silently drop and recreate the policy.
+- **Coverage is a deliberate subset, not all tables.** 14 of the 38 tables are
+  `ENABLE`d **and** `FORCE`d with exactly one `<base>_tenant_isolation` policy.
+  Four tables carry `organization_id` but are intentionally outside RLS because
+  they are read *before* a tenant context exists — a tenant predicate would hide
+  the very rows used to establish that context (`r_organization_members`,
+  `t_sso_session_exchanges`, `m_roles`, `r_user_roles`). See
+  [`docs/database.md`](../database.md) → "Tables deliberately outside RLS"
+  for the rationale and the compensating controls.
 
 ---
 
