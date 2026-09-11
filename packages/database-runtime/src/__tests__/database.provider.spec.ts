@@ -4,7 +4,6 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   DATABASE,
-  DATABASE_PRIMARY,
   DATABASE_READ_REPLICA_POOL,
   DEFAULT_DATABASE_RUNTIME_OPTIONS,
   databaseProviders,
@@ -238,18 +237,6 @@ describe("database replica providers", () => {
     expect(
       (database as import("../database.types").ReadReplicaDatabaseClient).$primary,
     ).toBeUndefined();
-    expect(database.$client).toBe(primaryPool);
-    await primaryPool.end();
-  });
-
-  it("exposes a client that is always pinned to the primary pool", async () => {
-    const provider = factoryProvider(DATABASE_PRIMARY);
-    const primaryPool = new Pool({ connectionString: "postgres://primary/app" });
-    const database = provider.useFactory(
-      primaryPool,
-      {},
-    ) as import("../database.types").DatabaseClient;
-
     expect(database.$client).toBe(primaryPool);
     await primaryPool.end();
   });

@@ -1,7 +1,7 @@
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { DATABASE_PRIMARY, type DatabaseClient } from "@repo/database-runtime";
+import { DATABASE, type DatabaseClient, getPrimaryDatabaseClient } from "@repo/database-runtime";
 import { and, asc, eq, isNull } from "drizzle-orm";
 
 import type { OrganizationsRepositoryPort } from "../application/ports/organizations.repository.port";
@@ -10,17 +10,21 @@ import { organizations } from "./persistence";
 
 @Injectable()
 export class OrganizationsRepository implements OrganizationsRepositoryPort {
-  constructor(@Inject(DATABASE_PRIMARY) private readonly database: DatabaseClient) {}
+  private readonly primaryDatabase: DatabaseClient;
+
+  constructor(@Inject(DATABASE) database: DatabaseClient) {
+    this.primaryDatabase = getPrimaryDatabaseClient(database);
+  }
 
   async createOrganization(
     values: typeof organizations.$inferInsert,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     const [organization] = await executor.insert(organizations).values(values).returning();
     return organization ?? null;
   }
 
-  async findBySlug(slug: string, executor: DatabaseExecutor = this.database) {
+  async findBySlug(slug: string, executor: DatabaseExecutor = this.primaryDatabase) {
     const [organization] = await executor
       .select()
       .from(organizations)
@@ -29,7 +33,7 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
     return organization ?? null;
   }
 
-  async findById(organizationId: string, executor: DatabaseExecutor = this.database) {
+  async findById(organizationId: string, executor: DatabaseExecutor = this.primaryDatabase) {
     const [organization] = await executor
       .select()
       .from(organizations)
@@ -38,7 +42,7 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
     return organization ?? null;
   }
 
-  async listAll(executor: DatabaseExecutor = this.database) {
+  async listAll(executor: DatabaseExecutor = this.primaryDatabase) {
     return executor
       .select()
       .from(organizations)
@@ -49,7 +53,7 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
   async updateOrganization(
     organizationId: string,
     values: Partial<Pick<typeof organizations.$inferInsert, "name">>,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     const [organization] = await executor
       .update(organizations)
@@ -59,7 +63,10 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
     return organization ?? null;
   }
 
-  async softDeleteOrganization(organizationId: string, executor: DatabaseExecutor = this.database) {
+  async softDeleteOrganization(
+    organizationId: string,
+    executor: DatabaseExecutor = this.primaryDatabase,
+  ) {
     const [organization] = await executor
       .update(organizations)
       .set({ deletedAt: new Date(), updatedAt: new Date() })

@@ -2,18 +2,22 @@ import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
 import type { UserRoleAssignments } from "@repo/feature-access-control/contracts";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { DATABASE_PRIMARY } from "@repo/database-runtime";
+import { DATABASE, getPrimaryDatabaseClient } from "@repo/database-runtime";
 import { and, eq, inArray, isNull, or, sql, type SQL } from "drizzle-orm";
 
 import { permissions, rolePermissions, roles, userRoles } from "./persistence";
 
 @Injectable()
 export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
-  constructor(@Inject(DATABASE_PRIMARY) private readonly database: DatabaseClient) {}
+  private readonly primaryDatabase: DatabaseClient;
+
+  constructor(@Inject(DATABASE) database: DatabaseClient) {
+    this.primaryDatabase = getPrimaryDatabaseClient(database);
+  }
 
   async findUserIdsForRole(
     roleId: string,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<string[]> {
     const rows = await executor
       .select({ userId: userRoles.userId })
@@ -25,7 +29,7 @@ export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
   async findUserIdsForRoleName(
     roleName: string,
     organizationId?: string | null,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<string[]> {
     const filters: SQL[] = [eq(roles.name, roleName)];
     if (organizationId === null) {
@@ -45,7 +49,7 @@ export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
 
   async findUserIdsForPermission(
     permissionId: string,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<string[]> {
     const rows = await executor
       .select({ userId: userRoles.userId })
@@ -59,7 +63,7 @@ export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
     userId: string,
     roleIds: string[],
     organizationId: string | null,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<void> {
     if (organizationId === null) {
       await executor
@@ -96,7 +100,7 @@ export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
   async findRoleNamesForUser(
     userId: string,
     organizationId?: string | null,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<string[]> {
     const filters: SQL[] = [];
     if (organizationId !== undefined) {
@@ -130,7 +134,7 @@ export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
   async findPermissionNamesForUser(
     userId: string,
     organizationId?: string | null,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<string[]> {
     const filters: SQL[] = [];
     if (organizationId !== undefined) {
@@ -166,7 +170,7 @@ export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
   async findRoleNamesForUsers(
     userIds: string[],
     organizationId?: string | null,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     if (userIds.length === 0) return [];
     const filters = [inArray(userRoles.userId, userIds)];
@@ -185,7 +189,7 @@ export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
   async findRoleIdsForUser(
     userId: string,
     organizationId?: string | null,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<string[]> {
     const filters = [eq(userRoles.userId, userId)];
     if (organizationId === null) filters.push(isNull(userRoles.organizationId));
@@ -204,7 +208,7 @@ export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
   async findRoleAssignmentsForUser(
     userId: string,
     organizationId?: string | null,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<{ roleName: string; roleId: string; organizationId: string | null }[]> {
     const filters = [eq(userRoles.userId, userId)];
     if (organizationId === null) filters.push(isNull(userRoles.organizationId));
@@ -227,7 +231,7 @@ export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
   async findRoleIdsForUsers(
     userIds: string[],
     organizationId?: string | null,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ) {
     if (userIds.length === 0) return [];
     const filters = [inArray(userRoles.userId, userIds)];
@@ -247,7 +251,7 @@ export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
     userId: string,
     roleId: string,
     organizationId: string | null,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<void> {
     await executor
       .insert(userRoles)
@@ -257,7 +261,7 @@ export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
 
   async deleteByOrganizationId(
     organizationId: string,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<void> {
     await executor.delete(userRoles).where(eq(userRoles.organizationId, organizationId));
   }

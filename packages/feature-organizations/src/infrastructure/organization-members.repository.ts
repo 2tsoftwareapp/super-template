@@ -6,7 +6,7 @@ import type {
 } from "@repo/feature-organizations/contracts";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { DATABASE_PRIMARY, type DatabaseClient } from "@repo/database-runtime";
+import { DATABASE, type DatabaseClient, getPrimaryDatabaseClient } from "@repo/database-runtime";
 import { users } from "@repo/feature-users/schema";
 import { and, asc, count, eq, isNull, ne } from "drizzle-orm";
 
@@ -14,11 +14,15 @@ import { organizationMembers, organizations } from "./persistence";
 
 @Injectable()
 export class OrganizationMembersRepository implements OrganizationMembership {
-  constructor(@Inject(DATABASE_PRIMARY) private readonly database: DatabaseClient) {}
+  private readonly primaryDatabase: DatabaseClient;
+
+  constructor(@Inject(DATABASE) database: DatabaseClient) {
+    this.primaryDatabase = getPrimaryDatabaseClient(database);
+  }
 
   async addMember(
     values: { organizationId: string; userId: string; role: OrganizationMemberRole },
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<OrganizationMemberRecord | null> {
     const [member] = await executor.insert(organizationMembers).values(values).returning();
     return member ?? null;
@@ -26,7 +30,7 @@ export class OrganizationMembersRepository implements OrganizationMembership {
 
   async upsertMember(
     values: { organizationId: string; userId: string; role: OrganizationMemberRole },
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<OrganizationMemberRecord | null> {
     const [member] = await executor
       .insert(organizationMembers)
@@ -46,7 +50,7 @@ export class OrganizationMembersRepository implements OrganizationMembership {
   async findMembership(
     organizationId: string,
     userId: string,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<OrganizationMemberRecord | null> {
     const [member] = await executor
       .select()
@@ -61,7 +65,7 @@ export class OrganizationMembersRepository implements OrganizationMembership {
     return member ?? null;
   }
 
-  async listForUser(userId: string, executor: DatabaseExecutor = this.database) {
+  async listForUser(userId: string, executor: DatabaseExecutor = this.primaryDatabase) {
     return executor
       .select({
         id: organizations.id,
@@ -77,7 +81,7 @@ export class OrganizationMembersRepository implements OrganizationMembership {
       .orderBy(asc(organizations.name));
   }
 
-  async listMembers(organizationId: string, executor: DatabaseExecutor = this.database) {
+  async listMembers(organizationId: string, executor: DatabaseExecutor = this.primaryDatabase) {
     return executor
       .select({
         userId: organizationMembers.userId,
@@ -97,7 +101,7 @@ export class OrganizationMembersRepository implements OrganizationMembership {
     organizationId: string,
     options: { excludingUserId?: string; executor?: DatabaseExecutor; lock?: boolean } = {},
   ) {
-    const executor = options.executor ?? this.database;
+    const executor = options.executor ?? this.primaryDatabase;
     if (options.lock) {
       const owners = await executor
         .select({ userId: organizationMembers.userId })
@@ -129,7 +133,7 @@ export class OrganizationMembersRepository implements OrganizationMembership {
     return result?.value ?? 0;
   }
 
-  async countMembers(organizationId: string, executor: DatabaseExecutor = this.database) {
+  async countMembers(organizationId: string, executor: DatabaseExecutor = this.primaryDatabase) {
     const [result] = await executor
       .select({ value: count() })
       .from(organizationMembers)
@@ -139,7 +143,7 @@ export class OrganizationMembersRepository implements OrganizationMembership {
 
   async findUserIdsForOrganization(
     organizationId: string,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<string[]> {
     const rows = await executor
       .select({ userId: organizationMembers.userId })
@@ -152,7 +156,7 @@ export class OrganizationMembersRepository implements OrganizationMembership {
     organizationId: string,
     userId: string,
     role: OrganizationMemberRole,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<OrganizationMemberRecord | null> {
     const [member] = await executor
       .update(organizationMembers)
@@ -170,7 +174,7 @@ export class OrganizationMembersRepository implements OrganizationMembership {
   async removeMember(
     organizationId: string,
     userId: string,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<OrganizationMemberRecord | null> {
     const [member] = await executor
       .delete(organizationMembers)
@@ -184,7 +188,10 @@ export class OrganizationMembersRepository implements OrganizationMembership {
     return member ?? null;
   }
 
-  async findPrimaryOrganizationId(userId: string, executor: DatabaseExecutor = this.database) {
+  async findPrimaryOrganizationId(
+    userId: string,
+    executor: DatabaseExecutor = this.primaryDatabase,
+  ) {
     const [member] = await executor
       .select({ organizationId: organizationMembers.organizationId })
       .from(organizationMembers)
@@ -198,7 +205,7 @@ export class OrganizationMembersRepository implements OrganizationMembership {
 
   async deleteByOrganizationId(
     organizationId: string,
-    executor: DatabaseExecutor = this.database,
+    executor: DatabaseExecutor = this.primaryDatabase,
   ): Promise<void> {
     await executor
       .delete(organizationMembers)
