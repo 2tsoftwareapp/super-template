@@ -1,7 +1,7 @@
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { DATABASE, type DatabaseClient } from "@repo/database-runtime";
+import { DATABASE_PRIMARY, type DatabaseClient } from "@repo/database-runtime";
 import { and, asc, eq, isNull } from "drizzle-orm";
 
 import type { OrganizationsRepositoryPort } from "../application/ports/organizations.repository.port";
@@ -10,7 +10,7 @@ import { organizations } from "./persistence";
 
 @Injectable()
 export class OrganizationsRepository implements OrganizationsRepositoryPort {
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+  constructor(@Inject(DATABASE_PRIMARY) private readonly database: DatabaseClient) {}
 
   async createOrganization(
     values: typeof organizations.$inferInsert,

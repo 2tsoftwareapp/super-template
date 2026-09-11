@@ -1,7 +1,7 @@
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { DATABASE } from "@repo/database-runtime";
+import { DATABASE_PRIMARY } from "@repo/database-runtime";
 import { and, count, eq, ilike, inArray, isNotNull, isNull, or, type SQL } from "drizzle-orm";
 
 import type { RoleRecord } from "../application/ports/access-control.repository.port";
@@ -11,7 +11,7 @@ import { roles } from "./persistence";
 
 @Injectable()
 export class AccessControlRolePersistence {
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+  constructor(@Inject(DATABASE_PRIMARY) private readonly database: DatabaseClient) {}
 
   async findRolesPaginated(
     params: {

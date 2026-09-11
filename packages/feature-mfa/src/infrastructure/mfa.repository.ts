@@ -1,7 +1,7 @@
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { DATABASE, type DatabaseClient } from "@repo/database-runtime";
+import { DATABASE_PRIMARY, type DatabaseClient } from "@repo/database-runtime";
 import { and, eq, gt, isNull, sql } from "drizzle-orm";
 
 import type { MfaRepositoryPort } from "../application/ports/mfa.repository.port";
@@ -10,7 +10,7 @@ import { mfaChallenges, userRecoveryCodes, userTwoFactorSecrets } from "./persis
 
 @Injectable()
 export class MfaRepository implements MfaRepositoryPort {
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+  constructor(@Inject(DATABASE_PRIMARY) private readonly database: DatabaseClient) {}
 
   async findSecretByUserId(userId: string, executor: DatabaseExecutor = this.database) {
     const [secret] = await executor

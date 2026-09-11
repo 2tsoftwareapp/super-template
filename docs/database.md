@@ -68,7 +68,8 @@
 
 Tenant isolation depends on Postgres row-level security. Superusers and roles with `BYPASSRLS` ignore every policy, including `FORCE ROW LEVEL SECURITY`.
 
-- **`DATABASE_URL`** — restricted runtime role used by the API (`fullstack_starter_app` in local `.env.example`). The API refuses to boot when this connection is superuser or `BYPASSRLS`.
+- **`DATABASE_URL`** — restricted primary runtime role used by the API and worker (`fullstack_starter_app` in local `.env.example`). The runtime refuses to boot when this connection is superuser or `BYPASSRLS`.
+- **`DATABASE_URL_READ_REPLICA`** — optional restricted runtime role for the selected read-replica endpoint. The same RLS capability check runs against this pool; a superuser or `BYPASSRLS` replica role also fails startup.
 - **`DATABASE_MIGRATE_URL`** — privileged role for `db:migrate`, `db:reset`, and Drizzle kit (`postgres` in local `.env.example`).
 - Migration `0007_app_database_role.sql` provisions the application role and table grants on each database.
 
@@ -111,12 +112,47 @@ node scripts/create-project.mjs \
 Configure `DATABASE_URL_READ_REPLICA` for runtime and
 `DATABASE_URL_TEST_READ_REPLICA` for test runs. The selected capability fails
 startup when the relevant URL is absent. Both URLs should use a restricted
-database role and TLS settings appropriate to the environment.
+database role and TLS settings appropriate to the environment. The primary and
+replica URLs are independent endpoints; primary port discovery in
+`@repo/env-loader` does not rewrite either replica host or port.
 
 Drizzle select/query/count helpers use the replica with eventual consistency.
 Inserts, updates, deletes, raw `execute`, transactions, migrations, and
-advisory locks stay on the primary. There is no automatic failover or
-read-your-writes guarantee in this version.
+advisory locks stay on the primary. Security-sensitive auth session, user,
+organization, access-control, and MFA repositories use the exported
+`DATABASE_PRIMARY` client, so revocation, rotation, status, and permission
+decisions do not depend on replica lag. There is no automatic failover or
+general read-your-writes guarantee for eventual consumers in this version.
+
+`readConsistency: "strong"` cannot be composed with `readReplica: true`; the
+feature manifest resolver rejects that combination before runtime startup.
+Strong reads must use the primary client, while explicit eventual consumers
+continue using the default `DATABASE` client.
+
+## Topology integration test
+
+`apps/api/test/database-topology.e2e.spec.ts` is an opt-in real-PostgreSQL
+suite. It requires a migrated primary/replica pair using restricted roles plus
+`DATABASE_TOPOLOGY_ADMIN_URL` targeting the primary for temporary probe-table
+setup and cleanup:
+
+```bash
+DATABASE_TOPOLOGY_PRIMARY_URL='postgresql://app@primary/app' \
+DATABASE_TOPOLOGY_REPLICA_URL='postgresql://app@replica/app' \
+DATABASE_TOPOLOGY_ADMIN_URL='postgresql://admin@primary/app' \
+pnpm --filter api exec vitest run test/database-topology.e2e.spec.ts
+```
+
+The test covers tenant A/B isolation on both endpoints, independent endpoint
+configuration, immediate primary visibility after auth rotation/revocation,
+and an optional privileged replica-role failure using
+`DATABASE_TOPOLOGY_PRIVILEGED_REPLICA_URL`. If the three required topology
+URLs are unset, Vitest skips the file; the optional negative test is skipped
+when its URL is unset. This repository's Docker Compose file provides a
+development PostgreSQL primary but does not provision a read-replica service,
+so a live replica remains an environment prerequisite rather than a claim of
+local test success. Source: `apps/api/test/database-topology.e2e.spec.ts`,
+`infra/docker-compose.yml`.
 
 The live topology suite is opt-in because it requires a separately reachable
 replica and a restricted test role on both endpoints. Invoke Vitest directly so

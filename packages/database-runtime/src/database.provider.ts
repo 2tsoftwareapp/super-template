@@ -17,6 +17,8 @@ export const DATABASE_POOL = Symbol("DATABASE_POOL");
 export const DATABASE_READ_REPLICA_POOL = Symbol("DATABASE_READ_REPLICA_POOL");
 export const ADVISORY_LOCK_POOL = Symbol("ADVISORY_LOCK_POOL");
 export const DATABASE = Symbol("DATABASE");
+/** Nest token for security-sensitive reads and writes pinned to the primary. */
+export const DATABASE_PRIMARY = Symbol("DATABASE_PRIMARY");
 /** Nest token for the composed tenant and database-topology options. */
 export const DATABASE_RUNTIME_OPTIONS = Symbol("DATABASE_RUNTIME_OPTIONS");
 
@@ -213,6 +215,11 @@ export const databaseProviders: Provider[] = [
   {
     provide: DATABASE_SCHEMA,
     useValue: defaultSchema,
+  },
+  {
+    provide: DATABASE_PRIMARY,
+    inject: [DATABASE_POOL, DATABASE_SCHEMA],
+    useFactory: (pool: Pool, schema: Record<string, unknown>) => createDatabaseClient(pool, schema),
   },
   {
     provide: DATABASE,

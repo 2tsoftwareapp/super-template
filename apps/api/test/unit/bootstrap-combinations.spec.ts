@@ -19,7 +19,7 @@ import {
 } from "../../src/composition/composed-schema";
 import { enabledFeatures } from "../../src/composition/feature-registry";
 import { buildOrderedGuardCatalog } from "../../src/composition/global-pipeline";
-import { DATABASE } from "@repo/database-runtime";
+import { DATABASE, DATABASE_PRIMARY } from "@repo/database-runtime";
 import {
   ADVISORY_LOCK_PORT,
   APP_LOGGER,
@@ -47,6 +47,7 @@ const databaseFake = {
 @Module({
   providers: [
     { provide: DATABASE, useValue: databaseFake },
+    { provide: DATABASE_PRIMARY, useValue: databaseFake },
     {
       provide: PLATFORM_TRANSACTION_PORT,
       useValue: {
@@ -87,6 +88,7 @@ const databaseFake = {
   ],
   exports: [
     DATABASE,
+    DATABASE_PRIMARY,
     PLATFORM_TRANSACTION_PORT,
     TRANSACTION_PORT,
     TenantContextService,

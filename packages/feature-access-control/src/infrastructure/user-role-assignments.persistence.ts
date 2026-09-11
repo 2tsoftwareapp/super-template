@@ -2,14 +2,14 @@ import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
 import type { UserRoleAssignments } from "@repo/feature-access-control/contracts";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { DATABASE } from "@repo/database-runtime";
+import { DATABASE_PRIMARY } from "@repo/database-runtime";
 import { and, eq, inArray, isNull, or, sql, type SQL } from "drizzle-orm";
 
 import { permissions, rolePermissions, roles, userRoles } from "./persistence";
 
 @Injectable()
 export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+  constructor(@Inject(DATABASE_PRIMARY) private readonly database: DatabaseClient) {}
 
   async findUserIdsForRole(
     roleId: string,

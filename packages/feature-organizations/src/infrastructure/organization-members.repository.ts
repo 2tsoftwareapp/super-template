@@ -6,7 +6,7 @@ import type {
 } from "@repo/feature-organizations/contracts";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { DATABASE, type DatabaseClient } from "@repo/database-runtime";
+import { DATABASE_PRIMARY, type DatabaseClient } from "@repo/database-runtime";
 import { users } from "@repo/feature-users/schema";
 import { and, asc, count, eq, isNull, ne } from "drizzle-orm";
 
@@ -14,7 +14,7 @@ import { organizationMembers, organizations } from "./persistence";
 
 @Injectable()
 export class OrganizationMembersRepository implements OrganizationMembership {
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+  constructor(@Inject(DATABASE_PRIMARY) private readonly database: DatabaseClient) {}
 
   async addMember(
     values: { organizationId: string; userId: string; role: OrganizationMemberRole },
