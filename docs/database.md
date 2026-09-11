@@ -119,10 +119,12 @@ advisory locks stay on the primary. There is no automatic failover or
 read-your-writes guarantee in this version.
 
 The live topology suite is opt-in because it requires a separately reachable
-replica and a restricted test role on both endpoints:
+replica and a restricted test role on both endpoints. Invoke Vitest directly so
+only that spec runs, and set `DATABASE_URL_TEST_READ_REPLICA` alongside
+`DATABASE_URL_TEST`:
 
 ```sh
-RUN_DATABASE_TOPOLOGY_E2E=1 pnpm --filter api test:e2e -- database-topology.e2e.spec.ts
+RUN_DATABASE_TOPOLOGY_E2E=1 pnpm --filter api exec vitest run test/database-topology.e2e.spec.ts
 ```
 
 Without those external PostgreSQL endpoints, the deterministic provider,
