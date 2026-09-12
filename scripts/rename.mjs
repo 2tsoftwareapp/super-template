@@ -3,7 +3,9 @@
  * Rebrands this template for a new project.
  *
  * Replaces every casing of the template name and the original author/repo across
- * all git-tracked text files (lockfiles and binaries excluded):
+ * all git-tracked text files (lockfiles and binaries excluded). When the project
+ * is not a git repository yet — the state `scripts/create-project.mjs` leaves it
+ * in — it falls back to scanning the filesystem instead of failing:
  *
  *   super-template   (kebab)   -> <kebab>          package names, URLs, docker
  *   super_template   (snake)   -> <snake>          Dart package, generated client
@@ -19,7 +21,7 @@
  *   node scripts/rename.mjs "Acme App" --author acme-co --dry-run
  *   node scripts/rename.mjs            # interactive prompts
  */
-import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, statSync, readdirSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { resolve, relative, extname } from 'node:path';
 import { createInterface } from 'node:readline/promises';
@@ -49,6 +51,64 @@ const SKIP_FILES = new Set([
   'package-lock.json',
   'yarn.lock',
 ]);
+
+// Directories that only ever hold generated output, so they are never rebranded.
+const EXCLUDED_DIRS = new Set([
+  '.git',
+  'node_modules',
+  'dist',
+  'build',
+  'coverage',
+  '.next',
+  '.turbo',
+  '.dart_tool',
+  '.venv',
+  '.gradle',
+  '.idea',
+]);
+
+/** Every file in the tree, minus generated directories. */
+const walkSourceFiles = (root, dir = root, out = []) => {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const abs = resolve(dir, entry.name);
+
+    if (entry.isDirectory()) {
+      if (!EXCLUDED_DIRS.has(entry.name)) walkSourceFiles(root, abs, out);
+      continue;
+    }
+
+    out.push(relative(root, abs));
+  }
+
+  return out;
+};
+
+/**
+ * Files eligible for rebranding.
+ *
+ * Git's index is preferred so generated-but-untracked files stay untouched. It
+ * falls back to a filesystem walk when the project is not a git repository yet —
+ * which is exactly the state `scripts/create-project.mjs` leaves behind, and the
+ * documented next step is to run this script.
+ */
+const listRenameTargets = (root) => {
+  try {
+    const tracked = execSync('git ls-files', {
+      cwd: root,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    if (tracked.length > 0) return { files: tracked, fromGit: true };
+  } catch {
+    // Not a git repository, or git unavailable — fall through to the walk.
+  }
+
+  return { files: walkSourceFiles(root), fromGit: false };
+};
 
 const parseArgs = (argv) => {
   const args = { _: [], author: undefined, dryRun: false, help: false };
@@ -150,10 +210,15 @@ const main = async () => {
   stdout.write(`  author: ${OLD.author}      ->  ${NEW.author}\n`);
   stdout.write(args.dryRun ? `\n[dry-run] no files will be written\n\n` : `\n`);
 
-  const tracked = execSync('git ls-files', { cwd: repoRoot, encoding: 'utf8' })
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean);
+  const { files: tracked, fromGit } = listRenameTargets(repoRoot);
+
+  if (!fromGit) {
+    stdout.write(
+      `\nNote: no git repository here, so the whole tree is being scanned.\n` +
+        `      Generated directories (node_modules, dist, build, ...) are skipped.\n` +
+        `      Run \`git init && git add -A\` first if you only want tracked files rewritten.\n\n`,
+    );
+  }
 
   let totalOccurrences = 0;
   const changedFiles = [];

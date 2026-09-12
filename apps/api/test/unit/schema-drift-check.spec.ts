@@ -111,37 +111,56 @@ function bootstrapManifest(tempMigrations: string): void {
   );
 }
 
+/**
+ * Every test below copies the whole `packages/` tree into a temp directory
+ * (createIsolatedEnvironment) before invoking check-schema.mjs, and the
+ * integrity tests invoke it twice — once to seal, once to verify. Each
+ * check-schema.mjs run shells out to drizzle-kit, so a single test is a
+ * copy plus two bundling passes. On a loaded or I/O-throttled machine that
+ * easily exceeds 30s, which made these tests fail with a timeout instead of an
+ * assertion. Use a bound that reflects the work rather than the happy path.
+ */
+const ISOLATED_RUN_TIMEOUT = 180_000;
+
 describe("Schema drift check", () => {
-  it("passes when canonical schemas match committed migrations", { timeout: 30_000 }, () => {
-    const result = runDriftCheck();
-    expect(result.code, result.stderr).toBe(0);
-  });
+  it(
+    "passes when canonical schemas match committed migrations",
+    { timeout: ISOLATED_RUN_TIMEOUT },
+    () => {
+      const result = runDriftCheck();
+      expect(result.code, result.stderr).toBe(0);
+    },
+  );
 
   describe("SQL migration integrity (append-only enforcement)", () => {
-    it("fails when an old SQL migration file is modified", { timeout: 30_000 }, () => {
-      const { tempMigrations, cleanup } = createIsolatedEnvironment();
-      try {
-        bootstrapManifest(tempMigrations);
+    it(
+      "fails when an old SQL migration file is modified",
+      { timeout: ISOLATED_RUN_TIMEOUT },
+      () => {
+        const { tempMigrations, cleanup } = createIsolatedEnvironment();
+        try {
+          bootstrapManifest(tempMigrations);
 
-        const sqls = readdirSync(tempMigrations)
-          .filter((f) => f.endsWith(".sql"))
-          .sort();
-        expect(sqls.length).toBeGreaterThan(0);
+          const sqls = readdirSync(tempMigrations)
+            .filter((f) => f.endsWith(".sql"))
+            .sort();
+          expect(sqls.length).toBeGreaterThan(0);
 
-        // Mutate the oldest SQL file — this MUST fail.
-        const targetSql = join(tempMigrations, sqls[0]!);
-        const original = readFileSync(targetSql, "utf8");
-        writeFileSync(targetSql, original + "\n-- test mutation\n");
+          // Mutate the oldest SQL file — this MUST fail.
+          const targetSql = join(tempMigrations, sqls[0]!);
+          const original = readFileSync(targetSql, "utf8");
+          writeFileSync(targetSql, original + "\n-- test mutation\n");
 
-        const result = runDriftCheck({ migrationsPath: tempMigrations });
-        expect(result.code, result.stderr).toBe(1);
-        expect(result.stderr).toMatch(/modified/i);
-      } finally {
-        cleanup();
-      }
-    });
+          const result = runDriftCheck({ migrationsPath: tempMigrations });
+          expect(result.code, result.stderr).toBe(1);
+          expect(result.stderr).toMatch(/modified/i);
+        } finally {
+          cleanup();
+        }
+      },
+    );
 
-    it("fails when an old SQL migration file is deleted", { timeout: 30_000 }, () => {
+    it("fails when an old SQL migration file is deleted", { timeout: ISOLATED_RUN_TIMEOUT }, () => {
       const { tempMigrations, cleanup } = createIsolatedEnvironment();
       try {
         bootstrapManifest(tempMigrations);
@@ -164,7 +183,7 @@ describe("Schema drift check", () => {
 
     it(
       "fails in default mode when new SQL files exist but are not sealed",
-      { timeout: 30_000 },
+      { timeout: ISOLATED_RUN_TIMEOUT },
       () => {
         const { tempMigrations, cleanup } = createIsolatedEnvironment();
         try {
@@ -183,42 +202,46 @@ describe("Schema drift check", () => {
       },
     );
 
-    it("allows sealing new SQL files via --generate (append-only)", { timeout: 30_000 }, () => {
-      const { tempMigrations, cleanup } = createIsolatedEnvironment();
-      try {
-        bootstrapManifest(tempMigrations);
+    it(
+      "allows sealing new SQL files via --generate (append-only)",
+      { timeout: ISOLATED_RUN_TIMEOUT },
+      () => {
+        const { tempMigrations, cleanup } = createIsolatedEnvironment();
+        try {
+          bootstrapManifest(tempMigrations);
 
-        // Add a new SQL file and seal it.
-        const newFile = join(tempMigrations, "9999_sealed.sql");
-        writeFileSync(newFile, "CREATE TABLE test_sealed (id uuid PRIMARY KEY);\n");
+          // Add a new SQL file and seal it.
+          const newFile = join(tempMigrations, "9999_sealed.sql");
+          writeFileSync(newFile, "CREATE TABLE test_sealed (id uuid PRIMARY KEY);\n");
 
-        // Seal the new file.
-        execFileSync(
-          "node",
-          [
-            resolve(repoRoot, "scripts/check-schema.mjs"),
-            "--generate",
-            "--migrations",
-            tempMigrations,
-          ],
-          { cwd: repoRoot, stdio: "pipe" },
-        );
+          // Seal the new file.
+          execFileSync(
+            "node",
+            [
+              resolve(repoRoot, "scripts/check-schema.mjs"),
+              "--generate",
+              "--migrations",
+              tempMigrations,
+            ],
+            { cwd: repoRoot, stdio: "pipe" },
+          );
 
-        // Now the sealed manifest should pass integrity check.
-        const result = runDriftCheck({ migrationsPath: tempMigrations });
-        // May still fail for schema drift (new table not in canonical schema),
-        // but must NOT fail for integrity reasons.
-        if (result.code !== 0) {
-          expect(result.stderr).not.toMatch(/modified|deleted|not in integrity/i);
+          // Now the sealed manifest should pass integrity check.
+          const result = runDriftCheck({ migrationsPath: tempMigrations });
+          // May still fail for schema drift (new table not in canonical schema),
+          // but must NOT fail for integrity reasons.
+          if (result.code !== 0) {
+            expect(result.stderr).not.toMatch(/modified|deleted|not in integrity/i);
+          }
+        } finally {
+          cleanup();
         }
-      } finally {
-        cleanup();
-      }
-    });
+      },
+    );
 
     it(
       "fails when a sealed SQL migration is missing from the legacy journal map",
-      { timeout: 30_000 },
+      { timeout: ISOLATED_RUN_TIMEOUT },
       () => {
         const { tempMigrations, cleanup } = createIsolatedEnvironment();
         try {
@@ -249,14 +272,14 @@ describe("Schema drift check", () => {
 
     it(
       "--generate fails when trying to overwrite modified existing checksums",
-      { timeout: 30_000 },
+      { timeout: ISOLATED_RUN_TIMEOUT },
       () => {
         const { tempMigrations, cleanup } = createIsolatedEnvironment();
         try {
           bootstrapManifest(tempMigrations);
 
           // Read the manifest before tampering so we can verify it was not changed.
-          const manifestPath = join(tempMigrations, "meta", "migration-integrity.json");
+          const manifestPath = join(tempMigrations, "meta", "_migration-integrity.json");
           const manifestBefore = readFileSync(manifestPath, "utf8");
 
           const sqls = readdirSync(tempMigrations)

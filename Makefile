@@ -71,7 +71,7 @@ infra-down:
 	docker compose -f infra/docker-compose.yml down
 
 db-generate:
-	pnpm --filter @repo/database-runtime db:generate
+	node scripts/db-generate.mjs
 
 db-migrate:
 	pnpm --filter api db:migrate

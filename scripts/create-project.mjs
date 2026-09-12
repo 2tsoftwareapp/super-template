@@ -48,13 +48,15 @@ Options:
   --dry-run         Preview copy and file mutations without writing.
   --check           Verify an existing generated target without writing.
   --skip-install    Do not run pnpm install after generation.
+  --refresh-lockfile
+                    With --skip-install, also re-resolve pnpm-lock.yaml (slow, needs network).
   --help            Show this help.
 `;
 
 /**
  * Parse the small, explicit CLI surface so target safety can run before any write.
  * @param {string[]} argv
- * @returns {{features: string[], featuresProvided: boolean, tenantMode: string | undefined, readReplica: boolean, target: string | undefined, source: string, surfaces: string[], dryRun: boolean, check: boolean, skipInstall: boolean, help: boolean}}
+ * @returns {{features: string[], featuresProvided: boolean, tenantMode: string | undefined, readReplica: boolean, target: string | undefined, source: string, surfaces: string[], dryRun: boolean, check: boolean, skipInstall: boolean, refreshLockfile: boolean, help: boolean}}
  */
 function parseArgs(argv) {
   const result = {
@@ -68,6 +70,7 @@ function parseArgs(argv) {
     dryRun: false,
     check: false,
     skipInstall: false,
+    refreshLockfile: false,
     help: false,
   };
   const values = new Set(["--features", "--target", "--source", "--surfaces", "--tenant-mode"]);
@@ -88,6 +91,10 @@ function parseArgs(argv) {
     }
     if (argument === "--skip-install") {
       result.skipInstall = true;
+      continue;
+    }
+    if (argument === "--refresh-lockfile") {
+      result.refreshLockfile = true;
       continue;
     }
     if (argument === "--read-replica") {
@@ -466,6 +473,33 @@ function writeAtomic(file, content) {
 }
 
 /**
+ * Refresh pnpm-lock.yaml after the generated manifests were rewritten.
+ *
+ * buildMutations rewrites workspace manifests (notably
+ * packages/app-composition/package.json), which leaves the copied lockfile
+ * describing the template's dependency set. CI installs with --frozen-lockfile by
+ * default, so an un-refreshed lockfile makes the very first install fail.
+ *
+ * Failures are warnings: the user can always run `pnpm install` themselves.
+ * @param {string} target
+ */
+function refreshLockfile(target) {
+  if (!existsSync(join(target, "pnpm-lock.yaml"))) return;
+  process.stdout.write("Refreshing pnpm-lock.yaml to match the generated manifests...\n");
+  const lockfile = spawnSync("pnpm", ["install", "--lockfile-only", "--ignore-scripts"], {
+    cwd: target,
+    encoding: "utf8",
+  });
+  if (lockfile.error || lockfile.status !== 0) {
+    process.stdout.write(
+      "Warning: could not refresh pnpm-lock.yaml. Run `pnpm install` in the generated project before committing.\n",
+    );
+    return;
+  }
+  process.stdout.write("Refreshed pnpm-lock.yaml.\n");
+}
+
+/**
  * Execute the project generation flow.
  *
  * Flow:
@@ -572,7 +606,14 @@ export async function main(argv = process.argv.slice(2)) {
     if (result.error) throw result.error;
     if (result.status !== 0)
       throw new Error(`pnpm install failed with exit code ${result.status}.`);
+  } else if (args.refreshLockfile) {
+    refreshLockfile(target);
+  } else {
+    process.stdout.write(
+      `Skipped install. Next: \`cd ${target} && git init && pnpm install\` — the generated manifests no longer match the copied pnpm-lock.yaml, so install is required before --frozen-lockfile (or re-run with --refresh-lockfile to re-resolve it).\n`,
+    );
   }
+
   process.stdout.write(`Project generated successfully at ${target}.\n`);
 }
 
