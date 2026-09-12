@@ -121,8 +121,17 @@ test("drizzle journal numbering stays ahead of the filename ledger", () => {
       .filter((file) => /^\d{4}_.*\.sql$/.test(file))
       .map((file) => Number(file.slice(0, 4))),
   );
-  assert.ok(
-    lastJournalIdx >= lastLedgerIdx,
-    `Journal ends at ${lastJournalIdx} but the ledger reaches ${lastLedgerIdx}; the next generated migration would collide with an existing file.`,
+  // Equality, not just ">=": a journal entry that outruns the ledger means a
+  // generated migration was cleaned up but its journal entry was left behind
+  // (an orphan). A journal entry that trails the ledger means a hand-written
+  // SQL file was added without recording it in _journal.json, so the next
+  // generated migration would reuse that number.
+  assert.equal(
+    lastJournalIdx,
+    lastLedgerIdx,
+    `Journal ends at ${lastJournalIdx} but the ledger reaches ${lastLedgerIdx}. ` +
+      (lastJournalIdx > lastLedgerIdx
+        ? "A journal entry has no corresponding SQL file — remove the orphan entry."
+        : "Add a _journal.json entry for the newest SQL file so generated migrations do not reuse its number."),
   );
 });
