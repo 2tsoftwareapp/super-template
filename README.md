@@ -146,6 +146,13 @@ non-interactive runs, pass feature IDs explicitly:
 pnpm create:project --features auth,import-export --target ../my-project --skip-install
 ```
 
+The generator does not create a git repository for you — run `git init` in the
+new project. Because the generated manifests no longer match the copied
+`pnpm-lock.yaml`, `pnpm install` is required before anything uses
+`--frozen-lockfile`; `--refresh-lockfile` re-resolves the lockfile without a
+full install. `scripts/rename.mjs` works in either case (it falls back to a
+filesystem walk when the project is not a git repository yet).
+
 Generated feature selection is immutable for an existing target. A later run
 with a different selection fails before writing; create a new target when the
 feature set must change. This protects user-owned files from generator cleanup.

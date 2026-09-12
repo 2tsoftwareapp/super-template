@@ -124,12 +124,40 @@ the primary connection (see the read-replica section below).
 ## Migration Workflow
 
 1. Edit feature schema under `packages/feature-*/src/infrastructure/persistence/`
-2. Run `make db-generate` (`pnpm --filter @repo/database-runtime db:generate`)
+2. Run `make db-generate` (`node scripts/db-generate.mjs`)
 3. Review generated SQL under `apps/api/migrations/`
 4. Run `make db-migrate` (uses `DATABASE_MIGRATE_URL` or `POSTGRES_*` admin credentials)
 5. Run `make db-seed` if needed
 
 `db:push` is available only as a local convenience and is not part of CI or production workflow.
+
+### How the history is stored
+
+This repository keeps **two** records of the migration history, and
+`scripts/db-generate.mjs` keeps them in sync so you never edit them by hand:
+
+| File | Owner | Purpose |
+| --- | --- | --- |
+| `apps/api/migrations/*.sql` | runtime (`apps/api/src/cli/migrations.ts`) | the actual applied history, applied in filename order |
+| `meta/_journal.json` | drizzle-kit | numbering for the next generated migration |
+| `meta/NNNN_snapshot.json` | drizzle-kit | schema state the next migration diffs against |
+| `meta/_legacy-journal-map.json` | `check-schema.mjs` | filename ledger; every SQL file must be listed |
+| `meta/_migration-integrity.json` | `check-schema.mjs` | SHA-256 checksums; the history is append-only |
+
+Two rules follow from this and are enforced by
+`scripts/__tests__/migration-tooling.spec.mjs` and `scripts/check-schema.mjs`:
+
+- **Every file in `meta/` that drizzle-kit should not parse must start with `_`.**
+  drizzle-kit treats every other entry as a Drizzle snapshot and aborts with
+  `data is malformed`.
+- **`meta/_journal.json` must end at or above the highest `NNNN_` prefix in the
+  ledger**, otherwise a generated migration reuses an existing number.
+
+`drizzle.config.ts` deliberately globs only the canonical persistence entry
+points (`persistence/index.ts`, plus `feature-outbox/.../outbox-messages.ts`).
+A wider glob such as `persistence/**/*.ts` also pulls in repositories and DTOs,
+and drizzle-kit then fails while bundling them with esbuild
+(`Parameter decorators only work when experimental decorators are enabled`).
 
 ## Application Database Role
 

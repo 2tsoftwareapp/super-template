@@ -411,14 +411,20 @@ test("scaffold fixture uses the canonical plugin kit and registry path", () => {
   );
   assert.equal(result.status, 0, result.stderr);
 
-  const packageJson = JSON.parse(
-    readFileSync(join(fixture, "packages/feature-billing/package.json"), "utf8"),
-  );
-  const index = readFileSync(join(fixture, "packages/feature-billing/src/index.ts"), "utf8");
-  const readme = readFileSync(join(fixture, "packages/feature-billing/README.md"), "utf8");
+  const featureRoot = join(fixture, "packages/feature-billing");
+  const packageJson = JSON.parse(readFileSync(join(featureRoot, "package.json"), "utf8"));
+  const manifest = readFileSync(join(featureRoot, "src/billing.feature.ts"), "utf8");
+  const index = readFileSync(join(featureRoot, "src/index.ts"), "utf8");
+  const readme = readFileSync(join(featureRoot, "README.md"), "utf8");
   assert.equal(packageJson.dependencies["@repo/api-plugin-kit"], "workspace:*");
   assert.equal(packageJson.dependencies["@repo/api-runtime"], undefined);
-  assert.match(index, /from "@repo\/api-plugin-kit"/);
-  assert.doesNotMatch(index, /apps\/api\/src\/features\.ts/);
-  assert.doesNotMatch(readme, /apps\/api\/src\/features\.ts/);
+  assert.match(manifest, /defineFeature[\s\S]*from "@repo\/api-plugin-kit"/);
+  assert.match(index, /export \{ billingFeature \}/);
+  for (const [name, content] of Object.entries({ manifest, index, readme })) {
+    assert.doesNotMatch(
+      content,
+      /apps\/api\/src\/features\.ts/,
+      `${name} references the legacy registry`,
+    );
+  }
 });

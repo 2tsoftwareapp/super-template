@@ -8,6 +8,20 @@
       "when": 1784390830604,
       "tag": "0036_schema_sync",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1787749838000,
+      "tag": "0037_table_naming_convention_prefixes",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1789219524000,
+      "tag": "0038_bright_bulldozer",
+      "breakpoints": true
     }
   ]
 }

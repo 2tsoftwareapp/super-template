@@ -15,7 +15,7 @@
  *   node check-schema.mjs --generate --migrations <dir> # generate for a custom dir
  */
 import { cp, mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
@@ -64,10 +64,40 @@ function sha256hex(data) {
   return createHash("sha256").update(data).digest("hex");
 }
 
+/**
+ * Reject any file in `meta/` that drizzle-kit would mistake for a snapshot.
+ *
+ * drizzle-kit's prepareOutFolder() reads every entry of `meta/` that does not
+ * start with "_" and parses it as a Drizzle snapshot. A single stray JSON file
+ * therefore makes `drizzle-kit generate` abort with "data is malformed" — which
+ * is how `make db-generate` used to fail for every consumer of this template.
+ *
+ * Allowed shapes: `_journal.json`, `NNNN_snapshot.json`, and any other
+ * underscore-prefixed bookkeeping file.
+ * @param {string} migrationsDir
+ */
+function checkMetaHygiene(migrationsDir) {
+  const meta = join(migrationsDir, "meta");
+  if (!existsSync(meta)) return;
+  const offenders = readdirSync(meta).filter(
+    (name) =>
+      !name.startsWith("_") && !(name.endsWith(".json") && /^\d{4}_snapshot\.json$/.test(name)),
+  );
+  if (offenders.length > 0) {
+    failures.push(
+      `Migration meta hygiene: ${offenders.join(", ")} in migrations/meta/ would be parsed as a Drizzle snapshot and breaks "drizzle-kit generate". Prefix the filename with "_" (e.g. _${offenders[0]}) or move it out of meta/.`,
+    );
+  }
+}
+
 let failures = [];
 
 // --- 1. Migration integrity: SHA-256 checksums (append-only enforcement) ---
-const INTEGRITY_MANIFEST = "migration-integrity.json";
+// Files in meta/ are prefixed with "_" on purpose: drizzle-kit treats every
+// meta/ entry that does not start with "_" as a Drizzle snapshot, so a stray
+// JSON file there makes `drizzle-kit generate` abort with "data is malformed".
+// See checkMetaHygiene() below.
+const INTEGRITY_MANIFEST = "_migration-integrity.json";
 
 try {
   const manifestPath = join(migrations, "meta", INTEGRITY_MANIFEST);
@@ -154,7 +184,8 @@ try {
 // --- 2. Journal cross-reference and legacy mapping ---
 try {
   const journalPath = join(migrations, "meta", "_journal.json");
-  const legacyMapPath = join(migrations, "meta", "legacy-journal-map.json");
+  const legacyMapPath = join(migrations, "meta", "_legacy-journal-map.json");
+  checkMetaHygiene(migrations);
   if (existsSync(journalPath)) {
     const journal = JSON.parse(await readFile(journalPath, "utf8"));
     const journalTags = new Set((journal.entries ?? []).map((e) => e.tag));
@@ -177,7 +208,7 @@ try {
       return !journalTracksFile && !legacyFiles.has(f);
     });
     if (untracked.length > 0) {
-      const message = `Migration journal: ${untracked.length} SQL migration file(s) are neither in _journal.json nor legacy-journal-map.json: ${untracked.join(", ")}`;
+      const message = `Migration journal: ${untracked.length} SQL migration file(s) are neither in _journal.json nor _legacy-journal-map.json: ${untracked.join(", ")}`;
       if (generateMode) console.warn(`${message}. Update the mapping before committing.`);
       else failures.push(message);
     }
@@ -185,7 +216,7 @@ try {
     const missingLegacyFiles = [...legacyFiles].filter((file) => !sqlFiles.includes(file));
     if (missingLegacyFiles.length > 0) {
       failures.push(
-        `Migration journal: legacy-journal-map.json references missing SQL file(s): ${missingLegacyFiles.join(", ")}`,
+        `Migration journal: _legacy-journal-map.json references missing SQL file(s): ${missingLegacyFiles.join(", ")}`,
       );
     }
   }

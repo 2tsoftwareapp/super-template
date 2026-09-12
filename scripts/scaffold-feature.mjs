@@ -2,14 +2,19 @@
 /**
  * Scaffolds a new feature plugin package under `packages/feature-<id>/`.
  *
- * A feature plugin owns a vertical slice across all four surfaces (API, database,
- * admin, web) and exports a single typed `FeatureManifest` from `@repo/api-plugin-kit`.
- * The app composes features explicitly in `packages/app-composition/src/feature-registry.ts`;
- * there is no kernel edit to add or remove one. See ADR 0002 and the generated README.
+ * A feature plugin owns a vertical slice and exports a single typed
+ * `FeatureManifest` from `@repo/api-plugin-kit`. The app composes features
+ * explicitly in `packages/app-composition/src/feature-registry.ts`; there is no
+ * kernel edit to add or remove one. See ADR 0002 and the generated README.
  *
- * The generated package mirrors the `@repo/feature-health` add-on exemplar (package
- * shape, tsconfig, turbo boundary tag) but is richer: it lays out the schema,
- * migrations, and per-surface folders so the four-surface contract is visible.
+ * The generated layout mirrors the existing feature packages (for example
+ * `packages/feature-activities`) rather than inventing a new shape, because the
+ * repo's policy gates enforce that shape:
+ *   - `scripts/check-source-policy.sh` rejects wildcard `"./*"` exports.
+ *   - `scripts/generate-feature-indexes.mjs --check` verifies every declared
+ *     export target exists.
+ *   - `scripts/check-feature-manifest-deps.mjs` verifies every `dependsOn` entry
+ *     has a matching workspace dependency.
  *
  * Usage:
  *   node scripts/scaffold-feature.mjs billing
@@ -41,6 +46,9 @@ The id must match /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/ and becomes:
   - package name   @repo/feature-<id>
   - Nest module    <Pascal>Module
   - manifest const <camel>Feature
+
+The generated package matches the layout used by the existing feature packages
+so it passes the repo policy gates without further edits.
 `;
 
 // kebab-case ids are the only valid input; everything else is derived from them.
@@ -63,17 +71,30 @@ const toCamel = (id) => {
 
 /**
  * Build the full set of files for the package as a flat map of
- * relative-path -> contents. `.gitkeep` markers keep otherwise-empty,
- * mandatory folders (migrations) tracked by git.
+ * relative-path -> contents.
+ *
+ * Every directory below matches where the existing feature packages put the
+ * same kind of code: `application/` for use cases and ports,
+ * `infrastructure/persistence/` for Drizzle tables, `presentation/` for
+ * controllers and DTOs, `public/` for the contracts other features may import,
+ * and `testing/` for test helpers.
  */
 const buildFiles = ({ id, pascal, camel }) => {
   const pkgName = `@repo/feature-${id}`;
   const moduleClass = `${pascal}Module`;
   const manifestConst = `${camel}Feature`;
   const moduleFile = `${id}.module.ts`;
+  const featureFile = `${id}.feature.ts`;
+  // Import specifiers omit the extension; filenames keep it.
+  const moduleBase = `${id}.module`;
+  const featureBase = `${id}.feature`;
 
   // JSON files are hand-formatted (not JSON.stringify) to byte-match the repo's
   // prettier style — short arrays stay inline, as in packages/feature-health.
+  //
+  // The export map is explicit on purpose: `check-source-policy.sh` forbids the
+  // `"./*"` wildcard, and `generate-feature-indexes.mjs` verifies each target
+  // exists. Add `"./schema"` only while this feature actually owns tables.
   const packageJson = `{
   "name": "${pkgName}",
   "version": "1.0.0",
@@ -81,7 +102,9 @@ const buildFiles = ({ id, pascal, camel }) => {
   "type": "commonjs",
   "exports": {
     ".": "./src/index.ts",
-    "./*": "./src/*"
+    "./contracts": "./src/public/contracts.ts",
+    "./testing": "./src/testing/index.ts",
+    "./schema": "./src/infrastructure/persistence/index.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",
@@ -130,31 +153,31 @@ const buildFiles = ({ id, pascal, camel }) => {
 }
 `;
 
-  const indexTs = `import { defineFeature } from "@repo/api-plugin-kit";
+  // The manifest lives in its own file, matching every existing feature package.
+  const featureTs = `import { defineFeature, type FeatureManifest } from "@repo/api-plugin-kit";
 
-import { ${moduleClass} } from "./${id}.module";
+import { ${moduleClass} } from "./${moduleBase}";
 
-export { ${moduleClass} } from "./${id}.module";
-
-/**
- * The \`${id}\` feature manifest — the single typed contract the app composes.
- * Enable the feature by adding \`${manifestConst}\` to \`featureManifests\` in
- * \`packages/app-composition/src/feature-registry.ts\`; disable it by removing that one line (and the
- * workspace dependency). No kernel code changes either way.
- */
-export const ${manifestConst} = defineFeature({
+export const ${manifestConst}: FeatureManifest = defineFeature({
   id: "${id}",
+  dependsOn: [],
   nestModule: ${moduleClass},
-  // schema: ${camel}Schema,        // uncomment once this feature owns Drizzle tables
-  // permissions: ["${id}:read"],   // RBAC permission keys this feature defines
+  // schema: { exampleTable },   // Drizzle tables this feature owns
+  // Every id listed in dependsOn must also be a workspace dependency in
+  // package.json — scripts/check-feature-manifest-deps.mjs enforces this.
 });
+`;
+
+  const indexTs = `export { ${manifestConst} } from "./${featureBase}";
+export { ${moduleClass} } from "./${moduleBase}";
+export * from "./public/contracts";
 `;
 
   const moduleTs = `import { Module } from "@nestjs/common";
 
 /**
  * Backend surface for the \`${id}\` feature. This is the single public NestJS
- * module the app wires into \`imports[]\` via the manifest in \`./index.ts\`.
+ * module the app wires into \`imports[]\` via the manifest in \`./${featureFile}\`.
  *
  * Register this feature's controllers, application services, and infrastructure
  * providers here as it grows. Cross-feature needs go through kernel ports
@@ -164,45 +187,35 @@ export const ${manifestConst} = defineFeature({
 export class ${moduleClass} {}
 `;
 
-  const schemaTs = `/**
+  // Owned by the `./schema` entry point. Empty until this feature has tables;
+  // delete the file and its export entry if the feature never owns one.
+  const persistenceIndexTs = `/**
  * Drizzle tables owned by the \`${id}\` feature.
  *
  * This feature owns its tables here — the built-in \`@repo/database-runtime\` schema
- * must never define them. Declare the tables in this file, export them, then
- * reference them from the manifest's \`schema\` field in \`../index.ts\`. The app
- * merges every feature's schema via \`composeFeatureSchemas\` in
- * \`packages/app-composition/src/feature-registry.ts\`, which throws on duplicate table names, so keep
- * table names unique across all composed features. Co-locate the SQL migrations
- * that create these tables under \`./migrations/\`.
+ * must never define them. Declare the tables in this folder, re-export them from
+ * this barrel, then reference them from the manifest's \`schema\` field in
+ * \`../../../${featureFile}\`. The app merges every feature's schema via
+ * \`composeFeatureSchemas\` in \`packages/app-composition/src/feature-registry.ts\`,
+ * which throws on duplicate table names, so keep table names unique across all
+ * composed features.
  */
 export {};
 `;
 
-  const apiReadme = `# ${id} — API surface
-
-NestJS controllers, application services, and infrastructure for the \`${id}\`
-feature, exposed through the \`${moduleClass}\` in \`../index.ts\` and composed into
-the app via \`packages/app-composition/src/feature-registry.ts\`.
+  const contractsTs = `/** Public contracts for ${pkgName}. */
+export { ${moduleClass} } from "../${moduleBase}";
 `;
 
-  const adminReadme = `# ${id} — Admin surface
-
-Admin console slice (\`resource.ts\` + feature components) for the \`${id}\` feature,
-concatenated into \`apps/admin/src/lib/admin-resources.ts\` and rendered by a thin
-\`page.tsx\` route.
-`;
-
-  const webReadme = `# ${id} — Web surface
-
-Web BFF slice (routes + components) for the \`${id}\` feature, wired through a thin
-\`page.tsx\` route in \`apps/web\`.
+  const testingTs = `/** Testing helpers for ${pkgName}. */
+export {};
 `;
 
   const readme = `# ${pkgName}
 
 The \`${id}\` feature as a **compile-time plugin package** (see ADR 0002). It owns a
-vertical slice across all four surfaces and exports one typed \`FeatureManifest\`
-from \`@repo/api-plugin-kit\` for the backend manifest surface.
+vertical slice and exports one typed \`FeatureManifest\` from
+\`@repo/api-plugin-kit\`.
 
 ## The contract
 
@@ -215,20 +228,20 @@ export const ${manifestConst} = defineFeature({
 });
 \`\`\`
 
-Frontend surfaces are exposed through per-surface entrypoints in this package
-(\`./admin\`, \`./web\`) rather than the backend-only manifest, so the plugin kit
-never depends on React or Flutter.
-
 ## Layout
 
-| Path                 | Surface  | Role                                                        |
-| -------------------- | -------- | ----------------------------------------------------------- |
-| \`src/index.ts\`       | —        | Exports \`${moduleClass}\` and the \`${manifestConst}\` manifest.      |
-| \`src/${moduleFile}\`  | API      | The single public NestJS module surface.                    |
-| \`src/database/\`      | Database | Feature-owned Drizzle \`schema.ts\` + SQL \`migrations/\`.       |
-| \`src/api/\`           | API      | Controllers, application services, infrastructure.          |
-| \`src/admin/\`         | Admin    | Admin console \`resource.ts\` + feature components.            |
-| \`src/web/\`           | Web      | Web BFF routes + components.                                 |
+Matches the existing feature packages (see \`packages/feature-activities\`):
+
+| Path                                  | Role                                                    |
+| ------------------------------------- | ------------------------------------------------------- |
+| \`src/${featureFile}\`                  | The manifest — the single typed contract.               |
+| \`src/index.ts\`                        | Re-exports the manifest, module and public contracts.    |
+| \`src/${moduleFile}\`                   | The single public NestJS module surface.                 |
+| \`src/application/\`                    | Use cases, application services and ports.               |
+| \`src/infrastructure/persistence/\`     | Feature-owned Drizzle tables (\`./schema\` entry point).   |
+| \`src/presentation/\`                   | Controllers and DTOs.                                    |
+| \`src/public/contracts.ts\`             | What other features may import (\`./contracts\`).          |
+| \`src/testing/index.ts\`                | Test helpers (\`./testing\`).                              |
 
 ## How the app composes this feature
 
@@ -237,18 +250,26 @@ never depends on React or Flutter.
 2. **Register the manifest** in \`packages/app-composition/src/feature-registry.ts\`:
    \`\`\`ts
    import { ${manifestConst} } from "${pkgName}";
-   export const featureManifests = [${manifestConst}];
+   export const enabledFeatures: readonly FeatureManifest[] = [..., ${manifestConst}];
    \`\`\`
    This wires the Nest module into \`AppModule\` and merges \`schema\` into
    \`DatabaseModule.forRoot({ schema })\`.
-3. **Add the admin resource** by concatenating this feature's \`resource.ts\` into
-   \`apps/admin/src/lib/admin-resources.ts\` (plus a thin \`page.tsx\`).
-4. **Add the mobile package** by listing the Flutter sub-package in
-   \`apps/mobile/pubspec.yaml\` and registering its routes.
+3. **Install so pnpm links the new package:** \`pnpm install\`.
+4. **Generate a migration** if the feature owns tables: \`make db-generate\`.
+5. As the feature grows, add the admin resource, web slice, and mobile package.
 
 Disabling the feature is the reverse: remove the workspace dependency and the one
 composition line. Note that removing a plugin does **not** drop its tables — that
 is a deliberate, separate data migration.
+
+## Gates this package must keep passing
+
+\`\`\`bash
+sh scripts/check-source-policy.sh
+node scripts/check-feature-manifest-deps.mjs
+node scripts/generate-feature-indexes.mjs --check
+node scripts/check-cross-feature-fks.mjs
+\`\`\`
 `;
 
   return {
@@ -256,13 +277,12 @@ is a deliberate, separate data migration.
     "turbo.json": turboJson,
     "tsconfig.json": tsconfigJson,
     "README.md": readme,
+    [`src/${featureFile}`]: featureTs,
     "src/index.ts": indexTs,
     [`src/${moduleFile}`]: moduleTs,
-    "src/database/schema.ts": schemaTs,
-    "src/database/migrations/.gitkeep": "",
-    "src/api/README.md": apiReadme,
-    "src/admin/README.md": adminReadme,
-    "src/web/README.md": webReadme,
+    "src/infrastructure/persistence/index.ts": persistenceIndexTs,
+    "src/public/contracts.ts": contractsTs,
+    "src/testing/index.ts": testingTs,
   };
 };
 
@@ -321,8 +341,10 @@ const main = () => {
       `       export const enabledFeatures: readonly FeatureManifest[] = [..., ${camel}Feature];\n` +
       `  3. Install so pnpm links the new package:\n` +
       `       pnpm install\n` +
-      `  4. As the feature grows, add the admin resource, web slice, and mobile package\n` +
-      `     (see packages/feature-${id}/README.md).\n`,
+      `  4. Verify the policy gates before committing:\n` +
+      `       sh scripts/check-source-policy.sh && node scripts/check-feature-manifest-deps.mjs\n` +
+      `  5. If the feature owns no tables, delete src/infrastructure/persistence/\n` +
+      `     and the "./schema" export from its package.json.\n`,
   );
 };
 
