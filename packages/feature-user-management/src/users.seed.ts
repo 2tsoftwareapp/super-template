@@ -1,17 +1,13 @@
 import type { FeatureSeedContext, FeatureSeeder } from "@repo/api-plugin-kit";
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
-import { hashPassword } from "@repo/api-kernel";
+import { hashPassword, PLATFORM_SCOPE_ORGANIZATION_ID } from "@repo/api-kernel";
 import { EnvironmentService } from "@repo/api-runtime";
 import {
   ROLE_NAMES,
   USER_ACCESS_CONTROL,
   type UserAccessControl,
 } from "@repo/feature-access-control/contracts";
-import {
-  PERSONAL_ORGANIZATION_PROVISIONER,
-  type PersonalOrganizationProvisioner,
-} from "@repo/feature-organization-management/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 
 /** Bag key written by the users seeder for downstream notifications/auth seeders. */
@@ -19,17 +15,14 @@ export const SEEDED_USERS_BAG_KEY = "seededUsers";
 
 export interface SeededUsersBag {
   adminUserId: string;
-  adminOrganizationId: string;
+  adminOrganizationId: string | null;
   regularUserId: string;
-  regularOrganizationId: string;
+  regularOrganizationId: string | null;
 }
 
 async function runUsersSeed(ctx: FeatureSeedContext): Promise<void> {
   const accessControlService = ctx.app.get(USER_ACCESS_CONTROL) as UserAccessControl;
   const environmentService = ctx.app.get(EnvironmentService) as EnvironmentService;
-  const personalOrganizationProvisioner = ctx.app.get(
-    PERSONAL_ORGANIZATION_PROVISIONER,
-  ) as PersonalOrganizationProvisioner;
   const usersRepository = ctx.app.get(USERS_REPOSITORY) as UsersRepositoryPort;
   const executor = ctx.executor as DatabaseExecutor;
 
@@ -82,11 +75,10 @@ async function runUsersSeed(ctx: FeatureSeedContext): Promise<void> {
 
     await accessControlService.replaceUserRoles(user.id, [role.id], null, executor);
 
-    const organizationId = (await personalOrganizationProvisioner.ensurePersonalOrganization(
-      user.id,
-      user.displayName,
-      executor,
-    )) as string;
+    // Organization membership is model-dependent: org-optional deployments
+    // seed plain platform users with no organization. The sentinel id keeps
+    // the seed bag shape stable for downstream seeders.
+    const organizationId = PLATFORM_SCOPE_ORGANIZATION_ID;
 
     return { userId: user.id, organizationId };
   };

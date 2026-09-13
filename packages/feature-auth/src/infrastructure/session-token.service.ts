@@ -28,7 +28,7 @@ export class SessionTokenService implements AuthTokenProviderPort {
 
   async createSessionTokens(
     userId: string,
-    organizationId: string,
+    organizationId: string | null,
     metadata: { ipAddress: string | null; userAgent: string | null },
   ) {
     const sessionId = randomUUID();
@@ -76,7 +76,7 @@ export class SessionTokenService implements AuthTokenProviderPort {
     sessionId: string,
     refreshTokenHash: string,
     userId: string,
-    organizationId: string,
+    organizationId: string | null,
     metadata: { ipAddress: string | null; userAgent: string | null },
     options?: { startGraceWindow?: boolean },
   ) {
@@ -124,7 +124,7 @@ export class SessionTokenService implements AuthTokenProviderPort {
   async reissueSessionTokens(
     sessionId: string,
     userId: string,
-    organizationId: string,
+    organizationId: string | null,
     metadata: { ipAddress: string | null; userAgent: string | null },
   ) {
     const {
@@ -156,7 +156,11 @@ export class SessionTokenService implements AuthTokenProviderPort {
     };
   }
 
-  private async issueTokenPair(userId: string, sessionId: string, organizationId: string) {
+  private async issueTokenPair(
+    userId: string,
+    sessionId: string,
+    organizationId: string | null,
+  ) {
     const accessToken = await this.signToken(userId, sessionId, "access", organizationId);
     const refreshToken = await this.signToken(userId, sessionId, "refresh", organizationId);
     const refreshTokenHash = await hashRefreshToken(refreshToken);
@@ -168,7 +172,7 @@ export class SessionTokenService implements AuthTokenProviderPort {
     userId: string,
     sessionId: string,
     type: TokenPayload["typ"],
-    organizationId: string,
+    organizationId: string | null,
   ) {
     const secret =
       type === "access"
@@ -188,7 +192,7 @@ export class SessionTokenService implements AuthTokenProviderPort {
         sid: sessionId,
         jti: randomUUID(),
         typ: type,
-        oid: organizationId,
+        oid: organizationId ?? undefined,
       },
       {
         secret,

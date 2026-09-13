@@ -3,8 +3,19 @@
 ## Access Token Flow
 
 - The API issues a short-lived JWT access token
-- The token includes the user id, session id, and a per-token `jti`
+- The token includes the user id, session id, a per-token `jti`, and the active
+  organization id (`oid`) when the user has one
 - Backend guards authorize requests from the bearer token
+
+### Organization-less sessions (org-optional model)
+
+In the `org-optional` organization model a user may have **no** organization.
+Sessions then carry no `oid` claim and `organizationId` is `null` in every
+session/`/auth/me` payload. Login, refresh, token rotation, and MFA all work
+identically — only organization-scoped endpoints reject the request with `403`
+until the user joins an organization. In the default `personal-orgs` model the
+API keeps the historical behavior of provisioning a personal organization for
+every new user (see `docs/database.md` → "Organization model modes").
 
 ## Session-Backed Access Tokens (Deliberate Tradeoff)
 

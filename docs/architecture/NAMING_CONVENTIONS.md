@@ -185,6 +185,12 @@ RLS follows the table, so two rules hold:
   `t_sso_session_exchanges`, `m_roles`, `r_user_roles`). See
   [`docs/database.md`](../database.md) → "Tables deliberately outside RLS"
   for the rationale and the compensating controls.
+- **Organization-optional deployments add a user-scoped branch** to every
+  tenant-isolation policy (migration `0038_org_optional_user_scoped_rls.sql`):
+  platform-scope rows written with the sentinel organization id
+  `00000000-0000-0000-0000-000000000000` are visible only to their owner via
+  `<owner column> = NULLIF(current_setting('app.user_id', true), '')::uuid`.
+  Policy names are unchanged — only their predicates gain the branch.
 
 ---
 

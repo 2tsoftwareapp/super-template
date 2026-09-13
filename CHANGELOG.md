@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Selectable organization model** (compile-time capability, mirrors tenant
+  modes): `feature-org-model-optional` (`org-model-optional`) lets users exist
+  and operate **without** any organization — registration/SSO no longer force a
+  personal organization, sessions carry `organizationId: null`, and the
+  generator accepts `--org-model org-optional|personal-orgs`.
+  `feature-org-model-personal-orgs` (`org-model-personal-orgs`) preserves the
+  historical always-provision behavior; selecting both is a composition error.
+- **User-scoped RLS for organization-less data** (migration
+  `0038_org_optional_user_scoped_rls.sql`): every tenant-isolation policy gains
+  a branch isolating platform-scope rows (sentinel organization id
+  `00000000-0000-0000-0000-000000000000`) to their owner via `app.user_id`, so
+  org-less users can never read each other's data at the database level.
+  `PLATFORM_SCOPE_ORGANIZATION_ID` / `organizationIdForStorage()` added to
+  `@repo/api-kernel`.
+- Composed `organizationModelOptions` flows from the feature registry through
+  `DatabaseModule.forRoot({ organizationModel })` to the
+  `ORGANIZATION_MODEL_OPTIONS` provider; `ResolveOrganizationIdForUserUseCase`
+  returns `null` instead of `403` for org-less users in the org-optional model.
+
 - `LICENSE` (MIT), `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, and GitHub issue/PR templates.
 - `scripts/rename.mjs` to rebrand the template for a new project.
 - Root `CLAUDE.md` documenting the monorepo layout and workflows.

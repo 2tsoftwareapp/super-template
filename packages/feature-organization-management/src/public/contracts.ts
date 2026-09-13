@@ -5,6 +5,10 @@ import type { TransactionExecutor } from "@repo/api-kernel";
  * Inject this directly in features that create users (auth, sso)
  * to ensure organization admin-role assignment happens.
  *
+ * The implementation is organization-model aware: in the `org-optional`
+ * model it is a no-op (returns null), so callers must treat a null result
+ * as "no organization was provisioned" and continue without one.
+ *
  * This is NOT the same as PERSONAL_ORGANIZATION_PROVIDER from
  * feature-organizations — that one is core-only and does not
  * include RBAC assignment.
@@ -14,7 +18,7 @@ export interface PersonalOrganizationProvisioner {
     userId: string,
     displayName: string,
     executor?: TransactionExecutor,
-  ): Promise<unknown>;
+  ): Promise<string | null>;
 }
 
 export const PERSONAL_ORGANIZATION_PROVISIONER = Symbol("PERSONAL_ORGANIZATION_PROVISIONER");

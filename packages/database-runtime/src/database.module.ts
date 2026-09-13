@@ -10,6 +10,7 @@ import {
 import {
   ADVISORY_LOCK_PORT,
   type DatabaseRuntimeOptions,
+  type OrganizationModelOptions,
   PLATFORM_TRANSACTION_PORT,
   TenantContextService,
   TRANSACTION_PORT,
@@ -24,6 +25,7 @@ import {
   DATABASE_SCHEMA,
   databaseProviders,
   DEFAULT_DATABASE_RUNTIME_OPTIONS,
+  ORGANIZATION_MODEL_OPTIONS,
 } from "./database.provider";
 import { DrizzlePlatformTransactionService } from "./drizzle-platform-transaction.service";
 import { DrizzleTransactionService } from "./drizzle-transaction.service";
@@ -63,6 +65,7 @@ export class DatabaseModule implements OnApplicationShutdown {
   static forRoot(options: {
     schema: Record<string, unknown>;
     options?: DatabaseRuntimeOptions;
+    organizationModel?: OrganizationModelOptions;
   }): DynamicModule {
     return {
       module: DatabaseModule,
@@ -72,8 +75,12 @@ export class DatabaseModule implements OnApplicationShutdown {
           provide: DATABASE_RUNTIME_OPTIONS,
           useValue: options.options ?? DEFAULT_DATABASE_RUNTIME_OPTIONS,
         },
+        {
+          provide: ORGANIZATION_MODEL_OPTIONS,
+          useValue: options.organizationModel ?? { organizationModel: "personal-orgs" },
+        },
       ],
-      exports: [DATABASE_SCHEMA, DATABASE_RUNTIME_OPTIONS],
+      exports: [DATABASE_SCHEMA, DATABASE_RUNTIME_OPTIONS, ORGANIZATION_MODEL_OPTIONS],
     };
   }
 

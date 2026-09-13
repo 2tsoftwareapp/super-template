@@ -55,6 +55,13 @@ Authorization uses three layers:
 
 **Tenant rule:** `organizationId` for RLS always comes from the authenticated session user, never from client-supplied body fields.
 
+**Organization model:** the platform composes one of two organization-model
+capabilities (see `docs/database.md` → "Organization model modes"). In the
+default `personal-orgs` model every user is provisioned a personal organization;
+in the `org-optional` model users may operate without any organization — their
+session `organizationId` is `null` and their tenant-scoped rows carry the
+platform-scope sentinel, isolated by user-scoped RLS branches (migration `0038`).
+
 ## Web vs Admin
 
 | Surface      | Role                                                               |

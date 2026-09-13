@@ -68,7 +68,7 @@ test("interactive selector lists discovered packages and returns selected IDs", 
     promptConfig.choices.map((choice) => choice.value),
     catalog.features.map((feature) => feature.id),
   );
-  assert.equal(promptConfig.choices.length, 23);
+  assert.equal(promptConfig.choices.length, 25);
   assert.match(
     buildFeatureChoices(catalog).find((choice) => choice.value === "auth").description,
     /requires:/,
@@ -92,6 +92,21 @@ test("catalog exposes infrastructure capability metadata and rejects conflicting
     readReplica: true,
     readConsistency: "eventual",
   });
+  assert.deepEqual(catalog.byId.get("org-model-optional").organizationModel, {
+    organizationModel: "org-optional",
+  });
+  assert.deepEqual(catalog.byId.get("org-model-personal-orgs").organizationModel, {
+    organizationModel: "personal-orgs",
+  });
+  assert.throws(
+    () =>
+      resolveFeatureSelection(catalog, ["org-model-optional", "org-model-personal-orgs"]),
+    /Conflicting feature capabilities.*org-model-optional.*org-model-personal-orgs/,
+  );
+  assert.equal(
+    resolveFeatureSelection(catalog, ["org-model-optional"]).organizationModel.organizationModel,
+    "org-optional",
+  );
 
   assert.throws(
     () => resolveFeatureSelection(catalog, ["tenant-shared-schema", "tenant-schema"]),
@@ -205,6 +220,7 @@ test("capability aliases generate a reproducible tenant and replica profile", ()
     tenantMode: "schema-per-tenant",
     readReplica: true,
     readConsistency: "eventual",
+    organizationModel: "personal-orgs",
   });
   assert.ok(profile.resolvedFeatures.includes("tenant-schema"));
   assert.ok(profile.resolvedFeatures.includes("database-read-replica"));

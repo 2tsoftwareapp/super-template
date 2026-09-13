@@ -158,7 +158,7 @@ export class RefreshSessionUseCase {
     expectedHash: string,
     refreshToken: string,
     userId: string,
-    organizationId: string,
+    organizationId: string | null,
     metadata: { ipAddress: string | null; userAgent: string | null },
   ) {
     const rotated = await this.tokenProvider.tryRotateSessionTokens(
@@ -220,7 +220,7 @@ export class RefreshSessionUseCase {
     expectedHash: string,
     refreshToken: string,
     userId: string,
-    organizationId: string,
+    organizationId: string | null,
     metadata: { ipAddress: string | null; userAgent: string | null },
   ) {
     let currentExpectedHash = expectedHash;

@@ -19,14 +19,14 @@ export interface AuthTokenProviderPort {
     userId: string,
     sessionId: string,
     type: TokenPayload["typ"],
-    organizationId: string,
+    organizationId: string | null,
   ): Promise<string>;
 
   verifyToken(token: string, expectedType: TokenPayload["typ"]): Promise<TokenPayload>;
 
   createSessionTokens(
     userId: string,
-    organizationId: string,
+    organizationId: string | null,
     metadata: { ipAddress: string | null; userAgent: string | null },
   ): Promise<{
     accessToken: string;
@@ -38,7 +38,7 @@ export interface AuthTokenProviderPort {
     sessionId: string,
     refreshTokenHash: string,
     userId: string,
-    organizationId: string,
+    organizationId: string | null,
     metadata: { ipAddress: string | null; userAgent: string | null },
     options?: { startGraceWindow?: boolean },
   ): Promise<RotateTokensResult | null>;
@@ -50,7 +50,7 @@ export interface AuthTokenProviderPort {
   reissueSessionTokens(
     sessionId: string,
     userId: string,
-    organizationId: string,
+    organizationId: string | null,
     metadata: { ipAddress: string | null; userAgent: string | null },
   ): Promise<RotateTokensResult>;
 }

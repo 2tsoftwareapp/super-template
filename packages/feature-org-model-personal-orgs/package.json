@@ -1,0 +1,26 @@
+{
+  "name": "@repo/feature-org-model-personal-orgs",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@nestjs/common": "11.1.27",
+    "@repo/api-plugin-kit": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/test-config": "workspace:*",
+    "@repo/tsconfig": "workspace:*",
+    "@types/node": "24.10.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.9"
+  }
+}

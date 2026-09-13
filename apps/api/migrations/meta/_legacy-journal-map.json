@@ -42,6 +42,7 @@
     "0034_user_roles_org_consistency.sql",
     "0035_repair_permission_scopes.sql",
     "0036_storage_object_tracking.sql",
-    "0037_table_naming_convention_prefixes.sql"
+    "0037_table_naming_convention_prefixes.sql",
+    "0038_org_optional_user_scoped_rls.sql"
   ]
 }
