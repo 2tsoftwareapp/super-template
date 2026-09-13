@@ -25,6 +25,7 @@ export APP_ENV="${APP_ENV:-development}"
 . ./scripts/load-env.sh
 
 pnpm install
+node scripts/hooks/install.mjs
 if sh scripts/mobile.sh doctor >/dev/null 2>&1; then
   sh scripts/mobile.sh setup
 else

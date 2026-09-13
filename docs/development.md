@@ -12,6 +12,22 @@ See [onboarding.md](./onboarding.md) for a first-day walkthrough.
 | Regenerate contracts | `make generate` | `pnpm run generate:contracts` |
 | CI-style verify | `make verify` | `pnpm verify` |
 | Mobile doctor | `pnpm run mobile:doctor` | same |
+| Install git hooks | automatic after bootstrap | `pnpm hooks:install` |
+
+## Git Hooks (pre-push gate)
+
+`pnpm hooks:install` (run automatically by `pnpm bootstrap`) points
+`core.hooksPath` at `.githooks/`, where every push is gated on the same checks
+CI enforces:
+
+1. `pnpm run format:check`
+2. `pnpm run lint` — source policy chain + turbo lint (catches import-sort)
+3. `pnpm run typecheck`
+
+A failing check blocks the push, so import-sort or formatting drift can never
+reach CI. Re-run `pnpm hooks:install` after cloning or after adding hooks under
+`scripts/hooks/`. To bypass in an emergency: `git push --no-verify` (required
+CI checks still run server-side).
 
 ## Running Individual Apps
 

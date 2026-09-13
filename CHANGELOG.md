@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Pre-push git hook** gating every push on `format:check`, `lint` (policy
+  chain + turbo lint), and `typecheck`, so import-sort/format drift is caught
+  locally before CI. Installed automatically by `pnpm bootstrap` (or manually
+  via `pnpm hooks:install`); bypass with `git push --no-verify` in emergencies.
 - **Selectable organization model** (compile-time capability, mirrors tenant
   modes): `feature-org-model-optional` (`org-model-optional`) lets users exist
   and operate **without** any organization — registration/SSO no longer force a
