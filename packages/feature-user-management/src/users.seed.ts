@@ -1,13 +1,18 @@
 import type { FeatureSeedContext, FeatureSeeder } from "@repo/api-plugin-kit";
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
-import { hashPassword, PLATFORM_SCOPE_ORGANIZATION_ID } from "@repo/api-kernel";
+import { hashPassword } from "@repo/api-kernel";
 import { EnvironmentService } from "@repo/api-runtime";
 import {
   ROLE_NAMES,
   USER_ACCESS_CONTROL,
   type UserAccessControl,
 } from "@repo/feature-access-control/contracts";
+import {
+  ORGANIZATION_ACCESS_CONTROL,
+  type OrganizationAccessControlPort,
+} from "@repo/feature-organizations/contracts";
+import { EnsurePersonalOrganizationUseCase } from "@repo/feature-organizations/module";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 
 /** Bag key written by the users seeder for downstream notifications/auth seeders. */
@@ -23,6 +28,12 @@ export interface SeededUsersBag {
 async function runUsersSeed(ctx: FeatureSeedContext): Promise<void> {
   const accessControlService = ctx.app.get(USER_ACCESS_CONTROL) as UserAccessControl;
   const environmentService = ctx.app.get(EnvironmentService) as EnvironmentService;
+  const organizationProvisioner = ctx.app.get(
+    EnsurePersonalOrganizationUseCase,
+  ) as EnsurePersonalOrganizationUseCase;
+  const organizationAccessControl = ctx.app.get(
+    ORGANIZATION_ACCESS_CONTROL,
+  ) as OrganizationAccessControlPort;
   const usersRepository = ctx.app.get(USERS_REPOSITORY) as UsersRepositoryPort;
   const executor = ctx.executor as DatabaseExecutor;
 
@@ -75,10 +86,17 @@ async function runUsersSeed(ctx: FeatureSeedContext): Promise<void> {
 
     await accessControlService.replaceUserRoles(user.id, [role.id], null, executor);
 
-    // Organization membership is model-dependent: org-optional deployments
-    // seed plain platform users with no organization. The sentinel id keeps
-    // the seed bag shape stable for downstream seeders.
-    const organizationId = PLATFORM_SCOPE_ORGANIZATION_ID;
+    // Seeded users need a real organization as test fixture in both
+    // organization models — org-scoped endpoints and RLS tests rely on it.
+    // Created explicitly (independent of the organization-model capability)
+    // and granted the organization admin role, mirroring the historical
+    // personal-org provisioning flow.
+    const organizationId = await organizationProvisioner.execute(
+      user.id,
+      user.displayName,
+      executor,
+    );
+    await organizationAccessControl.ensureOrganizationAdminRole(organizationId, user.id, executor);
 
     return { userId: user.id, organizationId };
   };

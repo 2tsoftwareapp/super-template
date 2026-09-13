@@ -6,9 +6,9 @@ export {
   DATABASE_READ_REPLICA_POOL,
   DATABASE_RUNTIME_OPTIONS,
   DATABASE_SCHEMA,
-  ORGANIZATION_MODEL_OPTIONS,
   databaseProviders,
   DEFAULT_DATABASE_RUNTIME_OPTIONS,
+  ORGANIZATION_MODEL_OPTIONS,
 } from "./database.provider";
 export {
   createDatabaseClient,

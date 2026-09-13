@@ -5,7 +5,6 @@ import {
   type DatabaseRuntimeEnv,
   type DatabaseRuntimeOptions,
   DEFAULT_ORGANIZATION_MODEL_OPTIONS,
-  type OrganizationModelOptions,
   getTenantContext,
 } from "@repo/api-kernel";
 import { Pool, type PoolClient, type PoolConfig } from "pg";
