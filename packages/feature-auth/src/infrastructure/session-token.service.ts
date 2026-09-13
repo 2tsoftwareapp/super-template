@@ -156,11 +156,7 @@ export class SessionTokenService implements AuthTokenProviderPort {
     };
   }
 
-  private async issueTokenPair(
-    userId: string,
-    sessionId: string,
-    organizationId: string | null,
-  ) {
+  private async issueTokenPair(userId: string, sessionId: string, organizationId: string | null) {
     const accessToken = await this.signToken(userId, sessionId, "access", organizationId);
     const refreshToken = await this.signToken(userId, sessionId, "refresh", organizationId);
     const refreshTokenHash = await hashRefreshToken(refreshToken);

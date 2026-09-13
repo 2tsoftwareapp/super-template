@@ -22,6 +22,13 @@
       "when": 1789382400000,
       "tag": "0038_org_optional_user_scoped_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1789382400001,
+      "tag": "0039_platform_scope_organization",
+      "breakpoints": true
     }
   ]
 }

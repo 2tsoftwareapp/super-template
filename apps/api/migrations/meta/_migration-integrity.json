@@ -41,6 +41,7 @@
     "0035_repair_permission_scopes.sql": "2e152d15d9ef403027678b0cc20827a82aa0764c6f8d426c1ddcf9d394c92a0c",
     "0036_storage_object_tracking.sql": "63b7f139137c57c81aa598405163b056a00a117784c1c056644553606103f27b",
     "0037_table_naming_convention_prefixes.sql": "df456f42c644c5867658e4bc9cf050235eb0fb1fdd8c9e1251c6ac96f7e44a49",
-    "0038_org_optional_user_scoped_rls.sql": "87b147d2bd324e71de545ffebd20787fb87f6c8aeded0d88e71d559ce3ba1ad8"
+    "0038_org_optional_user_scoped_rls.sql": "87b147d2bd324e71de545ffebd20787fb87f6c8aeded0d88e71d559ce3ba1ad8",
+    "0039_platform_scope_organization.sql": "0afe16635a6a9b652a4a7622cd42e3ff2903a379db17d9c7dee623e333ccbc6f"
   }
 }
