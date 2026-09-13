@@ -29,6 +29,13 @@
       "when": 1789382400001,
       "tag": "0039_platform_scope_organization",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1789382400002,
+      "tag": "0040_job_child_tables_sentinel_scoping",
+      "breakpoints": true
     }
   ]
 }

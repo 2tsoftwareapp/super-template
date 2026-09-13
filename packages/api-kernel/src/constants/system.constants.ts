@@ -13,8 +13,3 @@ export type SystemScope = (typeof SYSTEM_SCOPE)[keyof typeof SYSTEM_SCOPE];
 export const DEFAULT_ORGANIZATION_MODEL_OPTIONS = {
   organizationModel: "personal-orgs",
 } as const;
-
-/** Runtime organization-model options value (defaults are narrowed `as const`). */
-export interface ResolvedOrganizationModelOptions {
-  organizationModel: "personal-orgs" | "org-optional";
-}

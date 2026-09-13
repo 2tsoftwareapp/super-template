@@ -10,6 +10,7 @@ import {
 import {
   ADVISORY_LOCK_PORT,
   type DatabaseRuntimeOptions,
+  DEFAULT_ORGANIZATION_MODEL_OPTIONS,
   type OrganizationModelOptions,
   PLATFORM_TRANSACTION_PORT,
   TenantContextService,
@@ -77,7 +78,7 @@ export class DatabaseModule implements OnApplicationShutdown {
         },
         {
           provide: ORGANIZATION_MODEL_OPTIONS,
-          useValue: options.organizationModel ?? { organizationModel: "personal-orgs" },
+          useValue: options.organizationModel ?? DEFAULT_ORGANIZATION_MODEL_OPTIONS,
         },
       ],
       exports: [DATABASE_SCHEMA, DATABASE_RUNTIME_OPTIONS, ORGANIZATION_MODEL_OPTIONS],

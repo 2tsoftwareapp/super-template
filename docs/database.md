@@ -108,7 +108,11 @@ OR current_setting('app.bypass_rls', true) = 'true'
 ```
 
 `<owner column>` is the row's user attribution column (`actor_id`,
-`created_by_id`, `uploaded_by_id`, or `user_id`). Platform-scope rows are
+`created_by_id`, `uploaded_by_id`, or `user_id`). The job-observability child
+tables (`w_job_attempts`, `w_job_events`, `r_job_dependencies`) have no owner
+column; migration `0040_job_child_tables_sentinel_scoping.sql` scopes their
+sentinel branch through the parent job's `w_jobs.created_by_id` via an
+`EXISTS` subquery. Platform-scope rows are
 written with the sentinel organization id `00000000-0000-0000-0000-000000000000`
 (see `PLATFORM_SCOPE_ORGANIZATION_ID` in `@repo/api-kernel`), so real tenant
 rows and personal rows never mix, and org-less users can never read each

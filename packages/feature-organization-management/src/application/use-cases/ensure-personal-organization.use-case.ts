@@ -1,8 +1,9 @@
-import { Inject, Injectable } from "@nestjs/common";
 import type { TransactionExecutor } from "@repo/api-kernel";
 import type { OrganizationModelOptions } from "@repo/api-kernel";
-import { ORGANIZATION_MODEL_OPTIONS } from "@repo/database-runtime";
 import type { OrganizationAccessControlPort } from "@repo/feature-organizations/contracts";
+
+import { Inject, Injectable } from "@nestjs/common";
+import { ORGANIZATION_MODEL_OPTIONS } from "@repo/database-runtime";
 import { ORGANIZATION_ACCESS_CONTROL } from "@repo/feature-organizations/contracts";
 import { EnsurePersonalOrganizationUseCase as CoreEnsurePersonalOrganization } from "@repo/feature-organizations/module";
 
