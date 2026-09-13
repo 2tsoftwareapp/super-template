@@ -1,5 +1,10 @@
 import type { DynamicModule, Provider, Type } from "@nestjs/common";
-import type { DatabaseReadConsistency, DatabaseRuntimeOptions, TenantMode } from "@repo/api-kernel";
+import type {
+  DatabaseReadConsistency,
+  DatabaseRuntimeOptions,
+  OrganizationModelOptions,
+  TenantMode,
+} from "@repo/api-kernel";
 
 /**
  * A feature package participates in the application by exporting exactly one
@@ -79,7 +84,10 @@ export interface FeatureHttpPipeline {
 }
 
 /** Capability families understood by the application composition layer. */
-export type FeatureCapabilityFamily = "tenant-isolation" | "database-topology";
+export type FeatureCapabilityFamily =
+  | "tenant-isolation"
+  | "database-topology"
+  | "organization-model";
 
 /** Selector-facing metadata for a package-owned infrastructure capability. */
 export interface FeatureCapability {
@@ -95,6 +103,15 @@ export interface FeatureDatabaseContribution {
   readonly readConsistency?: DatabaseReadConsistency;
 }
 
+/**
+ * Organization-model contribution owned by a feature manifest. Exactly one
+ * organization-model capability may be selected per composition; omitting it
+ * preserves the historical personal-organization default.
+ */
+export interface FeatureOrganizationModelContribution {
+  readonly organizationModel?: OrganizationModelOptions["organizationModel"];
+}
+
 export interface FeatureManifest {
   /** Stable, unique feature id (kebab-case), e.g. `"audit"`, `"identity"`. */
   readonly id: string;
@@ -104,6 +121,12 @@ export interface FeatureManifest {
 
   /** Optional database topology contribution composed by the application host. */
   readonly database?: FeatureDatabaseContribution;
+
+  /**
+   * Optional organization-model contribution composed by the application host.
+   * When no contribution is present the default remains `"personal-orgs"`.
+   */
+  readonly organizationModel?: FeatureOrganizationModelContribution;
 
   /** The single public NestJS module surface the app wires into `imports[]`. */
   readonly nestModule: Type<unknown> | DynamicModule;
@@ -244,6 +267,8 @@ export interface ComposedFeatures {
   readonly httpPipelineInterceptors: readonly HttpPipelineProviderEntry[];
   /** Database topology derived from the selected feature manifests. */
   readonly database: DatabaseRuntimeOptions;
+  /** Organization model derived from the selected feature manifests. */
+  readonly organizationModel: OrganizationModelOptions;
 }
 
 /**
@@ -581,6 +606,35 @@ export function collectFeatureHttpPipeline(features: readonly FeatureManifest[])
 }
 
 /**
+ * Derive the organization model from selected feature manifests. Selecting
+ * both organization-model capabilities is a composition error; no contribution
+ * preserves the historical personal-organization default.
+ * @param features Selected manifests or their organization-model contributions.
+ * @returns The single organization-model option set for the selected graph.
+ */
+export function composeOrganizationModelOptions(
+  features: readonly Pick<FeatureManifest, "id" | "organizationModel">[],
+): OrganizationModelOptions {
+  const contributions = features.flatMap((feature) =>
+    feature.organizationModel?.organizationModel
+      ? [{ id: feature.id, model: feature.organizationModel.organizationModel }]
+      : [],
+  );
+  const uniqueModels = [...new Map(contributions.map((entry) => [entry.model, entry])).values()];
+  if (uniqueModels.length > 1) {
+    throw new Error(
+      "Conflicting organization models: " +
+        contributions.map((entry) => entry.id + " (" + entry.model + ")").join(", ") +
+        ". Select exactly one organization-model capability.",
+    );
+  }
+
+  return {
+    organizationModel: uniqueModels[0]?.model ?? "personal-orgs",
+  };
+}
+
+/**
  * Full composition entrypoint used by the API host: validates ids/deps/cycles,
  * returns deterministic order, and merges schema/modules/permissions/seeders
  * and HTTP pipeline contributions.
@@ -627,5 +681,6 @@ export function composeFeatures(features: readonly FeatureManifest[]): ComposedF
     httpPipelineGuards: guards,
     httpPipelineInterceptors: interceptors,
     database: composeDatabaseRuntimeOptions(ordered),
+    organizationModel: composeOrganizationModelOptions(ordered),
   };
 }

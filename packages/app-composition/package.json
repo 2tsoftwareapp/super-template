@@ -27,6 +27,8 @@
     "@repo/feature-mail": "workspace:*",
     "@repo/feature-mfa": "workspace:*",
     "@repo/feature-notifications": "workspace:*",
+    "@repo/feature-org-model-optional": "workspace:*",
+    "@repo/feature-org-model-personal-orgs": "workspace:*",
     "@repo/feature-organization-management": "workspace:*",
     "@repo/feature-organizations": "workspace:*",
     "@repo/feature-outbox": "workspace:*",

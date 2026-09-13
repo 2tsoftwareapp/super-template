@@ -121,7 +121,7 @@ Shared packages: `@repo/web-ui` · `@repo/web-hooks` · `@repo/web-utils` · `@r
 
 - [x] **Contract-first API** — OpenAPI from NestJS; TypeScript + Dart clients via `make generate`
 - [x] **Authentication** — JWT rotation, Argon2id, CSRF, RBAC, TOTP MFA, OIDC SSO backend (Google / Apple / GitHub; configure credentials + UI)
-- [x] **Tenant database topology** — PostgreSQL RLS, optional eventual read replica, and primary-pinned security decisions
+- [x] **Tenant database topology** — PostgreSQL RLS, optional eventual read replica, primary-pinned security decisions, and a selectable organization model (`org-optional`: users work without an organization, or `personal-orgs`: every user gets one)
 - [x] **Admin dashboard** — users, roles, jobs, mail, imports/exports, audit logs, SSE notifications
 - [x] **Flutter mobile** — Material 3 design system, 20+ widgets, in-app UI Kit gallery, optional FCM push
 - [x] **Environment layering** — `development` · `staging` · `production` across API, web, admin, and mobile
@@ -144,6 +144,15 @@ non-interactive runs, pass feature IDs explicitly:
 
 ```bash
 pnpm create:project --features auth,import-export --target ../my-project --skip-install
+```
+
+Two capability switches ride along as explicit flags:
+
+```bash
+# Tenant isolation: shared-schema (default) or schema-per-tenant
+pnpm create:project --tenant-mode schema-per-tenant --target ../my-project
+# Organization model: personal-orgs (default) or org-optional
+pnpm create:project --org-model org-optional --target ../my-project
 ```
 
 The generator does not create a git repository for you — run `git init` in the

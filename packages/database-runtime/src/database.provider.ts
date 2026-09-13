@@ -4,6 +4,7 @@ import {
   DATABASE_RUNTIME_ENV,
   type DatabaseRuntimeEnv,
   type DatabaseRuntimeOptions,
+  DEFAULT_ORGANIZATION_MODEL_OPTIONS,
   getTenantContext,
 } from "@repo/api-kernel";
 import { Pool, type PoolClient, type PoolConfig } from "pg";
@@ -19,6 +20,8 @@ export const ADVISORY_LOCK_POOL = Symbol("ADVISORY_LOCK_POOL");
 export const DATABASE = Symbol("DATABASE");
 /** Nest token for the composed tenant and database-topology options. */
 export const DATABASE_RUNTIME_OPTIONS = Symbol("DATABASE_RUNTIME_OPTIONS");
+/** Nest token for the composed organization-model options. */
+export const ORGANIZATION_MODEL_OPTIONS = Symbol("ORGANIZATION_MODEL_OPTIONS");
 
 /** Compatibility defaults for registries that do not select infrastructure capabilities. */
 export const DEFAULT_DATABASE_RUNTIME_OPTIONS: DatabaseRuntimeOptions = {
@@ -185,6 +188,10 @@ export const databaseProviders: Provider[] = [
   {
     provide: DATABASE_RUNTIME_OPTIONS,
     useValue: DEFAULT_DATABASE_RUNTIME_OPTIONS,
+  },
+  {
+    provide: ORGANIZATION_MODEL_OPTIONS,
+    useValue: DEFAULT_ORGANIZATION_MODEL_OPTIONS,
   },
   {
     provide: DATABASE_POOL,

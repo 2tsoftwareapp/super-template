@@ -8,6 +8,7 @@ export {
   DATABASE_SCHEMA,
   databaseProviders,
   DEFAULT_DATABASE_RUNTIME_OPTIONS,
+  ORGANIZATION_MODEL_OPTIONS,
 } from "./database.provider";
 export {
   createDatabaseClient,

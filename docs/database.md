@@ -95,8 +95,29 @@ organization_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid
 OR current_setting('app.bypass_rls', true) = 'true'
 ```
 
-`l_audit_logs` additionally allows `organization_id IS NULL` so platform-wide
-audit rows remain visible.
+In the **org-optional** organization model, migration
+`0038_org_optional_user_scoped_rls.sql` rewrites every tenant-isolation policy to
+add a third branch so organization-less (platform-scope) rows stay private to
+their owner:
+
+```sql
+organization_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid
+OR (organization_id = '00000000-0000-0000-0000-000000000000'::uuid
+    AND <owner column> = NULLIF(current_setting('app.user_id', true), '')::uuid)
+OR current_setting('app.bypass_rls', true) = 'true'
+```
+
+`<owner column>` is the row's user attribution column (`actor_id`,
+`created_by_id`, `uploaded_by_id`, or `user_id`). The job-observability child
+tables (`w_job_attempts`, `w_job_events`, `r_job_dependencies`) have no owner
+column; migration `0040_job_child_tables_sentinel_scoping.sql` scopes their
+sentinel branch through the parent job's `w_jobs.created_by_id` via an
+`EXISTS` subquery. Platform-scope rows are
+written with the sentinel organization id `00000000-0000-0000-0000-000000000000`
+(see `PLATFORM_SCOPE_ORGANIZATION_ID` in `@repo/api-kernel`), so real tenant
+rows and personal rows never mix, and org-less users can never read each
+other's data at the database level. `l_audit_logs` additionally allows
+`organization_id IS NULL` so platform-wide audit rows remain visible.
 
 ### Tables deliberately outside RLS
 
@@ -191,6 +212,30 @@ context uses `public` only, and a non-UUID tenant id fails before SQL runs.
 The generator does not create schemas, grant access, or fan out migrations;
 operators must provision each tenant schema and apply compatible DDL before
 enabling this mode in a deployed environment.
+
+## Organization model modes
+
+Two mutually exclusive capabilities select how users relate to organizations:
+
+```sh
+node scripts/create-project.mjs --org-model personal-orgs --target ../my-app
+node scripts/create-project.mjs --org-model org-optional --target ../my-app
+```
+
+| Capability | id | Behavior |
+| --- | --- | --- |
+| `feature-org-model-personal-orgs` | `org-model-personal-orgs` | Historical default. Registration, SSO signup, and platform user creation provision a personal organization + ADMIN role for every user; sessions without an organization are rejected (`403`). |
+| `feature-org-model-optional` | `org-model-optional` | Organizations become an opt-in module. New users have **no** organization; `organizationId` is `null` in sessions/tokens and tenant-scoped writes use the platform-scope sentinel. Tenant-scoped endpoints that require an organization keep returning `403` until the user joins one. |
+
+Selecting both is a composition error (same conflict mechanism as tenant
+modes). The composed value flows to every host through `organizationModelOptions`
+(`@repo/app-composition`) → `DatabaseModule.forRoot({ organizationModel })` →
+`ORGANIZATION_MODEL_OPTIONS` (`@repo/database-runtime`).
+
+User-scoped data isolation in the org-optional model is enforced by the RLS
+policies installed in migration `0038` (see "Row-level security coverage"
+above). Both tenant topology modes can be combined with either organization
+model.
 
 ## Read-replica topology
 

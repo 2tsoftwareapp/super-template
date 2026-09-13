@@ -40,6 +40,16 @@ tenant-schema `search_path` behavior. Provisioning tenant schemas and applying
 feature migrations to each schema is an operator-owned release prerequisite;
 the application startup does not perform that migration fan-out.
 
+The composed **organization model** must be chosen at generation time with
+`--org-model` (`personal-orgs` — historical default, organizations effectively
+mandatory — or `org-optional` — users may operate without any organization).
+Switching models later is a new project generation, not a runtime toggle. In
+`org-optional` deployments, endpoints guarded by `requireOrganizationId()`
+(files, notifications, import/export) return `403` for users who have not joined
+an organization; their platform-scope rows are isolated by the user-scoped RLS
+branches installed in migration `0038`. See `docs/database.md` → "Organization
+model modes".
+
 When `database-read-replica` is selected, set the replica URL in both API and
 worker environments. Replica reads are eventual and tenant-aware. Mutations,
 transactions, raw SQL, migrations, and advisory locks remain on the primary;

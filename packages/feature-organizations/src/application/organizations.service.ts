@@ -29,7 +29,7 @@ export class OrganizationsService {
     userId: string,
     organizationId?: string | null,
     executor?: TransactionExecutor,
-  ) {
+  ): Promise<string | null> {
     return this.resolveOrganizationIdForUserUseCase.execute(userId, organizationId, executor);
   }
 }

@@ -41,6 +41,9 @@ Options:
   --features <ids>  Comma-separated or repeated feature IDs; omit in a TTY to select interactively.
   --tenant-mode <mode>
                      Select shared-schema or schema-per-tenant tenant isolation.
+  --org-model <model>
+                     Select personal-orgs (default: every user gets a personal
+                     organization) or org-optional (users may have no organization).
   --read-replica     Enable the database-read-replica capability.
   --target <dir>    New or previously generated project directory (required).
   --source <dir>    Template repository (default: current directory).
@@ -56,13 +59,14 @@ Options:
 /**
  * Parse the small, explicit CLI surface so target safety can run before any write.
  * @param {string[]} argv
- * @returns {{features: string[], featuresProvided: boolean, tenantMode: string | undefined, readReplica: boolean, target: string | undefined, source: string, surfaces: string[], dryRun: boolean, check: boolean, skipInstall: boolean, refreshLockfile: boolean, help: boolean}}
+ * @returns {{features: string[], featuresProvided: boolean, tenantMode: string | undefined, orgModel: string | undefined, readReplica: boolean, target: string | undefined, source: string, surfaces: string[], dryRun: boolean, check: boolean, skipInstall: boolean, refreshLockfile: boolean, help: boolean}}
  */
 function parseArgs(argv) {
   const result = {
     features: [],
     featuresProvided: false,
     tenantMode: undefined,
+    orgModel: undefined,
     readReplica: false,
     target: undefined,
     source: process.cwd(),
@@ -73,7 +77,7 @@ function parseArgs(argv) {
     refreshLockfile: false,
     help: false,
   };
-  const values = new Set(["--features", "--target", "--source", "--surfaces", "--tenant-mode"]);
+  const values = new Set(["--features", "--target", "--source", "--surfaces", "--tenant-mode", "--org-model"]);
 
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -128,6 +132,19 @@ function parseArgs(argv) {
         );
       }
       result.tenantMode = value;
+    }
+    else if (name === "--org-model") {
+      if (!new Set(["personal-orgs", "org-optional"]).has(value)) {
+        throw new Error(
+          `Unsupported organization model "${value}". Use personal-orgs or org-optional.`,
+        );
+      }
+      if (result.orgModel && result.orgModel !== value) {
+        throw new Error(
+          `Conflicting --org-model values: ${result.orgModel}, ${value}. Select one model.`,
+        );
+      }
+      result.orgModel = value;
     }
   }
 
@@ -345,6 +362,7 @@ function buildFeatureProfile(selection) {
         tenantMode: selection.database.tenantMode,
         readReplica: selection.database.readReplica,
         readConsistency: selection.database.readConsistency,
+        organizationModel: selection.organizationModel.organizationModel,
       },
     },
     null,
@@ -542,6 +560,11 @@ export async function main(argv = process.argv.slice(2)) {
     );
   }
   if (args.readReplica) aliasedFeatures.push("database-read-replica");
+  if (args.orgModel) {
+    aliasedFeatures.push(
+      args.orgModel === "org-optional" ? "org-model-optional" : "org-model-personal-orgs",
+    );
+  }
   args.features.push(...aliasedFeatures);
   if (args.features.length === 0) {
     if (args.featuresProvided) {

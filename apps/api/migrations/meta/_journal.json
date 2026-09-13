@@ -15,6 +15,27 @@
       "when": 1787749838000,
       "tag": "0037_table_naming_convention_prefixes",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1789382400000,
+      "tag": "0038_org_optional_user_scoped_rls",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1789382400001,
+      "tag": "0039_platform_scope_organization",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1789382400002,
+      "tag": "0040_job_child_tables_sentinel_scoping",
+      "breakpoints": true
     }
   ]
 }

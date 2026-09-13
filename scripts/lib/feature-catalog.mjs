@@ -15,6 +15,7 @@ const FEATURE_PACKAGE = /^@repo\/feature-[a-z0-9-]+$/;
  * @property {string[]} dependsOn
  * @property {{family: string, variant: string, conflictsWith: string[]} | undefined} capability
  * @property {{tenantMode?: string, readReplica?: boolean, readConsistency?: string} | undefined} database
+ * @property {{organizationModel?: string} | undefined} organizationModel
  * @property {Record<string, unknown>} packageJson
  */
 
@@ -139,6 +140,30 @@ function parseDatabase(node, file) {
 }
 
 /**
+ * Read organization-model metadata owned by a feature manifest.
+ * @param {ts.Node | undefined} node
+ * @param {string} file
+ * @returns {{organizationModel?: string} | undefined}
+ */
+function parseOrganizationModel(node, file) {
+  if (!node) return undefined;
+  if (!ts.isObjectLiteralExpression(node)) {
+    throw new Error(`${file}: organizationModel must be an object literal.`);
+  }
+  const property = (name) =>
+    node.properties.find(
+      (item) =>
+        ts.isPropertyAssignment(item) && ts.isIdentifier(item.name) && item.name.text === name,
+    )?.initializer;
+  const organizationModel = property("organizationModel");
+  return {
+    ...(organizationModel
+      ? { organizationModel: stringLiteral(organizationModel, "organizationModel.organizationModel", file) }
+      : {}),
+  };
+}
+
+/**
  * Parse the one exported `defineFeature` call owned by a package.
  * @param {string} file
  * @returns {{id: string, dependsOn: string[], manifestExport: string, capability: object | undefined, database: object | undefined} | undefined}
@@ -189,6 +214,7 @@ function parseManifest(file) {
         manifestExport: declaration.name.text,
         capability: parseCapability(property("capability"), file),
         database: parseDatabase(property("database"), file),
+        organizationModel: parseOrganizationModel(property("organizationModel"), file),
       });
     }
   }
@@ -250,6 +276,7 @@ export function discoverFeatureCatalog(repositoryRoot) {
         dependsOn: manifest.parsed.dependsOn,
         capability: manifest.parsed.capability,
         database: manifest.parsed.database,
+        organizationModel: manifest.parsed.organizationModel,
         packageJson,
       };
     })
@@ -331,9 +358,9 @@ export function resolveFeatureSelection(catalog, requestedIds) {
 
   for (const id of [...selected].sort(compareByCatalogOrder)) visit(id, []);
 
-  const resolvedIds = ordered.map((feature) => feature.id);
-  validateCapabilitySelection(catalog, resolvedIds);
+  const resolvedIds = ordered.map((feature) => feature.id);    validateCapabilitySelection(catalog, resolvedIds);
   const database = composeCatalogDatabaseRuntimeOptions(ordered);
+  const organizationModel = composeCatalogOrganizationModelOptions(ordered);
 
   return {
     requestedIds: requested,
@@ -341,6 +368,7 @@ export function resolveFeatureSelection(catalog, requestedIds) {
     autoAddedIds: resolvedIds.filter((id) => !requested.includes(id)),
     features: ordered,
     database,
+    organizationModel,
   };
 }
 
@@ -380,6 +408,30 @@ export function composeCatalogDatabaseRuntimeOptions(features) {
     tenantMode: tenantModes[0] ?? "shared-schema",
     readReplica,
     readConsistency: readConsistency[0] ?? (readReplica ? "eventual" : "strong"),
+  };
+}
+
+/**
+ * Mirror of composeOrganizationModelOptions in @repo/api-plugin-kit.
+ * @param {FeaturePackage[]} features
+ * @returns {{organizationModel: "personal-orgs" | "org-optional"}}
+ */
+export function composeCatalogOrganizationModelOptions(features) {
+  const models = [
+    ...new Set(
+      features
+        .map((feature) => feature.organizationModel?.organizationModel)
+        .filter((model) => model !== undefined),
+    ),
+  ];
+  if (models.length > 1) {
+    throw new Error(
+      `Conflicting organization models: ${models.join(", ")}. Select one variant.`,
+    );
+  }
+
+  return {
+    organizationModel: models[0] ?? "personal-orgs",
   };
 }
 

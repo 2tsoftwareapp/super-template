@@ -1,8 +1,9 @@
 import type { TransactionExecutor } from "@repo/api-kernel";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError } from "@repo/api-kernel";
+import { AppError, type OrganizationModelOptions } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
+import { ORGANIZATION_MODEL_OPTIONS } from "@repo/database-runtime";
 
 import type { OrganizationMembership } from "../../public/contracts";
 
@@ -15,9 +16,15 @@ export class ResolveOrganizationIdForUserUseCase {
     @Inject(ORGANIZATION_MEMBERSHIP)
     private readonly membership: OrganizationMembership,
     private readonly assertOrganizationMembershipUseCase: AssertOrganizationMembershipUseCase,
+    @Inject(ORGANIZATION_MODEL_OPTIONS)
+    private readonly organizationModelOptions: OrganizationModelOptions,
   ) {}
 
-  async execute(userId: string, organizationId?: string | null, executor?: TransactionExecutor) {
+  async execute(
+    userId: string,
+    organizationId?: string | null,
+    executor?: TransactionExecutor,
+  ): Promise<string | null> {
     if (organizationId) {
       try {
         await this.assertOrganizationMembershipUseCase.execute(organizationId, userId, executor);
@@ -29,14 +36,20 @@ export class ResolveOrganizationIdForUserUseCase {
 
     const primary = await this.membership.findPrimaryOrganizationId(userId, executor);
 
-    if (!primary) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        "No organization is available for this user",
-        HttpStatus.FORBIDDEN,
-      );
+    if (primary) {
+      return primary;
     }
 
-    return primary;
+    if (this.organizationModelOptions.organizationModel === "org-optional") {
+      // Organization-optional model: a user without any organization is a
+      // valid platform user. Sessions run without a tenant scope.
+      return null;
+    }
+
+    throw new AppError(
+      ERROR_CODES.AUTH_FORBIDDEN,
+      "No organization is available for this user",
+      HttpStatus.FORBIDDEN,
+    );
   }
 }

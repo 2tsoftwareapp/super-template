@@ -13,11 +13,22 @@ function buildMocks() {
   };
 }
 
-function buildUseCase(m: ReturnType<typeof buildMocks>) {
-  return new EnsurePersonalOrganizationUseCase(m.core as never, m.accessControl as never);
+function buildUseCase(
+  m: ReturnType<typeof buildMocks>,
+  organizationModel: "personal-orgs" | "org-optional" = "personal-orgs",
+) {
+  return new EnsurePersonalOrganizationUseCase(
+    m.core as never,
+    m.accessControl as never,
+    { organizationModel } as never,
+  );
 }
 
 describe("EnsurePersonalOrganizationUseCase (RBAC-aware)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("creates organization via core then assigns admin role", async () => {
     const m = buildMocks();
     const useCase = buildUseCase(m);
@@ -115,5 +126,16 @@ describe("EnsurePersonalOrganizationUseCase (RBAC-aware)", () => {
 
     // Core was still called (and organization was created).
     expect(m.core.execute).toHaveBeenCalledOnce();
+  });
+
+  it("is a no-op returning null in the org-optional model", async () => {
+    const m = buildMocks();
+    const useCase = buildUseCase(m, "org-optional");
+
+    const orgId = await useCase.ensurePersonalOrganization("user-1", "Alice", "tx-exec" as never);
+
+    expect(orgId).toBeNull();
+    expect(m.core.execute).not.toHaveBeenCalled();
+    expect(m.accessControl.ensureOrganizationAdminRole).not.toHaveBeenCalled();
   });
 });

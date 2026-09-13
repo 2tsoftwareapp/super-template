@@ -10,5 +10,6 @@ export {
   databaseRuntimeOptions,
   featureModules,
   orderedFeatures,
+  organizationModelOptions,
 } from "./composed-schema";
 export { enabledFeatures } from "./feature-registry";
