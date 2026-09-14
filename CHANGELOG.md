@@ -28,6 +28,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`jobs → users`, `organization-management → users`,
   `organization-management → outbox`, `sso → organizations`); every edge in
   the feature graph is now backed by a real integration (61 edges total).
+- **Session-issuance port (ADR 0004 Phase 1)**: `feature-auth` exposes
+  `SESSION_ISSUER` / `SessionIssuer` (with a structural `SessionIssuanceUser`
+  input — no password hash required for issuance) and binds it via
+  `SessionIssuerAdapter` → `IssueSessionUseCase`, keeping one issuance
+  implementation for password login, MFA, and SSO.
+  `HandleSsoCallbackUseCase` now injects the port instead of the concrete
+  use-case class and imports `hashPassword` from the kernel, so `feature-sso`
+  consumes auth through contracts and module wiring only.
 - **Selectable organization model** (compile-time capability, mirrors tenant
   modes): `feature-org-model-optional` (`org-model-optional`) lets users exist
   and operate **without** any organization — registration/SSO no longer force a

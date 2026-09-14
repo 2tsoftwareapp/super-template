@@ -7,6 +7,7 @@ import { OrganizationManagementModule } from "@repo/feature-organization-managem
 import { AuthMapper } from "./application/auth.mapper";
 import { AuthService } from "./application/auth.service";
 import { AUTH_TOKEN_PROVIDER } from "./application/ports/auth-token.provider.port";
+import { SessionIssuerAdapter } from "./application/session-issuer.adapter";
 import { AuthenticateAccessTokenUseCase } from "./application/use-cases/authenticate-access-token.use-case";
 import { CompleteMfaLoginUseCase } from "./application/use-cases/complete-mfa-login.use-case";
 import { ForgotPasswordUseCase } from "./application/use-cases/forgot-password.use-case";
@@ -30,6 +31,7 @@ import { AuthRecoveryController } from "./presentation/auth-recovery.controller"
 import { AuthRegistrationController } from "./presentation/auth-registration.controller";
 import { AuthSessionController } from "./presentation/auth-session.controller";
 import { ACCESS_TOKEN_AUTHENTICATOR } from "./public/access-token-authenticator.port";
+import { SESSION_ISSUER } from "./public/session-issuer.port";
 
 @Global()
 @Module({
@@ -59,6 +61,11 @@ import { ACCESS_TOKEN_AUTHENTICATOR } from "./public/access-token-authenticator.
       useExisting: SessionTokenService,
     },
     IssueSessionUseCase,
+    SessionIssuerAdapter,
+    {
+      provide: SESSION_ISSUER,
+      useExisting: SessionIssuerAdapter,
+    },
     CompleteMfaLoginUseCase,
     RegisterUseCase,
     LoginUseCase,
@@ -79,6 +86,7 @@ import { ACCESS_TOKEN_AUTHENTICATOR } from "./public/access-token-authenticator.
     AuthService,
     ACCESS_TOKEN_AUTHENTICATOR,
     IssueSessionUseCase,
+    SESSION_ISSUER,
     AUTH_TOKEN_PROVIDER,
     AuthDataModule,
   ],

@@ -4,7 +4,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { OrganizationsService } from "@repo/feature-organizations/module";
 
-import type { AuthUserModel } from "../models/auth-user";
+import type { SessionIssuanceOptions, SessionIssuanceUser } from "../../public/session-issuer.port";
 
 import { AuthMapper } from "../auth.mapper";
 import { AUTH_TOKEN_PROVIDER, type AuthTokenProviderPort } from "../ports/auth-token.provider.port";
@@ -21,9 +21,9 @@ export class IssueSessionUseCase {
   ) {}
 
   async execute(
-    user: AuthUserModel,
+    user: SessionIssuanceUser,
     requestContext?: RequestContext,
-    options?: { mustChangePassword?: boolean },
+    options?: SessionIssuanceOptions,
   ) {
     const organizationId = await this.organizationsService.resolveOrganizationIdForUser(user.id);
 

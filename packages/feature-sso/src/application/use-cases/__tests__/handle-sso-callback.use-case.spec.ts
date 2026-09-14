@@ -17,8 +17,8 @@ const buildLoginState = (overrides: Partial<Record<string, unknown>> = {}) => ({
   ...overrides,
 });
 
-const buildIssueSessionUseCase = () => ({
-  execute: vi.fn(async () => ({
+const buildSessionIssuer = () => ({
+  issue: vi.fn(async () => ({
     accessToken: "access-token",
     refreshToken: "refresh-token",
     organizationId: "org-1",
@@ -41,7 +41,7 @@ interface BuildArgsOverrides {
   usersRepository?: unknown;
   accessControlService?: unknown;
   personalOrganizationProvisioner?: unknown;
-  issueSessionUseCase?: unknown;
+  sessionIssuer?: unknown;
   auditWriter?: unknown;
 }
 
@@ -53,7 +53,7 @@ const buildUseCase = (overrides: BuildArgsOverrides = {}) =>
     (overrides.usersRepository ?? {}) as never,
     (overrides.accessControlService ?? buildAccessControlService()) as never,
     (overrides.personalOrganizationProvisioner ?? buildPersonalOrganizationProvisioner()) as never,
-    (overrides.issueSessionUseCase ?? buildIssueSessionUseCase()) as never,
+    (overrides.sessionIssuer ?? buildSessionIssuer()) as never,
     (overrides.auditWriter ?? { log: vi.fn(async () => undefined) }) as never,
   );
 
@@ -89,11 +89,11 @@ describe("HandleSsoCallbackUseCase", () => {
     const provider = {
       exchangeCode: vi.fn(async () => ({ idToken: "idtok" })),
     };
-    const issueSessionUseCase = buildIssueSessionUseCase();
+    const sessionIssuer = buildSessionIssuer();
     const useCase = buildUseCase({
       providers: new Map([["fake", provider]]),
       ssoRepository,
-      issueSessionUseCase,
+      sessionIssuer,
     });
 
     await expect(
@@ -101,7 +101,7 @@ describe("HandleSsoCallbackUseCase", () => {
     ).rejects.toMatchObject({ code: SSO_ERROR_CODES.SSO_STATE_INVALID });
     // Consume-first: no provider exchange, no account/session side effects.
     expect(provider.exchangeCode).not.toHaveBeenCalled();
-    expect(issueSessionUseCase.execute).not.toHaveBeenCalled();
+    expect(sessionIssuer.issue).not.toHaveBeenCalled();
   });
 
   it("rejects when the state belongs to a different provider", async () => {
@@ -253,7 +253,7 @@ describe("HandleSsoCallbackUseCase", () => {
     const usersRepository = {
       findByEmail: vi.fn(async () => existingUser),
     };
-    const issueSessionUseCase = buildIssueSessionUseCase();
+    const sessionIssuer = buildSessionIssuer();
     const accessControlService = buildAccessControlService();
     const personalOrganizationProvisioner = buildPersonalOrganizationProvisioner();
     const useCase = buildUseCase({
@@ -262,7 +262,7 @@ describe("HandleSsoCallbackUseCase", () => {
       usersRepository,
       accessControlService,
       personalOrganizationProvisioner,
-      issueSessionUseCase,
+      sessionIssuer,
     });
 
     const result = await useCase.execute({
@@ -271,7 +271,7 @@ describe("HandleSsoCallbackUseCase", () => {
       state: "s",
     });
 
-    expect(issueSessionUseCase.execute).toHaveBeenCalledWith(existingUser, undefined);
+    expect(sessionIssuer.issue).toHaveBeenCalledWith(existingUser, undefined);
     expect(ssoRepository.createIdentity).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: "existing-user",
@@ -307,7 +307,7 @@ describe("HandleSsoCallbackUseCase", () => {
       findByEmail: vi.fn(async () => null),
       create: vi.fn(async () => createdUser),
     };
-    const issueSessionUseCase = buildIssueSessionUseCase();
+    const sessionIssuer = buildSessionIssuer();
     const accessControlService = buildAccessControlService();
     const personalOrganizationProvisioner = buildPersonalOrganizationProvisioner();
     const useCase = buildUseCase({
@@ -316,7 +316,7 @@ describe("HandleSsoCallbackUseCase", () => {
       usersRepository,
       accessControlService,
       personalOrganizationProvisioner,
-      issueSessionUseCase,
+      sessionIssuer,
     });
 
     await useCase.execute({ provider: "fake", code: "c", state: "s" });
@@ -340,7 +340,7 @@ describe("HandleSsoCallbackUseCase", () => {
       "fresh",
       "tx",
     );
-    expect(issueSessionUseCase.execute).toHaveBeenCalledWith(createdUser, undefined);
+    expect(sessionIssuer.issue).toHaveBeenCalledWith(createdUser, undefined);
   });
 
   it("reuses an already-linked identity without re-deciding account linking", async () => {
@@ -363,17 +363,17 @@ describe("HandleSsoCallbackUseCase", () => {
       findByEmail: vi.fn(),
       create: vi.fn(),
     };
-    const issueSessionUseCase = buildIssueSessionUseCase();
+    const sessionIssuer = buildSessionIssuer();
     const useCase = buildUseCase({
       providers: new Map([["fake", provider]]),
       ssoRepository,
       usersRepository,
-      issueSessionUseCase,
+      sessionIssuer,
     });
 
     await useCase.execute({ provider: "fake", code: "c", state: "s" });
 
     expect(usersRepository.findByEmail).not.toHaveBeenCalled();
-    expect(issueSessionUseCase.execute).toHaveBeenCalledWith(linkedUser, undefined);
+    expect(sessionIssuer.issue).toHaveBeenCalledWith(linkedUser, undefined);
   });
 });

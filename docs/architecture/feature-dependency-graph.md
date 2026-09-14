@@ -156,6 +156,11 @@ here (generator mirror) and at runtime (`composeFeatures()` in
 
 ## Decoupled integrations (kernel-owned ports)
 
+`feature-sso` consumes auth through the `SESSION_ISSUER` port (ADR 0004
+Phase 1) plus the existing `AUTH_SESSION_REPOSITORY` / `AUTH_TOKEN_PROVIDER`
+contracts — session issuance stays owned by `IssueSessionUseCase` behind
+`SessionIssuerAdapter`, shared with password login and the post-MFA flow.
+
 `auth` integrates with `jobs` and `mail` without depending on either package:
 the port tokens `JOB_HANDLER_REGISTRY` and `MAIL_TEMPLATE_SENDER` live in
 `@repo/api-kernel` (alongside `TRANSACTION_PORT`), are bound by the owning

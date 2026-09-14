@@ -6,6 +6,7 @@ import {
   AppError,
   generateOpaqueToken,
   hashOpaqueToken,
+  hashPassword,
   normalizeEmail,
   SYSTEM_SCOPE,
 } from "@repo/api-kernel";
@@ -13,8 +14,7 @@ import { PLATFORM_TRANSACTION_PORT } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
-import { hashPassword } from "@repo/feature-auth/contracts";
-import { IssueSessionUseCase } from "@repo/feature-auth/contracts";
+import { SESSION_ISSUER, type SessionIssuer } from "@repo/feature-auth/contracts";
 import {
   PERSONAL_ORGANIZATION_PROVISIONER,
   type PersonalOrganizationProvisioner,
@@ -40,7 +40,7 @@ export class HandleSsoCallbackUseCase {
     private readonly accessControlService: AccessControlService,
     @Inject(PERSONAL_ORGANIZATION_PROVISIONER)
     private readonly personalOrganizationProvisioner: PersonalOrganizationProvisioner,
-    private readonly issueSessionUseCase: IssueSessionUseCase,
+    @Inject(SESSION_ISSUER) private readonly sessionIssuer: SessionIssuer,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}
 
@@ -233,7 +233,7 @@ export class HandleSsoCallbackUseCase {
       return targetUser;
     });
 
-    const session = await this.issueSessionUseCase.execute(user, requestContext);
+    const session = await this.sessionIssuer.issue(user, requestContext);
 
     await this.auditWriter.log({
       actorId: user.id,
