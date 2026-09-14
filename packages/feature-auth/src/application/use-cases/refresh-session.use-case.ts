@@ -3,14 +3,21 @@ import type { RequestContext } from "@repo/api-kernel";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
-import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
-import { OrganizationsService } from "@repo/feature-organizations/module";
 
 import type { RefreshSessionCommand } from "../auth.types";
+import type { AuthSessionModel } from "../models/auth-session";
 
 import { resolveRefreshAttempt } from "../../domain/refresh-rotation.policy";
+import {
+  AUTH_ACCESS_PROFILE,
+  type AuthAccessProfile,
+} from "../../public/auth-access-profile.port";
+import {
+  AUTH_ORGANIZATION_CONTEXT,
+  type AuthOrganizationContext,
+} from "../../public/auth-organization-context.port";
 import { assertSessionUsable, verifyRefreshTokenHash } from "../auth.helpers";
 import { AuthMapper } from "../auth.mapper";
 import {
@@ -23,8 +30,8 @@ import {
   type TokenPayload,
 } from "../ports/auth-token.provider.port";
 
-/** CAS retries for grace-path rotation racing other refreshes. */
-const GRACE_ROTATION_MAX_ATTEMPTS = 3;
+/** Session re-reads allowed while resolving a rotation race. */
+const ROTATION_MAX_ATTEMPTS = 3;
 
 @Injectable()
 export class RefreshSessionUseCase {
@@ -33,8 +40,10 @@ export class RefreshSessionUseCase {
     private readonly authSessionRepository: AuthSessionRepositoryPort,
     @Inject(AUTH_USER_STORE)
     private readonly usersRepository: AuthUserStore,
-    private readonly accessControlService: AccessControlService,
-    private readonly organizationsService: OrganizationsService,
+    @Inject(AUTH_ACCESS_PROFILE)
+    private readonly accessProfile: AuthAccessProfile,
+    @Inject(AUTH_ORGANIZATION_CONTEXT)
+    private readonly organizationContext: AuthOrganizationContext,
     @Inject(AUTH_TOKEN_PROVIDER)
     private readonly tokenProvider: AuthTokenProviderPort,
     private readonly authMapper: AuthMapper,
@@ -65,15 +74,13 @@ export class RefreshSessionUseCase {
       );
     }
 
+    // Reuse is decided the same way later, inside `resolveRotation` (which must
+    // re-check after every re-read). Checking once here too keeps a theft
+    // signal from triggering user, organization and profile lookups.
     const decision = await this.resolveAttempt(session, input.refreshToken);
 
     if (decision.action === "reuse") {
-      await this.authSessionRepository.revokeSession(session.id);
-      throw new AppError(
-        AUTH_ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
-        "Refresh token reuse detected",
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw await this.rejectAsReuse(session.id);
     }
 
     const user = await this.usersRepository.findById(session.userId);
@@ -87,35 +94,24 @@ export class RefreshSessionUseCase {
       );
     }
 
-    const organizationId = await this.organizationsService.resolveOrganizationIdForUser(
+    const organizationId = await this.organizationContext.resolveOrganizationIdForUser(
       user.id,
       payload.oid,
     );
 
-    const accessProfile = await this.accessControlService.getAccessProfile(user.id, organizationId);
+    const accessProfile = await this.accessProfile.getAccessProfile(user.id, organizationId);
     const metadata = {
       ipAddress: requestContext?.ipAddress ?? null,
       userAgent: requestContext?.userAgent ?? null,
     };
 
-    const refreshedSession =
-      decision.action === "rotate"
-        ? await this.rotateWithStrictFallback(
-            session.id,
-            session.refreshTokenHash,
-            input.refreshToken,
-            user.id,
-            organizationId,
-            metadata,
-          )
-        : await this.rotateWithGrace(
-            session.id,
-            session.refreshTokenHash,
-            input.refreshToken,
-            user.id,
-            organizationId,
-            metadata,
-          );
+    const refreshedSession = await this.resolveRotation({
+      session,
+      refreshToken: input.refreshToken,
+      userId: user.id,
+      organizationId,
+      metadata,
+    });
 
     return {
       accessToken: refreshedSession.accessToken,
@@ -149,112 +145,127 @@ export class RefreshSessionUseCase {
   }
 
   /**
-   * Strict-rotation path with CAS-miss fallback: if another request already
-   * rotated from the same current hash, re-read the session and re-classify.
-   * Only revoke if the token is outside the grace window (actual reuse).
+   * Turns "which rotation does this refresh token belong to?" into the pair to
+   * return, or into revoke + `AUTH_REFRESH_TOKEN_REUSED`:
+   *
+   * - `rotate` — the token is the session's current one: start a new rotation
+   *   through the CAS. Losing the CAS is not the caller's fault, so we re-read
+   *   the session and classify again instead of revoking.
+   * - `replay` — the token is the one the current rotation consumed, inside the
+   *   grace window: return that rotation's pair. N concurrent retries of one
+   *   rotation therefore all succeed with the SAME tokens, and none of them
+   *   leaves the others holding a dead pair (which is what used to revoke
+   *   legitimate sessions a moment later).
+   * - `reuse` — neither: the token was superseded long ago or belongs to
+   *   another family. Revoke, exactly as before.
    */
-  private async rotateWithStrictFallback(
-    sessionId: string,
-    expectedHash: string,
-    refreshToken: string,
-    userId: string,
-    organizationId: string | null,
-    metadata: { ipAddress: string | null; userAgent: string | null },
-  ) {
-    const rotated = await this.tokenProvider.tryRotateSessionTokens(
-      sessionId,
-      expectedHash,
-      userId,
-      organizationId,
-      metadata,
-      { startGraceWindow: true },
-    );
+  private async resolveRotation(input: {
+    session: AuthSessionModel;
+    refreshToken: string;
+    userId: string;
+    organizationId: string | null;
+    metadata: { ipAddress: string | null; userAgent: string | null };
+  }): Promise<{ accessToken: string; refreshToken: string; session: AuthSessionModel }> {
+    let state = input.session;
 
-    if (rotated) {
-      return rotated;
-    }
+    for (let attempt = 0; attempt < ROTATION_MAX_ATTEMPTS; attempt++) {
+      const decision = await this.resolveAttempt(state, input.refreshToken);
 
-    // CAS miss — another request rotated first. Re-read session and classify
-    // the caller's token against the new state.
-    const fresh = await this.authSessionRepository.findSessionForUser(sessionId, userId);
+      if (decision.action === "reuse") {
+        throw await this.rejectAsReuse(state.id);
+      }
 
-    if (!fresh || fresh.revokedAt) {
-      throw new AppError(
-        AUTH_ERROR_CODES.AUTH_SESSION_REVOKED,
-        "Session has been revoked",
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
+      if (decision.action === "replay") {
+        return this.replayRotation(state, input);
+      }
 
-    const fallbackDecision = await this.resolveAttempt(fresh, refreshToken);
-
-    if (fallbackDecision.action === "reuse") {
-      await this.authSessionRepository.revokeSession(sessionId);
-      throw new AppError(
-        AUTH_ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
-        "Refresh token reuse detected",
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-
-    // Token is still the current or previous hash — retry through the
-    // grace path (which handles further races).
-    return this.rotateWithGrace(
-      sessionId,
-      fresh.refreshTokenHash,
-      refreshToken,
-      userId,
-      organizationId,
-      metadata,
-    );
-  }
-
-  /**
-   * Grace-path rotation: the caller holds the previous token, so other racers
-   * may rotate the current hash underneath us. Retry the CAS against a fresh
-   * read; every retry re-validates that the token is still inside the grace
-   * window before rotating.
-   */
-  private async rotateWithGrace(
-    sessionId: string,
-    expectedHash: string,
-    refreshToken: string,
-    userId: string,
-    organizationId: string | null,
-    metadata: { ipAddress: string | null; userAgent: string | null },
-  ) {
-    let currentExpectedHash = expectedHash;
-
-    for (let attempt = 0; attempt < GRACE_ROTATION_MAX_ATTEMPTS; attempt++) {
       const rotated = await this.tokenProvider.tryRotateSessionTokens(
-        sessionId,
-        currentExpectedHash,
-        userId,
-        organizationId,
-        metadata,
+        state.id,
+        state.refreshTokenHash,
+        input.userId,
+        input.organizationId,
+        input.metadata,
       );
 
       if (rotated) {
         return rotated;
       }
 
-      const fresh = await this.authSessionRepository.findSessionForUser(sessionId, userId);
+      // CAS miss: another request rotated between our read and the write.
+      // Re-read and re-classify — the presented token is very likely the one
+      // that other request just consumed, i.e. a `replay` of that rotation.
+      const fresh = await this.authSessionRepository.findSessionForUser(state.id, input.userId);
 
       if (!fresh || fresh.revokedAt) {
-        break;
+        throw new AppError(
+          AUTH_ERROR_CODES.AUTH_SESSION_REVOKED,
+          "Session has been revoked",
+          HttpStatus.UNAUTHORIZED,
+        );
       }
 
-      const decision = await this.resolveAttempt(fresh, refreshToken);
-
-      if (decision.action === "reuse") {
-        break;
-      }
-
-      currentExpectedHash = fresh.refreshTokenHash;
+      state = fresh;
     }
 
-    await this.authSessionRepository.revokeSession(sessionId);
+    // Exhausting the re-reads means contention only — at most one CAS per
+    // rotation can lose, and the winner's rotation always resolves as `replay`.
+    // Never revoke on contention alone: the session is untouched, and the
+    // client is told to retry instead of being logged out.
     throw new AppError(
+      ERROR_CODES.RESOURCE_CONFLICT,
+      "Concurrent refresh could not be resolved",
+      HttpStatus.CONFLICT,
+    );
+  }
+
+  /**
+   * Re-issues the pair the current rotation already produced for the presented
+   * token. The derived pair is compared against the session's live hash: a
+   * match proves the token is the one that rotation consumed, a mismatch means
+   * it is not — fail closed and treat it as reuse.
+   */
+  private async replayRotation(
+    state: AuthSessionModel,
+    input: { userId: string; organizationId: string | null },
+  ): Promise<{ accessToken: string; refreshToken: string; session: AuthSessionModel }> {
+    const consumedTokenHash = state.previousRefreshTokenHash;
+    const rotatedAt = state.previousRotatedAt;
+
+    if (!consumedTokenHash || !rotatedAt) {
+      throw await this.rejectAsReuse(state.id);
+    }
+
+    const replayed = await this.tokenProvider.replayRotationTokens({
+      sessionId: state.id,
+      userId: input.userId,
+      organizationId: input.organizationId,
+      consumedTokenHash,
+      rotatedAt,
+    });
+
+    if (replayed.refreshTokenHash !== state.refreshTokenHash) {
+      // The derived pair is not the session's live pair, so this session is not
+      // the one holding the tokens this rotation issued. The only inputs the
+      // caller influences here are the organization (resolved from the
+      // presented token) and the session/user identity: a divergence means the
+      // token belongs to a different organization context than the live pair —
+      // for example the user switched organization after the rotation. Fail
+      // closed: deny and revoke instead of minting a pair for the wrong context.
+      throw await this.rejectAsReuse(state.id);
+    }
+
+    return {
+      accessToken: replayed.accessToken,
+      refreshToken: replayed.refreshToken,
+      session: state,
+    };
+  }
+
+  /** Revokes the session and hands back the reuse error for the caller to throw. */
+  private async rejectAsReuse(sessionId: string): Promise<AppError> {
+    await this.authSessionRepository.revokeSession(sessionId);
+
+    return new AppError(
       AUTH_ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
       "Refresh token reuse detected",
       HttpStatus.UNAUTHORIZED,

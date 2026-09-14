@@ -26,7 +26,7 @@ function buildMocks() {
     ),
   };
 
-  const accessControlService = {
+  const authAccessProfile = {
     getRoleByName: vi.fn(async () => ({ id: "role-user", name: "USER" })),
     replaceUserRoles: vi.fn(async () => {}),
   };
@@ -55,7 +55,7 @@ function buildMocks() {
   const useCase = new RegisterUseCase(
     transactionPort as never,
     usersRepository as never,
-    accessControlService as never,
+    authAccessProfile as never,
     auditWriter as never,
     authSessionRepository as never,
     outbox as never,
@@ -68,7 +68,7 @@ function buildMocks() {
     tx,
     transactionPort,
     usersRepository,
-    accessControlService,
+    authAccessProfile,
     auditWriter,
     authSessionRepository,
     outbox,
@@ -144,8 +144,8 @@ describe("RegisterUseCase", () => {
     expect(m.usersRepository.create.mock.calls[0][0].passwordHash).not.toBe("strong-password-123");
 
     // --- USER role assigned ---
-    expect(m.accessControlService.getRoleByName).toHaveBeenCalledWith("USER", null, m.tx);
-    expect(m.accessControlService.replaceUserRoles).toHaveBeenCalledWith(
+    expect(m.authAccessProfile.getRoleByName).toHaveBeenCalledWith("USER", null, m.tx);
+    expect(m.authAccessProfile.replaceUserRoles).toHaveBeenCalledWith(
       "new-user-id",
       ["role-user"],
       null,
@@ -201,7 +201,7 @@ describe("RegisterUseCase", () => {
     // --- All side effects share the SAME transaction executor ---
     const allTxArgs = [
       m.usersRepository.create.mock.calls[0]?.[1],
-      m.accessControlService.replaceUserRoles.mock.calls[0]?.[3],
+      m.authAccessProfile.replaceUserRoles.mock.calls[0]?.[3],
       m.personalOrganizationProvisioner.ensurePersonalOrganization.mock.calls[0]?.[2],
       m.authSessionRepository.storeEmailVerificationToken.mock.calls[0]?.[1],
       m.outbox.append.mock.calls[0]?.[2],

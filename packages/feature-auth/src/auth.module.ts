@@ -25,12 +25,16 @@ import { RevokeSessionUseCase } from "./application/use-cases/revoke-session.use
 import { SwitchOrganizationUseCase } from "./application/use-cases/switch-organization.use-case";
 import { VerifyEmailUseCase } from "./application/use-cases/verify-email.use-case";
 import { AuthDataModule } from "./auth-data.module";
+import { AuthAccessProfileAdapter } from "./infrastructure/auth-access-profile.adapter";
+import { AuthOrganizationContextAdapter } from "./infrastructure/auth-organization-context.adapter";
 import { SessionTokenService } from "./infrastructure/session-token.service";
 import { AuthLoginController } from "./presentation/auth-login.controller";
 import { AuthRecoveryController } from "./presentation/auth-recovery.controller";
 import { AuthRegistrationController } from "./presentation/auth-registration.controller";
 import { AuthSessionController } from "./presentation/auth-session.controller";
 import { ACCESS_TOKEN_AUTHENTICATOR } from "./public/access-token-authenticator.port";
+import { AUTH_ACCESS_PROFILE } from "./public/auth-access-profile.port";
+import { AUTH_ORGANIZATION_CONTEXT } from "./public/auth-organization-context.port";
 import { SESSION_ISSUER } from "./public/session-issuer.port";
 
 @Global()
@@ -60,6 +64,16 @@ import { SESSION_ISSUER } from "./public/session-issuer.port";
       provide: AUTH_TOKEN_PROVIDER,
       useExisting: SessionTokenService,
     },
+    AuthAccessProfileAdapter,
+    {
+      provide: AUTH_ACCESS_PROFILE,
+      useExisting: AuthAccessProfileAdapter,
+    },
+    AuthOrganizationContextAdapter,
+    {
+      provide: AUTH_ORGANIZATION_CONTEXT,
+      useExisting: AuthOrganizationContextAdapter,
+    },
     IssueSessionUseCase,
     SessionIssuerAdapter,
     {
@@ -88,6 +102,8 @@ import { SESSION_ISSUER } from "./public/session-issuer.port";
     IssueSessionUseCase,
     SESSION_ISSUER,
     AUTH_TOKEN_PROVIDER,
+    AUTH_ACCESS_PROFILE,
+    AUTH_ORGANIZATION_CONTEXT,
     AuthDataModule,
   ],
 })

@@ -1,11 +1,14 @@
 import type { RequestContext } from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { AccessControlService } from "@repo/feature-access-control/contracts";
-import { OrganizationsService } from "@repo/feature-organizations/module";
 
 import type { SessionIssuanceOptions, SessionIssuanceUser } from "../../public/session-issuer.port";
 
+import { AUTH_ACCESS_PROFILE, type AuthAccessProfile } from "../../public/auth-access-profile.port";
+import {
+  AUTH_ORGANIZATION_CONTEXT,
+  type AuthOrganizationContext,
+} from "../../public/auth-organization-context.port";
 import { AuthMapper } from "../auth.mapper";
 import { AUTH_TOKEN_PROVIDER, type AuthTokenProviderPort } from "../ports/auth-token.provider.port";
 
@@ -13,8 +16,10 @@ import { AUTH_TOKEN_PROVIDER, type AuthTokenProviderPort } from "../ports/auth-t
 @Injectable()
 export class IssueSessionUseCase {
   constructor(
-    private readonly accessControlService: AccessControlService,
-    private readonly organizationsService: OrganizationsService,
+    @Inject(AUTH_ACCESS_PROFILE)
+    private readonly accessProfilePort: AuthAccessProfile,
+    @Inject(AUTH_ORGANIZATION_CONTEXT)
+    private readonly organizationContext: AuthOrganizationContext,
     @Inject(AUTH_TOKEN_PROVIDER)
     private readonly tokenProvider: AuthTokenProviderPort,
     private readonly authMapper: AuthMapper,
@@ -25,9 +30,9 @@ export class IssueSessionUseCase {
     requestContext?: RequestContext,
     options?: SessionIssuanceOptions,
   ) {
-    const organizationId = await this.organizationsService.resolveOrganizationIdForUser(user.id);
+    const organizationId = await this.organizationContext.resolveOrganizationIdForUser(user.id);
 
-    const accessProfile = await this.accessControlService.getAccessProfile(user.id, organizationId);
+    const accessProfile = await this.accessProfilePort.getAccessProfile(user.id, organizationId);
 
     const sessionPayload = await this.tokenProvider.createSessionTokens(user.id, organizationId, {
       ipAddress: requestContext?.ipAddress ?? null,

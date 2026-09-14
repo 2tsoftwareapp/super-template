@@ -4,8 +4,11 @@ import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, SYSTEM_SCOPE } from "@repo/api-kernel";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";
-import { OrganizationsService } from "@repo/feature-organizations/module";
 
+import {
+  AUTH_ORGANIZATION_CONTEXT,
+  type AuthOrganizationContext,
+} from "../../public/auth-organization-context.port";
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
@@ -15,7 +18,8 @@ import { AUTH_TOKEN_PROVIDER, type AuthTokenProviderPort } from "../ports/auth-t
 @Injectable()
 export class SwitchOrganizationUseCase {
   constructor(
-    private readonly organizationsService: OrganizationsService,
+    @Inject(AUTH_ORGANIZATION_CONTEXT)
+    private readonly organizationContext: AuthOrganizationContext,
     @Inject(AUTH_TOKEN_PROVIDER)
     private readonly tokenProvider: AuthTokenProviderPort,
     @Inject(AUTH_SESSION_REPOSITORY)
@@ -28,7 +32,7 @@ export class SwitchOrganizationUseCase {
     organizationId: string,
     requestContext?: RequestContext,
   ) {
-    await this.organizationsService.assertMembership(organizationId, user.userId);
+    await this.organizationContext.assertMembership(organizationId, user.userId);
 
     const session = await this.authSessionRepository.findSessionForUser(
       user.sessionId,
@@ -54,7 +58,6 @@ export class SwitchOrganizationUseCase {
       user.userId,
       organizationId,
       metadata,
-      { startGraceWindow: true },
     );
 
     if (!rotated) {

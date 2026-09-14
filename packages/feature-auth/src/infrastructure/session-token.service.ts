@@ -6,6 +6,8 @@ import { randomUUID } from "node:crypto";
 
 import type {
   AuthTokenProviderPort,
+  ReplayedRotationResult,
+  ReplayRotationInput,
   TokenPayload,
 } from "../application/ports/auth-token.provider.port";
 
@@ -14,6 +16,10 @@ import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
 } from "../application/ports/auth-session.repository.port";
+import {
+  resolveRotationIdentity,
+  type RotationIdentity,
+} from "../domain/refresh-rotation.policy";
 
 export { type TokenPayload };
 
@@ -66,11 +72,11 @@ export class SessionTokenService implements AuthTokenProviderPort {
    * The use case re-reads the session and re-classifies on CAS miss; only the
    * use case may decide to revoke.
    *
-   * When `startGraceWindow` is true (strict-rotate path) the session's
-   * previous-hash fields are set so that racers whose token was the old
-   * current-hash can still rotate inside the grace window.  Grace-path
-   * callers must NOT restart the window, so the original pre-race token
-   * keeps working for later racers.
+   * The row is stamped with the hash this rotation consumed and the moment it
+   * ran, which together are the rotation's identity. The pair handed out is
+   * derived from that identity, so a later retry of the same rotation
+   * (`replayRotationTokens`) reproduces these exact tokens instead of minting a
+   * competitor that would immediately supersede them.
    */
   async tryRotateSessionTokens(
     sessionId: string,
@@ -78,24 +84,30 @@ export class SessionTokenService implements AuthTokenProviderPort {
     userId: string,
     organizationId: string | null,
     metadata: { ipAddress: string | null; userAgent: string | null },
-    options?: { startGraceWindow?: boolean },
   ) {
+    // One clock reading for both the identity and the stored rotation time, so
+    // the derived `iat` and `previousRotatedAt` can never disagree.
+    const rotatedAt = new Date();
+    const identity = resolveRotationIdentity({
+      sessionId,
+      userId,
+      organizationId,
+      consumedTokenHash: refreshTokenHash,
+      rotatedAt,
+    });
+
     const {
       accessToken,
       refreshToken,
       refreshTokenHash: nextRefreshTokenHash,
-    } = await this.issueTokenPair(userId, sessionId, organizationId);
+    } = await this.issueTokenPair(userId, sessionId, organizationId, identity);
     const session = await this.authSessionRepository.updateSessionIfMatches(
       sessionId,
       refreshTokenHash,
       {
         refreshTokenHash: nextRefreshTokenHash,
-        ...(options?.startGraceWindow
-          ? {
-              previousRefreshTokenHash: refreshTokenHash,
-              previousRotatedAt: new Date(),
-            }
-          : {}),
+        previousRefreshTokenHash: refreshTokenHash,
+        previousRotatedAt: rotatedAt,
         expiresAt: new Date(
           Date.now() + durationToMilliseconds(this.environmentService.values.JWT_REFRESH_TTL),
         ),
@@ -114,6 +126,29 @@ export class SessionTokenService implements AuthTokenProviderPort {
       refreshToken,
       session,
     };
+  }
+
+  /**
+   * Re-derives the pair one rotation issued, from the same identity the
+   * rotating request used. Pure computation: no row is read or written, so
+   * concurrent retries of one rotation cannot fight each other.
+   */
+  async replayRotationTokens(input: ReplayRotationInput): Promise<ReplayedRotationResult> {
+    const identity = resolveRotationIdentity({
+      sessionId: input.sessionId,
+      userId: input.userId,
+      organizationId: input.organizationId,
+      consumedTokenHash: input.consumedTokenHash,
+      rotatedAt: input.rotatedAt,
+    });
+    const { accessToken, refreshToken, refreshTokenHash } = await this.issueTokenPair(
+      input.userId,
+      input.sessionId,
+      input.organizationId,
+      identity,
+    );
+
+    return { accessToken, refreshToken, refreshTokenHash };
   }
 
   /**
@@ -156,19 +191,31 @@ export class SessionTokenService implements AuthTokenProviderPort {
     };
   }
 
-  private async issueTokenPair(userId: string, sessionId: string, organizationId: string | null) {
-    const accessToken = await this.signToken(userId, sessionId, "access", organizationId);
-    const refreshToken = await this.signToken(userId, sessionId, "refresh", organizationId);
+  private async issueTokenPair(
+    userId: string,
+    sessionId: string,
+    organizationId: string | null,
+    identity?: RotationIdentity,
+  ) {
+    const accessToken = await this.signToken(userId, sessionId, "access", organizationId, identity);
+    const refreshToken = await this.signToken(userId, sessionId, "refresh", organizationId, identity);
     const refreshTokenHash = await hashRefreshToken(refreshToken);
 
     return { accessToken, refreshToken, refreshTokenHash };
   }
 
+  /**
+   * When `identity` is given the token belongs to a specific rotation: its
+   * `jti` and `iat` come from that identity, so signing twice for one rotation
+   * yields the same token (idempotent retry). Without it the token is a
+   * standalone one-off — a fresh session or an SSO re-issue.
+   */
   async signToken(
     userId: string,
     sessionId: string,
     type: TokenPayload["typ"],
     organizationId: string | null,
+    identity?: RotationIdentity,
   ) {
     const secret =
       type === "access"
@@ -186,9 +233,16 @@ export class SessionTokenService implements AuthTokenProviderPort {
       {
         sub: userId,
         sid: sessionId,
-        jti: randomUUID(),
+        jti: identity
+          ? type === "access"
+            ? identity.accessJti
+            : identity.refreshJti
+          : randomUUID(),
         typ: type,
         oid: organizationId ?? undefined,
+        // `exp` is derived from `iat` by the signer, so a replayed pair keeps
+        // the rotation's original expiry instead of sliding forward.
+        ...(identity ? { iat: identity.issuedAtSeconds } : {}),
       },
       {
         secret,
