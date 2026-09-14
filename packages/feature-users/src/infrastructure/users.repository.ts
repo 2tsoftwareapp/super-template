@@ -13,7 +13,18 @@ import type {
 } from "../application/ports/users.repository.port";
 import type { UserLookup } from "../public/user-lookup.port";
 
+import {
+  softDeleteUserAccount,
+  USER_ACCOUNT_SOFT_DELETE_MARKER,
+  USER_ACCOUNT_STATUS,
+} from "../domain/user-account.policy";
 import { users } from "./persistence";
+
+/**
+ * SQL rendering of `isActiveUserAccount`: live accounts are the ones whose
+ * soft-delete marker is unset (`domain/user-account.policy.ts`).
+ */
+const activeAccount = () => isNull(users[USER_ACCOUNT_SOFT_DELETE_MARKER]);
 
 const USER_SORT_FIELDS = {
   createdAt: users.createdAt,
@@ -44,7 +55,7 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
     const [user] = await executor
       .select()
       .from(users)
-      .where(and(eq(users.id, userId), isNull(users.deletedAt)))
+      .where(and(eq(users.id, userId), activeAccount()))
       .limit(1);
 
     return user ?? null;
@@ -58,7 +69,7 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
     const [user] = await executor
       .select()
       .from(users)
-      .where(and(eq(users.email, email), isNull(users.deletedAt)))
+      .where(and(eq(users.email, email), activeAccount()))
       .limit(1);
 
     return user ?? null;
@@ -82,18 +93,11 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
   }
 
   async softDelete(userId: string, executor: DatabaseExecutor = this.database) {
-    return this.update(
-      userId,
-      {
-        deletedAt: new Date(),
-        status: "BLOCKED",
-      },
-      executor,
-    );
+    return this.update(userId, softDeleteUserAccount(new Date()), executor);
   }
 
   async list(params: UsersCoreListQuery, executor: DatabaseExecutor = this.database) {
-    const filters = [isNull(users.deletedAt)];
+    const filters = [activeAccount()];
 
     if (params.search) {
       filters.push(
@@ -144,7 +148,7 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
     const rows = await executor
       .select({ id: users.id })
       .from(users)
-      .where(and(inArray(users.id, userIds), isNull(users.deletedAt)));
+      .where(and(inArray(users.id, userIds), activeAccount()));
     return rows.map((r) => r.id);
   }
 
@@ -152,7 +156,7 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
     const rows = await executor
       .select({ id: users.id })
       .from(users)
-      .where(and(eq(users.status, "ACTIVE"), isNull(users.deletedAt)));
+      .where(and(eq(users.status, USER_ACCOUNT_STATUS.ACTIVE), activeAccount()));
     return rows.map((r) => r.id);
   }
 
@@ -172,8 +176,8 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
       .where(
         and(
           eq(users.id, userId),
-          eq(users.status, "ACTIVE"),
-          isNull(users.deletedAt),
+          eq(users.status, USER_ACCOUNT_STATUS.ACTIVE),
+          activeAccount(),
           sql`exists(
             select 1 from r_organization_members
             where organization_id = ${organizationId}::uuid and user_id = ${users.id}
@@ -196,8 +200,8 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
       .where(
         and(
           inArray(users.id, userIds),
-          eq(users.status, "ACTIVE"),
-          isNull(users.deletedAt),
+          eq(users.status, USER_ACCOUNT_STATUS.ACTIVE),
+          activeAccount(),
           sql`exists(
             select 1 from r_organization_members
             where organization_id = ${organizationId}::uuid and user_id = ${users.id}
@@ -216,8 +220,8 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
       .from(users)
       .where(
         and(
-          eq(users.status, "ACTIVE"),
-          isNull(users.deletedAt),
+          eq(users.status, USER_ACCOUNT_STATUS.ACTIVE),
+          activeAccount(),
           sql`exists(
             select 1 from r_organization_members
             where organization_id = ${organizationId}::uuid and user_id = ${users.id}

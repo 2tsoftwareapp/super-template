@@ -1,7 +1,13 @@
-import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
-
 /** Audit-export files are tagged with this kind by the export use case. */
 export const AUDIT_EXPORT_FILE_KIND = "AUDIT_EXPORT";
+
+/**
+ * Platform super-role name (single source of truth for audit-export access).
+ * Kept local instead of importing ROLE_NAMES from the access-control feature:
+ * a feature's domain layer must not depend at runtime on another feature.
+ */
+export const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";
+
 /**
  * Whether an actor may download a stored audit-export file.
  *
@@ -21,7 +27,7 @@ export function canDownloadAuditExport(input: {
     return false;
   }
 
-  if (input.actorRoles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+  if (input.actorRoles.includes(PLATFORM_SUPER_ADMIN)) {
     return true;
   }
 

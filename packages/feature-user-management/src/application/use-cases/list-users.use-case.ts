@@ -13,7 +13,7 @@ import {
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 import { UsersMapper } from "@repo/feature-users/module";
 
-import { resolveUsersListOrganizationId } from "../../user-org-scope.policy";
+import { resolveUsersListOrganizationId } from "../../domain/user-org-scope.policy";
 
 @Injectable()
 export class ListUsersUseCase {

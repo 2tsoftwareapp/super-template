@@ -26,7 +26,7 @@ import {
   type UsersRepositoryPort,
 } from "@repo/feature-users/contracts";
 
-import { assertUserBelongsToOrganization } from "../../user-org-scope.policy";
+import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 import { resolveRoleById } from "../assignable-role.resolver";
 import { GetUserUseCase } from "./get-user.use-case";
 

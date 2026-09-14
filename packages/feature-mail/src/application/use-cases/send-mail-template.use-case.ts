@@ -8,7 +8,7 @@ import {
   type UserPreferencesLookup,
 } from "@repo/feature-user-preferences/contracts";
 
-import { isMandatoryMailTemplate } from "../../constants/mandatory-mail-templates";
+import { isMandatoryMailTemplate } from "../../domain/mandatory-mail-templates";
 import {
   MAIL_DELIVERIES_REPOSITORY,
   type MailDeliveriesRepositoryPort,
