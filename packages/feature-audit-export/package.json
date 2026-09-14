@@ -6,8 +6,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./contracts": "./src/public/contracts.ts",
-    "./module": "./src/audit-export.module.ts",
-    "./testing": "./src/testing/index.ts"
+    "./module": "./src/audit-export.module.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",

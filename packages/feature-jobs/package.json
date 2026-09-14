@@ -7,7 +7,6 @@
     ".": "./src/index.ts",
     "./contracts": "./src/public/contracts.ts",
     "./module": "./src/jobs.module.ts",
-    "./testing": "./src/testing/index.ts",
     "./schema": "./src/infrastructure/persistence/index.ts"
   },
   "scripts": {

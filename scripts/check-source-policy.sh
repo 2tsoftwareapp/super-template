@@ -112,3 +112,4 @@ fi
 
 printf 'Source policy checks passed.\n'
 node scripts/check-cross-feature-fks.mjs
+node scripts/check-error-codes.mjs

@@ -187,7 +187,8 @@ modules/<feature>/
 │   ├── <feature>.entity.ts
 │   ├── <feature>.policy.ts
 │   ├── <feature>.value-object.ts
-│   └── *.spec.ts
+│   └── __tests__/
+│       └── <feature>.policy.spec.ts
 │
 └── infrastructure/
     ├── persistence/
@@ -205,7 +206,13 @@ Rules:
 - thin CRUD may omit `domain/`;
 - complex features may split use cases further;
 - do not collapse unrelated responsibilities into `service.ts`;
-- do not introduce a different structure for a single feature.
+- do not introduce a different structure for a single feature;
+- keep DTOs in `presentation/dto/` — never loose in `presentation/`;
+- keep unit tests in `__tests__/` next to the layer they cover
+  (`src/**/__tests__/*.spec.ts`). A unit test is never parked beside its subject
+  file — the folder boundary is what tells `pnpm --filter <pkg> test` and the
+  reviewer which kind of test it is. Integration and composition tests use the
+  package or app test boundaries instead (`<pkg>/test/`, `apps/api/test/`).
 
 ---
 
@@ -389,7 +396,7 @@ Domain code must:
 
 - be framework-free;
 - not import NestJS, Express, Drizzle, database schema, Redis, S3, SMTP, Firebase, or controller DTOs;
-- have colocated unit tests;
+- have unit tests under `domain/__tests__/`;
 - expose named policies, entities, value objects, or pure functions;
 - never import application, presentation, or infrastructure.
 
@@ -500,6 +507,28 @@ Do not:
 - let response DTOs become domain entities.
 
 Explicit mapping is preferred at boundaries.
+
+### 12.1 Where DTO files live
+
+One layout, everywhere: `*.dto.ts` files sit in a `dto/` folder, and for HTTP
+presentation that folder is `presentation/dto/`.
+
+```text
+<feature>/src/presentation/dto/users.dto.ts       # controllers import ./dto/users.dto
+<feature>/src/exports/presentation/dto/exports.dto.ts
+```
+
+Do not:
+
+- park DTOs loose in `presentation/` (`presentation/users.dto.ts`);
+- keep a second, compatibility DTO path next to the real one — a re-export barrel
+  that nobody imports is a public surface claim, not a compatibility guarantee;
+- nest DTOs under a transport folder (`presentation/http/dto/`) when the feature's
+  controllers already live in `presentation/`.
+
+DTO class names, fields and validators are contract surface: moving a file may
+only change its import specifier, never its shape. No DTO file is re-exported
+through a package `exports` subpath, so a move stays inside the package.
 
 ---
 
@@ -615,7 +644,7 @@ A feature plugin's **backend** surface MUST:
   (application/infrastructure/presentation/domain as needed);
 - own its Drizzle tables under `src/infrastructure/persistence/` (SQL migrations
   are composed into `apps/api/migrations` via `@repo/database-runtime` drizzle-kit);
-- carry colocated unit tests and its own lint/typecheck scripts.
+- carry unit tests under `src/**/__tests__/` and its own lint/typecheck scripts.
 
 > **Schema composition:** `@repo/database-runtime` exports an empty built-in schema.
 > Feature packages contribute tables via `FeatureManifest.schema`;
@@ -640,6 +669,39 @@ deliberate data migration.
 > **Naming across all platforms** (DB table prefixes, feature package ids
 > `@repo/feature-<id>`, file/class/route conventions): see
 > [Naming Conventions](./NAMING_CONVENTIONS.md).
+
+### 15.2 Error codes and catalogs
+
+`AppError.code` is part of the HTTP contract: clients branch on it, so a value
+must have exactly one owner and one meaning. There are three tiers, and nothing
+else.
+
+| Tier              | Catalog                                                                           | Use it for                                                                                                                                                                                                                                                       |
+| ----------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **transport**     | `ERROR_CODES` in `packages/api-runtime/src/error-codes.ts`                        | cross-cutting HTTP/authorization outcomes any feature may raise: `AUTH_FORBIDDEN`, `AUTH_UNAUTHORIZED`, `INTERNAL_ERROR`, `RATE_LIMITED`, `RESOURCE_CONFLICT`, `SERVICE_UNAVAILABLE`, `VALIDATION_FAILED`. A feature never re-declares these.                    |
+| **kernel-shared** | `packages/api-kernel/src/errors/feature-error-codes.ts`                           | domain codes one feature raises **on behalf of another feature's data** (e.g. auth rejecting registration because `feature-settings` disabled it). The owning feature re-exports the same object from its `public/error-codes.ts`, so its contract stays stable. |
+| **feature-owned** | `packages/feature-<id>/src/public/error-codes.ts`, exported through `./contracts` | everything specific to the feature's own domain (`JOB_NOT_FOUND`, `MFA_INVALID_CODE`, …).                                                                                                                                                                        |
+
+Rules:
+
+- exactly one catalog declares a given code value — no duplicates across tiers or
+  features;
+- raise a code through its constant, never a bare string literal. A literal is
+  only acceptable for a **shared** tier value (transport or kernel-shared);
+- a domain code of another feature is referenced through that feature's
+  `./contracts` entrypoint, which means the dependency must already exist. Do not
+  add a feature-to-feature dependency just to reuse a constant — promote the code
+  to the kernel-shared tier instead (the owning feature then re-exports it);
+- never change an existing code value or HTTP status to "clean up" a catalog;
+  clients depend on the wire value.
+
+Enforcement: `node scripts/check-error-codes.mjs` (also chained into
+`scripts/check-source-policy.sh` and `pnpm run lint:policy`) walks the three
+tiers, rejects duplicate owners and rejects disallowed literals. The only
+permitted literals are listed with a reason in
+`scripts/lib/error-code-policy.mjs`; the guard prints them on every successful
+run so the debt stays visible. Its own self-check lives in
+`scripts/__tests__/error-code-policy.spec.mjs`.
 
 ---
 

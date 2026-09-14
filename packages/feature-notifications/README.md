@@ -6,7 +6,7 @@ This package owns the `notifications` feature and its application, domain, infra
 
 ## Public API
 
-The package declares these public entrypoints: `.`, `./contracts`, `./module`, `./testing`, `./schema`. Consumers must use these entrypoints instead of importing internal files.
+The package declares these public entrypoints: `.`, `./contracts`, `./module`, `./schema`. Consumers must use these entrypoints instead of importing internal files.
 
 ## Feature dependencies
 

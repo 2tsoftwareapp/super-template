@@ -49,7 +49,7 @@ import {
   FilesQueryDto,
   FileUrlDto,
   FileVersionDto,
-} from "./files.dto";
+} from "./dto/files.dto";
 
 @ApiTags("files")
 @ApiBearerAuth()

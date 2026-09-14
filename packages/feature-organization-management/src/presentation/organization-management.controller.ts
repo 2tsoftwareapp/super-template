@@ -15,7 +15,7 @@ import {
   CreateOrganizationDto,
   OrganizationDto,
   UpdateMemberRoleDto,
-} from "./organization-management.dto";
+} from "./dto/organization-management.dto";
 
 @ApiTags("organizations")
 @ApiBearerAuth()

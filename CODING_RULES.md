@@ -1008,6 +1008,35 @@ async execute(input: CreateUserCommand) {
 
 ---
 
+### 11.7 Error Codes (`AppError.code`)
+
+`AppError.code` thuộc HTTP contract — client branch theo giá trị này, nên mỗi mã
+chỉ có **một** chủ sở hữu. Có đúng ba tầng, không có tầng thứ tư:
+
+| Tầng | Catalog | Dùng cho |
+|------|---------|----------|
+| **transport** | `ERROR_CODES` (`packages/api-runtime/src/error-codes.ts`) | kết quả HTTP/authorization dùng chung: `AUTH_FORBIDDEN`, `AUTH_UNAUTHORIZED`, `INTERNAL_ERROR`, `RATE_LIMITED`, `RESOURCE_CONFLICT`, `SERVICE_UNAVAILABLE`, `VALIDATION_FAILED` |
+| **kernel-shared** | `packages/api-kernel/src/errors/feature-error-codes.ts` | mã domain mà feature A ném thay cho dữ liệu của feature B; feature sở hữu re-export lại cùng object |
+| **feature-owned** | `packages/feature-<id>/src/public/error-codes.ts` (export qua `./contracts`) | mã nghiệp vụ riêng của feature (`JOB_NOT_FOUND`, `MFA_INVALID_CODE`, …) |
+
+| # | Rule |
+|---|------|
+| R1 | Một giá trị mã chỉ được khai báo bởi **một** catalog — không trùng giữa các tầng/feature |
+| R2 | Ném mã qua hằng số, **không** ném string literal. Literal chỉ được phép với mã thuộc tầng shared (transport/kernel-shared) |
+| R3 | Mã domain của feature khác thì import qua `./contracts` của feature đó — chỉ khi dependency đã tồn tại. Không thêm dependency feature→feature chỉ để dùng lại hằng số; hãy đưa mã lên tầng kernel-shared |
+| R4 | **Không** đổi giá trị mã hay HTTP status đang chạy để "dọn" catalog — client đang phụ thuộc giá trị trên wire |
+
+Enforce: `node scripts/check-error-codes.mjs` (nằm trong chuỗi
+`sh scripts/check-source-policy.sh` và `pnpm run lint:policy`). Danh sách literal
+được phép — kèm lý do — nằm ở `scripts/lib/error-code-policy.mjs` và được in ra
+mỗi lần check xanh.
+
+> Quy tắc đầy đủ + quy ước layout DTO/test:
+> [docs/architecture/ARCHITECTURE_RULES.md](./docs/architecture/ARCHITECTURE_RULES.md)
+> §12.1 (DTO trong `presentation/dto/`), §15.2 (error codes), §5 (test trong `__tests__/`).
+
+---
+
 ## 12. DB & External Service Rules
 
 ### 12.1 Port-First Pattern

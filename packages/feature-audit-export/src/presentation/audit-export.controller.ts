@@ -24,7 +24,7 @@ import {
 
 import { DownloadAuditExportUseCase } from "../application/download-audit-export.use-case";
 import { ExportAuditLogsUseCase } from "../application/export-audit-logs.use-case";
-import { AuditExportResultDto, ExportAuditLogsQueryDto } from "./audit-export.dto";
+import { AuditExportResultDto, ExportAuditLogsQueryDto } from "./dto/audit-export.dto";
 
 @ApiTags("admin-audit")
 @ApiBearerAuth()

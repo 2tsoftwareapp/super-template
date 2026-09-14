@@ -6,7 +6,7 @@ This package owns the `jobs` feature and its application, domain, infrastructure
 
 ## Public API
 
-The package declares these public entrypoints: `.`, `./contracts`, `./module`, `./testing`, `./schema`. Consumers must use these entrypoints instead of importing internal files.
+The package declares these public entrypoints: `.`, `./contracts`, `./module`, `./schema`. Consumers must use these entrypoints instead of importing internal files.
 
 ## Feature dependencies
 

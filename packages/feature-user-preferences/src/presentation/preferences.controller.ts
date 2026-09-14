@@ -9,7 +9,7 @@ import { CurrentUser } from "@repo/api-runtime";
 import { GetPreferencesUseCase } from "../application/use-cases/get-preferences.use-case";
 import { ResetPreferencesUseCase } from "../application/use-cases/reset-preferences.use-case";
 import { UpdatePreferencesUseCase } from "../application/use-cases/update-preferences.use-case";
-import { UpdatePreferencesDto, UserPreferencesDto } from "./preferences.dto";
+import { UpdatePreferencesDto, UserPreferencesDto } from "./dto/preferences.dto";
 
 @ApiTags("users")
 @ApiBearerAuth()

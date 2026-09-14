@@ -9,7 +9,7 @@ import { Authorize } from "@repo/api-runtime";
 
 import { ListSettingsUseCase } from "../application/use-cases/list-settings.use-case";
 import { UpdateSettingUseCase } from "../application/use-cases/update-setting.use-case";
-import { ApplicationSettingDto, UpdateSettingDto } from "./settings.dto";
+import { ApplicationSettingDto, UpdateSettingDto } from "./dto/settings.dto";
 
 @ApiTags("admin-settings")
 @ApiBearerAuth()

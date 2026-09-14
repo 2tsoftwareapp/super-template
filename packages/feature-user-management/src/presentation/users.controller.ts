@@ -9,7 +9,7 @@ import { CurrentUser } from "@repo/api-runtime";
 import { ChangePasswordUseCase } from "../application/use-cases/change-password.use-case";
 import { GetUserUseCase } from "../application/use-cases/get-user.use-case";
 import { UpdateProfileUseCase } from "../application/use-cases/update-profile.use-case";
-import { ChangePasswordDto, UpdateProfileDto, UserDto } from "./users.dto";
+import { ChangePasswordDto, UpdateProfileDto, UserDto } from "./dto/users.dto";
 
 @ApiTags("users")
 @ApiBearerAuth()

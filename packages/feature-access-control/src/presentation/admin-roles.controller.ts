@@ -35,7 +35,7 @@ import {
   ReplaceRolePermissionsDto,
   RoleDto,
   UpdateRoleDto,
-} from "./roles.dto";
+} from "./dto/roles.dto";
 
 @ApiTags("admin-roles")
 @ApiBearerAuth()

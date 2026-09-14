@@ -24,7 +24,7 @@ import {
   MailTemplateDto,
   SendAdminMailDto,
   SendAdminMailResultDto,
-} from "./mail.dto";
+} from "./dto/mail.dto";
 
 @ApiTags("admin-mail")
 @ApiBearerAuth()

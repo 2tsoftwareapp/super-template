@@ -20,7 +20,7 @@ import { Authorize } from "@repo/api-runtime";
 import { AttachFileUseCase } from "../application/use-cases/attach-file.use-case";
 import { DeleteAttachmentUseCase } from "../application/use-cases/delete-attachment.use-case";
 import { ListAttachmentsUseCase } from "../application/use-cases/list-attachments.use-case";
-import { AttachEntityDto, AttachmentDto, AttachmentsQueryDto } from "./attachments.dto";
+import { AttachEntityDto, AttachmentDto, AttachmentsQueryDto } from "./dto/attachments.dto";
 
 @ApiTags("attachments")
 @ApiBearerAuth()

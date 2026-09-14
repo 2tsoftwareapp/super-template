@@ -8,7 +8,6 @@
     "./contracts": "./src/public/contracts.ts",
     "./module": "./src/outbox.module.ts",
     "./schema": "./src/infrastructure/persistence/outbox-messages.ts",
-    "./testing": "./src/testing/index.ts",
     "./dispatcher": "./src/application/outbox-dispatcher.service.ts",
     "./registry": "./src/application/outbox-handler.registry.ts"
   },

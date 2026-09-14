@@ -43,7 +43,7 @@ import {
   NotificationsQueryDto,
   RegisterDeviceDto,
   SendNotificationRequestDto,
-} from "./notifications.dto";
+} from "./dto/notifications.dto";
 
 @ApiTags("notifications")
 @ApiBearerAuth()

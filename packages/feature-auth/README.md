@@ -6,7 +6,7 @@ This package owns the `auth` feature and its application, domain, infrastructure
 
 ## Public API
 
-The package declares these public entrypoints: `.`, `./contracts`, `./testing`, `./schema`, `./module`, `./guard`. Consumers must use these entrypoints instead of importing internal files.
+The package declares these public entrypoints: `.`, `./contracts`, `./schema`, `./module`, `./guard`. Consumers must use these entrypoints instead of importing internal files.
 
 ## Feature dependencies
 

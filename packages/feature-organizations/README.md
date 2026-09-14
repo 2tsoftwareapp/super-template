@@ -6,7 +6,7 @@ This package owns the `organizations` feature and its application, domain, infra
 
 ## Public API
 
-The package declares these public entrypoints: `.`, `./contracts`, `./testing`, `./schema`, `./module`. Consumers must use these entrypoints instead of importing internal files.
+The package declares these public entrypoints: `.`, `./contracts`, `./schema`, `./module`. Consumers must use these entrypoints instead of importing internal files.
 
 ## Feature dependencies
 

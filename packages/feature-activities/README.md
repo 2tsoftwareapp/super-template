@@ -6,7 +6,7 @@ This package owns the `activities` feature and its application, domain, infrastr
 
 ## Public API
 
-The package declares these public entrypoints: `.`, `./contracts`, `./testing`, `./schema`. Consumers must use these entrypoints instead of importing internal files.
+The package declares these public entrypoints: `.`, `./contracts`, `./schema`. Consumers must use these entrypoints instead of importing internal files.
 
 ## Feature dependencies
 

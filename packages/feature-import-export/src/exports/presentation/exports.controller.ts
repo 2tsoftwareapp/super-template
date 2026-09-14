@@ -9,7 +9,7 @@ import { Authorize } from "@repo/api-runtime";
 
 import { CreateExportUseCase } from "../application/use-cases/create-export.use-case";
 import { GetExportUseCase } from "../application/use-cases/get-export.use-case";
-import { CreateExportDto, ExportJobDto } from "./exports.dto";
+import { CreateExportDto, ExportJobDto } from "./dto/exports.dto";
 
 @ApiTags("exports")
 @ApiBearerAuth()

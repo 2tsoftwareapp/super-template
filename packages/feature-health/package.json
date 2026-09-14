@@ -5,8 +5,7 @@
   "type": "commonjs",
   "exports": {
     ".": "./src/index.ts",
-    "./contracts": "./src/public/contracts.ts",
-    "./testing": "./src/testing/index.ts"
+    "./contracts": "./src/public/contracts.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",

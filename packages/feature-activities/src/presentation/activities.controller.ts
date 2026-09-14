@@ -4,7 +4,7 @@ import { ACTION, ApiPaginatedResponse, perm } from "@repo/api-runtime";
 import { Authorize } from "@repo/api-runtime";
 
 import { ListActivitiesUseCase } from "../application/use-cases/list-activities.use-case";
-import { ActivitiesQueryDto, ActivityDto } from "./activities.dto";
+import { ActivitiesQueryDto, ActivityDto } from "./dto/activities.dto";
 
 @ApiTags("activities")
 @ApiBearerAuth()

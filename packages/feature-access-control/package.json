@@ -6,7 +6,6 @@
   "exports": {
     ".": "./src/index.ts",
     "./contracts": "./src/public/contracts.ts",
-    "./testing": "./src/testing/index.ts",
     "./schema": "./src/infrastructure/persistence/index.ts",
     "./module": "./src/access-control.module.ts",
     "./interceptor": "./src/tenant-context.interceptor.ts"

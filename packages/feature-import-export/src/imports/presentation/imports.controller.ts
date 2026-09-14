@@ -10,7 +10,7 @@ import { Authorize } from "@repo/api-runtime";
 import { ConfirmImportUseCase } from "../application/use-cases/confirm-import.use-case";
 import { CreateImportUseCase } from "../application/use-cases/create-import.use-case";
 import { GetImportUseCase } from "../application/use-cases/get-import.use-case";
-import { CreateImportDto, ImportJobDto } from "./imports.dto";
+import { CreateImportDto, ImportJobDto } from "./dto/imports.dto";
 
 @ApiTags("imports")
 @ApiBearerAuth()

@@ -16,7 +16,7 @@ import {
   MfaRecoveryCodesResponseDto,
   MfaSetupResponseDto,
   MfaStatusDto,
-} from "./mfa.dto";
+} from "./dto/mfa.dto";
 
 @ApiTags("mfa")
 @ApiBearerAuth()
