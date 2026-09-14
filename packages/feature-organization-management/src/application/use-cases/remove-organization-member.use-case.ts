@@ -7,7 +7,6 @@ import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import {
   assertCanManageTargetRole,
-  assertNotLastOwner,
   assertOrganizationRole,
   ORGANIZATION_ACCESS_CONTROL,
   ORGANIZATION_ERROR_CODES,
@@ -15,6 +14,8 @@ import {
   type OrganizationAccessControlPort,
   type OrganizationMembership,
 } from "@repo/feature-organizations/contracts";
+
+import { LastOwnerGuard } from "../services/last-owner-guard.service";
 
 @Injectable()
 export class RemoveOrganizationMemberUseCase {
@@ -26,6 +27,7 @@ export class RemoveOrganizationMemberUseCase {
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     @Inject(ORGANIZATION_ACCESS_CONTROL)
     private readonly accessControl: OrganizationAccessControlPort,
+    private readonly lastOwnerGuard: LastOwnerGuard,
   ) {}
 
   async execute(
@@ -97,16 +99,12 @@ export class RemoveOrganizationMemberUseCase {
         );
       }
 
-      if (targetMembership.role === "OWNER") {
-        const remainingOwners = await this.membership.countOwners(organizationId, {
-          excludingUserId: targetUserId,
-          executor: transaction,
-          lock: true,
-        });
-        assertNotLastOwner({ userId: targetUserId, role: targetMembership.role }, remainingOwners);
-      }
-
-      const removed = await this.membership.removeMember(organizationId, targetUserId, transaction);
+      const removed = await this.lastOwnerGuard.run(
+        organizationId,
+        { userId: targetUserId, currentRole: targetMembership.role },
+        transaction,
+        () => this.membership.removeMember(organizationId, targetUserId, transaction),
+      );
 
       if (!removed) {
         throw new AppError(

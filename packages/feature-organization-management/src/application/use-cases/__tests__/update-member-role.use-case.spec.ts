@@ -1,6 +1,7 @@
 import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { describe, expect, it, vi } from "vitest";
 
+import { LastOwnerGuard } from "../../services/last-owner-guard.service";
 import { UpdateMemberRoleUseCase } from "../update-member-role.use-case";
 
 function buildMocks() {
@@ -33,6 +34,8 @@ function buildUseCase(mocks: ReturnType<typeof buildMocks>) {
     mocks.auditWriter as never,
     mocks.activityEmitter as never,
     mocks.accessControl as never,
+    // Real guard over the mocked membership port.
+    new LastOwnerGuard(mocks.membership as never),
   );
 }
 
@@ -136,6 +139,33 @@ describe("UpdateMemberRoleUseCase", () => {
     await expect(
       useCase.execute("org-1", { userId: "actor", roles: ["USER"] }, "target", "MEMBER"),
     ).rejects.toThrow(expect.objectContaining({ code: "ORGANIZATION_LAST_OWNER" }));
+
+    // The guard locks the owner rows before it decides.
+    expect(m.membership.countOwners).toHaveBeenCalledWith("org-1", {
+      excludingUserId: "target",
+      executor: "tx",
+      lock: true,
+    });
+    expect(m.membership.updateMemberRole).not.toHaveBeenCalled();
+  });
+
+  it("re-applying OWNER to an OWNER keeps ownership and skips the last-owner guard", async () => {
+    const m = buildMocks();
+    m.membership.findMembership.mockImplementation(async (_orgId: string, userId: string) => {
+      return { userId, role: "OWNER" };
+    });
+    m.membership.countOwners.mockResolvedValue(0);
+    m.membership.updateMemberRole.mockResolvedValue({
+      userId: "target",
+      role: "OWNER",
+      updatedAt: new Date(),
+    });
+
+    const useCase = buildUseCase(m);
+    await useCase.execute("org-1", { userId: "actor", roles: ["USER"] }, "target", "OWNER");
+
+    expect(m.membership.countOwners).not.toHaveBeenCalled();
+    expect(m.membership.updateMemberRole).toHaveBeenCalledWith("org-1", "target", "OWNER", "tx");
   });
 
   it("clears RBAC roles when demoting to MEMBER", async () => {

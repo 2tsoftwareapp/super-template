@@ -1,4 +1,5 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Optional } from "@nestjs/common";
+import { AppError } from "@repo/api-kernel";
 import {
   type DatabaseClient,
   type DatabaseExecutor,
@@ -18,6 +19,11 @@ import {
   USER_ACCOUNT_SOFT_DELETE_MARKER,
   USER_ACCOUNT_STATUS,
 } from "../domain/user-account.policy";
+import { USER_ERROR_CODES } from "../public/error-codes";
+import {
+  USER_ORGANIZATION_SCOPE,
+  type UserOrganizationScope,
+} from "../public/user-organization-scope.port";
 import { users } from "./persistence";
 
 /**
@@ -37,8 +43,34 @@ const USER_SORT_FIELDS = {
 export class UsersRepository implements UsersRepositoryPort, UserLookup {
   private readonly primaryDatabase: DatabaseClient;
 
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {
+  constructor(
+    @Inject(DATABASE) private readonly database: DatabaseClient,
+    // Optional so the users graph still boots when the organizations feature is
+    // not composed (see the omit-feature bootstrap matrix). Org-scoped lookups
+    // then fail closed instead of silently answering.
+    @Optional()
+    @Inject(USER_ORGANIZATION_SCOPE)
+    private readonly organizationScope?: UserOrganizationScope,
+  ) {
     this.primaryDatabase = getPrimaryDatabaseClient(database);
+  }
+
+  /**
+   * Membership reads are owned by feature-organizations and reached through
+   * {@link UserOrganizationScope}. Without the binding we cannot answer an
+   * organization-scoped question at all, so refuse loudly rather than return an
+   * empty result that callers would read as "no members".
+   */
+  private requireOrganizationScope(): UserOrganizationScope {
+    if (!this.organizationScope) {
+      throw new AppError(
+        USER_ERROR_CODES.USER_ORGANIZATION_SCOPE_UNAVAILABLE,
+        "Organization-scoped user lookups require the USER_ORGANIZATION_SCOPE port",
+        500,
+      );
+    }
+
+    return this.organizationScope;
   }
 
   async create(values: typeof users.$inferInsert, executor: DatabaseExecutor = this.database) {
@@ -165,6 +197,16 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
     organizationId: string,
     executor: DatabaseExecutor = this.database,
   ): Promise<{ id: string; email: string; displayName: string; status: string } | null> {
+    const isMember = await this.requireOrganizationScope().isMember(
+      userId,
+      organizationId,
+      executor,
+    );
+
+    if (!isMember) {
+      return null;
+    }
+
     const rows = await executor
       .select({
         id: users.id,
@@ -174,17 +216,10 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
       })
       .from(users)
       .where(
-        and(
-          eq(users.id, userId),
-          eq(users.status, USER_ACCOUNT_STATUS.ACTIVE),
-          activeAccount(),
-          sql`exists(
-            select 1 from r_organization_members
-            where organization_id = ${organizationId}::uuid and user_id = ${users.id}
-          )`,
-        ),
+        and(eq(users.id, userId), eq(users.status, USER_ACCOUNT_STATUS.ACTIVE), activeAccount()),
       )
       .limit(1);
+
     return rows[0] ?? null;
   }
 
@@ -194,20 +229,26 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
     executor: DatabaseExecutor = this.database,
   ): Promise<string[]> {
     if (userIds.length === 0) return [];
+
+    const memberIds = await this.requireOrganizationScope().filterMemberUserIds(
+      userIds,
+      organizationId,
+      executor,
+    );
+
+    if (memberIds.length === 0) return [];
+
     const rows = await executor
       .select({ id: users.id })
       .from(users)
       .where(
         and(
-          inArray(users.id, userIds),
+          inArray(users.id, memberIds),
           eq(users.status, USER_ACCOUNT_STATUS.ACTIVE),
           activeAccount(),
-          sql`exists(
-            select 1 from r_organization_members
-            where organization_id = ${organizationId}::uuid and user_id = ${users.id}
-          )`,
         ),
       );
+
     return rows.map((r) => r.id);
   }
 
@@ -215,19 +256,24 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
     organizationId: string,
     executor: DatabaseExecutor = this.database,
   ): Promise<string[]> {
+    const memberIds = await this.requireOrganizationScope().listMemberUserIds(
+      organizationId,
+      executor,
+    );
+
+    if (memberIds.length === 0) return [];
+
     const rows = await executor
       .select({ id: users.id })
       .from(users)
       .where(
         and(
+          inArray(users.id, memberIds),
           eq(users.status, USER_ACCOUNT_STATUS.ACTIVE),
           activeAccount(),
-          sql`exists(
-            select 1 from r_organization_members
-            where organization_id = ${organizationId}::uuid and user_id = ${users.id}
-          )`,
         ),
       );
+
     return rows.map((r) => r.id);
   }
 }

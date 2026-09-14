@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
+import { LastOwnerGuard } from "../../services/last-owner-guard.service";
 import { LeaveOrganizationUseCase } from "../leave-organization.use-case";
 
 function buildMocks() {
@@ -28,6 +29,9 @@ function buildUseCase(mocks: ReturnType<typeof buildMocks>) {
     mocks.membership as never,
     mocks.auditWriter as never,
     mocks.accessControl as never,
+    // Real guard over the mocked membership port: these tests exercise the
+    // leave flow end to end through the shared last-owner sequence.
+    new LastOwnerGuard(mocks.membership as never),
   );
 }
 
