@@ -82,24 +82,59 @@ make generate-check   # non-mutating; used in CI
 
 Regenerates OpenAPI, the TypeScript contract package, and (when Docker + Dart are available) the Flutter Dio client.
 
-## Adding a NestJS Module
+## Adding a Backend Feature (NestJS)
 
-1. Create a new feature module under `apps/api/src/modules`
-2. Add controller, service, and repository code
-3. Add DTO validation and Swagger decorators
-4. Register the module in `AppModule`
-5. Add tests and rerun `make generate` if the contract changes
+Backend capabilities are **feature plugin packages** (`packages/feature-<id>`);
+`apps/api` is a composition root only and must never grow a business module
+folder (`scripts/check-source-policy.sh` rejects `apps/api/src/<feature>`).
+
+1. Scaffold the package: `pnpm scaffold:feature <id>` (kebab-case, e.g.
+   `billing`). It creates `packages/feature-<id>/` with the manifest
+   (`src/<id>.feature.ts`), the module, the `presentation` / `application` /
+   `infrastructure` skeleton, `public/contracts.ts`, and a README.
+2. Add the workspace dependency in `packages/app-composition/package.json`:
+   `"@repo/feature-<id>": "workspace:*"`.
+3. Register the manifest in
+   `packages/app-composition/src/feature-registry.ts` (`enabledFeatures`). That
+   is the only composition edit — there is no `AppModule` edit.
+4. Run `pnpm install` so pnpm links the new package.
+5. If the feature owns tables, declare them under
+   `src/infrastructure/persistence/` and generate the migration with
+   `node scripts/db-generate.mjs` (see [database.md](./database.md)).
+6. Add DTO validation and Swagger decorators in `src/presentation/`, then keep
+   the gates green:
+
+   ```bash
+   sh scripts/check-source-policy.sh
+   node scripts/check-feature-manifest-deps.mjs
+   node scripts/generate-feature-indexes.mjs --check
+   node scripts/check-cross-feature-fks.mjs
+   ```
+
+7. Run `make generate` when the HTTP contract changed.
 
 ## Adding a Next.js Page
 
-1. Add route under `apps/web/src/app`
-2. Prefer server-safe data access through `/api/bff/*` or dedicated auth handlers
-3. Use generated contract types from `@repo/api-contract`
-4. Keep permission checks in UI as hints only
+Routes are always locale-prefixed (`/en/...`, `/vi/...`):
+
+1. Add the route under `apps/web/src/app/[locale]/**` (or
+   `apps/admin/src/app/[locale]/**`); route entries hold no business logic.
+2. Put services, react-query hooks, zod schemas and views under
+   `src/features/<resource>/` (`api/`, `model/`, `controllers/`, `screens/`,
+   `ui/`) — the ESLint boundary rules reject `app/**` importing
+   `@tanstack/react-query` or `@/lib/http`, and `features/**` importing `app/**`.
+3. Reach the API through the same-origin BFF (`/api/v1/<rest>` →
+   `/api/bff/<rest>`) and use generated contract types from
+   `@repo/api-contract`.
+4. Keep permission checks in the UI as hints only — the API is the authority.
 
 ## Adding a Flutter Feature
 
-1. Add domain, data, and presentation files under `apps/mobile/lib/features`
-2. Reuse the shared Dio client and secure token storage
-3. Prefer generated API DTOs over manual JSON maps
-4. Add widget or state tests under `apps/mobile/test`
+1. Add `data/`, `domain/`, and `presentation/` files under
+   `apps/mobile/lib/features/<feature>`.
+2. Reuse the shared Dio client and secure token storage from
+   `apps/mobile/lib/core/` (never a second HTTP client).
+3. Prefer generated API DTOs from `apps/mobile/lib/generated/api` over manual
+   JSON maps; regenerate with `make generate` instead of hand-editing them.
+4. Add widget or state tests under `apps/mobile/test` and run
+   `pnpm run mobile:check`.

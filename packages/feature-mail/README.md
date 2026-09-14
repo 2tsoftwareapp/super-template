@@ -10,7 +10,7 @@ The package declares these public entrypoints: `.`, `./contracts`, `./schema`. C
 
 ## Feature dependencies
 
-The package declares these feature dependencies: `feature-audit`, `feature-jobs`, `feature-user-preferences`.
+The package declares these feature dependencies: `feature-audit`, `feature-jobs`, `feature-organizations`, `feature-user-preferences`.
 
 ## Database and runtime
 

@@ -10,7 +10,7 @@ The package declares these public entrypoints: `.`, `./contracts`, `./module`, `
 
 ## Feature dependencies
 
-The package declares these feature dependencies: `feature-audit`, `feature-jobs`, `feature-organizations`, `feature-user-preferences`, `feature-user-management`, `feature-users`.
+The package declares these feature dependencies: `feature-audit`, `feature-jobs`, `feature-organizations`, `feature-user-preferences`, `feature-users`.
 
 ## Database and runtime
 

@@ -113,3 +113,6 @@ fi
 printf 'Source policy checks passed.\n'
 node scripts/check-cross-feature-fks.mjs
 node scripts/check-error-codes.mjs
+# ADR 0001 rule 1: feature `domain/` code stays framework-free (value imports
+# from Nest/Drizzle/Express/database-runtime are rejected; type-only is fine).
+node scripts/check-domain-purity.mjs
