@@ -33,7 +33,12 @@ describe("SessionTokenService — signing and verification", () => {
     const access = await service.verifyToken(issued.accessToken, "access");
     const refresh = await service.verifyToken(issued.refreshToken, "refresh");
 
-    expect(access).toMatchObject({ sub: USER_ID, sid: issued.session.id, typ: "access", oid: ORG_ID });
+    expect(access).toMatchObject({
+      sub: USER_ID,
+      sid: issued.session.id,
+      typ: "access",
+      oid: ORG_ID,
+    });
     expect(refresh).toMatchObject({
       sub: USER_ID,
       sid: issued.session.id,
@@ -256,13 +261,15 @@ describe("SessionTokenService — replaying one rotation", () => {
     });
 
     expect(otherOrg.refreshTokenHash).not.toBe(session?.refreshTokenHash);
-    expect(resolveRotationIdentity({
-      sessionId: issued.session.id,
-      userId: USER_ID,
-      organizationId: "org-2",
-      consumedTokenHash: session!.previousRefreshTokenHash!,
-      rotatedAt: session!.previousRotatedAt!,
-    })).not.toEqual(
+    expect(
+      resolveRotationIdentity({
+        sessionId: issued.session.id,
+        userId: USER_ID,
+        organizationId: "org-2",
+        consumedTokenHash: session!.previousRefreshTokenHash!,
+        rotatedAt: session!.previousRotatedAt!,
+      }),
+    ).not.toEqual(
       resolveRotationIdentity({
         sessionId: issued.session.id,
         userId: USER_ID,

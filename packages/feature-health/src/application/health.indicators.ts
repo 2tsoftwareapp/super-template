@@ -4,6 +4,12 @@ import { createRedisClient, EnvironmentService } from "@repo/api-runtime";
 import { DATABASE, type DatabaseClient } from "@repo/database-runtime";
 import { sql } from "drizzle-orm";
 
+import {
+  MISSING_REDIS_URL_WARNING,
+  REDIS_URL_NOT_CONFIGURED_REASON,
+  resolveRedisRequirement,
+} from "../domain/redis-readiness.policy";
+
 interface RedisHealthClient {
   isOpen?: boolean;
   isReady?: boolean;
@@ -91,7 +97,17 @@ export class RedisHealthIndicator {
     try {
       const client = await this.getClient();
       if (!client) {
-        return indicator.down({ reason: "redis url not configured" });
+        // No URL in a non-production environment is normally filtered out of the
+        // readiness list; reaching here without a URL means the shared policy
+        // required Redis (production misconfiguration), so say which case it is.
+        const requirement = resolveRedisRequirement(this.environmentService);
+
+        return indicator.down({
+          reason:
+            requirement === "required-missing"
+              ? `${REDIS_URL_NOT_CONFIGURED_REASON} (required in production) — ${MISSING_REDIS_URL_WARNING}`
+              : REDIS_URL_NOT_CONFIGURED_REASON,
+        });
       }
 
       await client.ping();

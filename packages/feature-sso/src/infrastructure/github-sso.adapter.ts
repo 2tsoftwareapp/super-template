@@ -1,5 +1,5 @@
-import { Injectable } from "@nestjs/common";
-import { generateOpaqueToken } from "@repo/api-kernel";
+import { Inject, Injectable } from "@nestjs/common";
+import { durationToMilliseconds } from "@repo/api-kernel";
 import { EnvironmentService } from "@repo/api-runtime";
 
 import type {
@@ -7,11 +7,19 @@ import type {
   SsoProviderAdapter,
   SsoTokenSet,
 } from "../application/ports/sso-provider.port";
+import type { SsoRepositoryPort } from "../application/ports/sso.repository.port";
+
+import { SSO_REPOSITORY } from "../application/ports/sso.repository.port";
 
 const AUTHORIZATION_ENDPOINT = "https://github.com/login/oauth/authorize";
 const TOKEN_ENDPOINT = "https://github.com/login/oauth/access_token";
 const USER_ENDPOINT = "https://api.github.com/user";
 const EMAILS_ENDPOINT = "https://api.github.com/user/emails";
+
+// GitHub does not consume the identity server-side until verifyIdToken runs,
+// so the stored exchange only needs to cover that window (plus a crash/retry
+// margin) — mirroring the session-exchange TTL.
+const IDENTITY_EXCHANGE_TTL = "2m";
 
 interface GithubUser {
   id: number;
@@ -26,30 +34,31 @@ interface GithubEmail {
   verified: boolean;
 }
 
-interface StoredIdentity {
-  subject: string;
-  email: string;
-  emailVerified: boolean;
-}
-
 // GitHub OAuth2 provider. Uses the standard Authorization Code + PKCE flow.
 // GitHub does not issue OIDC id_tokens, so identity is fetched from the /user
-// and /user/emails APIs after the code exchange, then stored in process memory
-// for the duration of the callback round-trip (seconds).
+// and /user/emails APIs after the code exchange, then persisted in the SSO
+// store (t_sso_login_states, encrypted at rest) behind a one-time handle. The
+// handle doubles as the idToken and is CAS-consumed by verifyIdToken, so
+// exchangeCode and verifyIdToken may run on different instances.
 @Injectable()
 export class GithubSsoAdapter implements SsoProviderAdapter {
   readonly provider = "github";
 
-  private readonly pendingIdentities = new Map<string, StoredIdentity>();
-
-  constructor(private readonly environmentService: EnvironmentService) {}
+  constructor(
+    @Inject(SSO_REPOSITORY) private readonly ssoRepository: SsoRepositoryPort,
+    private readonly environmentService: EnvironmentService,
+  ) {}
 
   getCallbackRedirectUri(): string {
     const { GITHUB_REDIRECT_URI, API_INTERNAL_URL } = this.environmentService.values;
     return GITHUB_REDIRECT_URI ?? `${API_INTERNAL_URL}/api/v1/auth/sso/github/callback`;
   }
 
-  buildAuthorizationUrl(params: { state: string; nonce: string; codeChallenge: string }): string {
+  buildAuthorizationUrl(params: {
+    state: string;
+    nonce: string;
+    codeChallenge: string;
+  }): Promise<string> {
     const url = new URL(AUTHORIZATION_ENDPOINT);
     url.searchParams.set("client_id", this.requireClientId());
     url.searchParams.set("redirect_uri", this.getCallbackRedirectUri());
@@ -58,7 +67,8 @@ export class GithubSsoAdapter implements SsoProviderAdapter {
     // PKCE is supported by GitHub OAuth apps (introduced 2023).
     url.searchParams.set("code_challenge", params.codeChallenge);
     url.searchParams.set("code_challenge_method", "S256");
-    return url.toString();
+    // The identity exchange is stored during exchangeCode, not here.
+    return Promise.resolve(url.toString());
   }
 
   async exchangeCode(params: { code: string; codeVerifier: string }): Promise<SsoTokenSet> {
@@ -138,27 +148,32 @@ export class GithubSsoAdapter implements SsoProviderAdapter {
 
     const emailVerified = emails.find((e) => e.email === primaryEmail)?.verified ?? false;
 
-    const opaque = generateOpaqueToken();
-    this.pendingIdentities.set(opaque, {
-      subject: `github:${user.id}`,
-      email: primaryEmail,
-      emailVerified,
+    // GitHub ignores the OIDC nonce (no id_token), so the stored exchange
+    // carries an empty nonce and verifyIdToken does not compare it.
+    const handle = await this.ssoRepository.storeIdentityExchange({
+      provider: this.provider,
+      identity: {
+        subject: `github:${user.id}`,
+        email: primaryEmail,
+        emailVerified,
+      },
+      nonce: "",
+      expiresAt: new Date(Date.now() + durationToMilliseconds(IDENTITY_EXCHANGE_TTL)),
     });
 
-    // The opaque token doubles as the idToken handle; verifyIdToken retrieves it.
-    return { idToken: opaque };
+    // The opaque handle doubles as the idToken; verifyIdToken retrieves the
+    // identity from the store exactly once.
+    return { idToken: handle };
   }
 
-  verifyIdToken(idToken: string, _nonce: string): Promise<SsoIdentity> {
-    const identity = this.pendingIdentities.get(idToken);
+  async verifyIdToken(idToken: string, _nonce: string): Promise<SsoIdentity> {
+    const record = await this.ssoRepository.consumeIdentityExchange(idToken);
 
-    if (!identity) {
+    if (!record) {
       throw new Error("GitHub identity not found or already consumed");
     }
 
-    this.pendingIdentities.delete(idToken);
-
-    return Promise.resolve(identity);
+    return record.identity;
   }
 
   private requireClientId(): string {

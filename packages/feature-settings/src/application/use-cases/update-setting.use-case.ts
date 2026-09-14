@@ -15,6 +15,7 @@ import {
   SETTINGS_REPOSITORY,
   type SettingsRepositoryPort,
 } from "../ports/settings.repository.port";
+import { getSettingDefinition } from "../setting-definitions";
 import { SettingsMapper } from "../settings.mapper";
 
 @Injectable()
@@ -41,6 +42,12 @@ export class UpdateSettingUseCase {
         HttpStatus.FORBIDDEN,
       );
     }
+
+    // Registry validation is the single write gate for known keys: an invalid
+    // value must never reach the store, otherwise lookups would fall back to
+    // their safe default and silently ignore the operator's intent. Unknown
+    // keys stay free-form (template extension point) and are not validated.
+    getSettingDefinition(key)?.validate(input.value);
 
     const updated = await this.platformTransactionPort.run(async (tx) => {
       const setting = await this.settingsRepository.upsert(key, input.value, actor.userId, tx);

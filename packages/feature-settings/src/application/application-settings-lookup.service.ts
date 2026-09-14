@@ -1,26 +1,16 @@
-import type { JsonObject } from "@repo/api-kernel";
-
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { isJsonObject } from "@repo/api-kernel";
 import { adaptRedisClient, createRedisClient, EnvironmentService } from "@repo/api-runtime";
 import { type ApplicationSettingsLookup } from "@repo/feature-settings/contracts";
 
 import { SETTINGS_REPOSITORY, type SettingsRepositoryPort } from "./ports/settings.repository.port";
-
-const REGISTRATION_ENABLED_KEY = "registration_enabled";
-const MAINTENANCE_MODE_KEY = "maintenance_mode";
+import { SETTING_DEFINITIONS, type SettingDefinition } from "./setting-definitions";
 
 const CACHE_KEY_PREFIX = "settings-flag:";
 const DEFAULT_TTL_SECONDS = 5;
 
 function cacheKey(key: string): string {
   return `${CACHE_KEY_PREFIX}${key}`;
-}
-
-function readEnabledFlag(value: JsonObject | undefined): boolean {
-  const enabled = value?.enabled;
-
-  return typeof enabled === "boolean" ? enabled : false;
 }
 
 interface RedisCacheClient {
@@ -76,11 +66,11 @@ export class ApplicationSettingsLookupService implements ApplicationSettingsLook
 
   async isRegistrationEnabled(): Promise<boolean> {
     // Absent setting means the seed has not run: keep the default permissive.
-    return this.readFlag(REGISTRATION_ENABLED_KEY, true);
+    return this.readFlag(SETTING_DEFINITIONS.registration_enabled);
   }
 
   async isMaintenanceMode(): Promise<boolean> {
-    return this.readStoreFlag(MAINTENANCE_MODE_KEY, false);
+    return this.readStoreFlag(SETTING_DEFINITIONS.maintenance_mode);
   }
 
   /**
@@ -109,32 +99,34 @@ export class ApplicationSettingsLookupService implements ApplicationSettingsLook
     this.localEntries.delete(key);
   }
 
-  private async readFlag(key: string, defaultValue: boolean): Promise<boolean> {
-    const cached = await this.readCache(key);
+  private async readFlag(definition: SettingDefinition): Promise<boolean> {
+    const cached = await this.readCache(definition.key);
 
     if (cached !== null) {
       return cached;
     }
 
-    const epochBeforeRead = this.invalidationEpoch(key);
-    const value = await this.readStoreFlag(key, defaultValue);
+    const epochBeforeRead = this.invalidationEpoch(definition.key);
+    const value = await this.readStoreFlag(definition);
 
     // The read overlapped an invalidation: another writer committed a different
     // value while this one was in flight, so caching the value read here would
     // resurrect the state the write replaced.
-    if (this.invalidationEpoch(key) === epochBeforeRead) {
-      await this.writeCache(key, value);
+    if (this.invalidationEpoch(definition.key) === epochBeforeRead) {
+      await this.writeCache(definition.key, value);
     }
 
     return value;
   }
 
-  private async readStoreFlag(key: string, defaultValue: boolean): Promise<boolean> {
-    const setting = await this.settingsRepository.findByKey(key);
+  private async readStoreFlag(definition: SettingDefinition): Promise<boolean> {
+    const setting = await this.settingsRepository.findByKey(definition.key);
 
-    return setting
-      ? readEnabledFlag(isJsonObject(setting.value) ? setting.value : undefined)
-      : defaultValue;
+    // The registry owns both the fallback (its seeded default) and the read
+    // interpretation, so lookups and the seeder share one definition per key.
+    return definition.parse(
+      setting ? (isJsonObject(setting.value) ? setting.value : undefined) : definition.defaultValue,
+    );
   }
 
   private invalidationEpoch(key: string): number {

@@ -6,10 +6,7 @@ import { ERROR_CODES } from "@repo/api-runtime";
 import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
-import {
-  AUTH_ACCESS_PROFILE,
-  type AuthAccessProfile,
-} from "../../public/auth-access-profile.port";
+import { AUTH_ACCESS_PROFILE, type AuthAccessProfile } from "../../public/auth-access-profile.port";
 import {
   AUTH_ORGANIZATION_CONTEXT,
   type AuthOrganizationContext,

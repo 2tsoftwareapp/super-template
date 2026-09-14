@@ -1,14 +1,16 @@
 import type { JsonObject } from "@repo/api-kernel";
 
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsEnum, IsObject, IsOptional, IsString, MaxLength } from "class-validator";
+import { IsObject, IsOptional } from "class-validator";
 
+import type { PreferenceLanguage, PreferenceTheme } from "../application/preferences.constants";
+
+import { PREFERENCE_LANGUAGES, PREFERENCE_THEMES } from "../application/preferences.constants";
 import {
-  PREFERENCE_LANGUAGES,
-  PREFERENCE_THEMES,
-  type PreferenceLanguage,
-  type PreferenceTheme,
-} from "../application/preferences.constants";
+  IsPreferenceLanguage,
+  IsPreferenceTheme,
+  IsPreferenceTimezone,
+} from "./preferences.validators";
 
 export class UserPreferencesDto {
   @ApiProperty()
@@ -39,18 +41,19 @@ export class UserPreferencesDto {
 export class UpdatePreferencesDto {
   @ApiPropertyOptional({ enum: PREFERENCE_THEMES })
   @IsOptional()
-  @IsEnum(PREFERENCE_THEMES)
+  @IsPreferenceTheme()
   theme?: PreferenceTheme;
 
   @ApiPropertyOptional({ enum: PREFERENCE_LANGUAGES })
   @IsOptional()
-  @IsEnum(PREFERENCE_LANGUAGES)
+  @IsPreferenceLanguage()
   language?: PreferenceLanguage;
 
-  @ApiPropertyOptional()
+  // Rule lives in application/preferences.validation.ts (single source of
+  // truth); the custom validator here only surfaces it as an HTTP parse error.
+  @ApiPropertyOptional({ maxLength: 64 })
   @IsOptional()
-  @IsString()
-  @MaxLength(64)
+  @IsPreferenceTimezone()
   timezone?: string;
 
   @ApiPropertyOptional({ type: "object", additionalProperties: true })

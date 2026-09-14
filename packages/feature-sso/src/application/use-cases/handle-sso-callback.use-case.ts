@@ -233,6 +233,19 @@ export class HandleSsoCallbackUseCase {
       return targetUser;
     });
 
+    // DELIBERATE: the session is issued AFTER the user transaction commits, not
+    // inside it. The session issuer writes through its own auth-session ports
+    // (token hashing, its own transactional writes), so pulling it into this
+    // transaction would (a) extend row locks across JWT/token-hashing work, and
+    // (b) hand out tokens for a user whose rows could still roll back
+    // afterwards — an orphan session pointing at a user that never existed.
+    // Known risk of keeping it outside: if the process dies between the commit
+    // and `issue()` (or `issue()` fails), the user/identity persist but no
+    // session is returned. Recovery is safe: the login state was already
+    // CAS-consumed, so a retried callback is rejected and the user must start a
+    // fresh login; no tokens were ever sent to the client, so nothing can be
+    // replayed. The post-commit audit failure path has the same shape (user
+    // exists, session exists, audit row missing) and is accepted.
     const session = await this.sessionIssuer.issue(user, requestContext);
 
     await this.auditWriter.log({

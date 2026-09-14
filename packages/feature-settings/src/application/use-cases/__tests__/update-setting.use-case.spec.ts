@@ -143,6 +143,66 @@ describe("UpdateSettingUseCase", () => {
     expect(auditService.log).not.toHaveBeenCalled();
     expect(settingsLookup.invalidate).not.toHaveBeenCalled();
   });
+
+  it("rejects a registry key value that does not match its definition", async () => {
+    const settingsRepository = { upsert: vi.fn() };
+    const auditService = { log: vi.fn() };
+    const platformTransactionPort = { run: vi.fn(async (cb) => cb({})) };
+    const settingsLookup = { invalidate: vi.fn() };
+    const useCase = new UpdateSettingUseCase(
+      settingsRepository as never,
+      auditService as never,
+      platformTransactionPort as never,
+      settingsLookup as never,
+    );
+
+    await expect(
+      useCase.execute(actor, "registration_enabled", { value: { enabled: "yes" } }),
+    ).rejects.toMatchObject({ code: SETTINGS_ERROR_CODES.SETTINGS_INVALID_VALUE });
+
+    // Validation is the first write gate: nothing is persisted, audited, or invalidated.
+    expect(settingsRepository.upsert).not.toHaveBeenCalled();
+    expect(platformTransactionPort.run).not.toHaveBeenCalled();
+    expect(auditService.log).not.toHaveBeenCalled();
+    expect(settingsLookup.invalidate).not.toHaveBeenCalled();
+  });
+
+  it("rejects a malformed maintenance_mode message", async () => {
+    const settingsRepository = { upsert: vi.fn() };
+    const useCase = new UpdateSettingUseCase(
+      settingsRepository as never,
+      { log: vi.fn() } as never,
+      { run: vi.fn(async (cb) => cb({})) } as never,
+      { invalidate: vi.fn() } as never,
+    );
+
+    await expect(
+      useCase.execute(actor, "maintenance_mode", { value: { enabled: true, message: 42 } }),
+    ).rejects.toMatchObject({ code: SETTINGS_ERROR_CODES.SETTINGS_INVALID_VALUE });
+    expect(settingsRepository.upsert).not.toHaveBeenCalled();
+  });
+
+  it("keeps upserting keys outside the registry (template extension point)", async () => {
+    const updated = {
+      key: "custom.flag",
+      value: { anything: [1, 2, 3] },
+      updatedById: "user-1",
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+      updatedAt: new Date("2026-01-02T00:00:00.000Z"),
+    };
+    const settingsRepository = { upsert: vi.fn(async () => updated) };
+    const useCase = new UpdateSettingUseCase(
+      settingsRepository as never,
+      { log: vi.fn(async () => undefined) } as never,
+      { run: vi.fn(async (cb) => cb({})) } as never,
+      { invalidate: vi.fn() } as never,
+    );
+
+    await expect(
+      useCase.execute(actor, "custom.flag", { value: { anything: [1, 2, 3] } }),
+    ).resolves.toMatchObject({ key: "custom.flag" });
+    expect(settingsRepository.upsert).toHaveBeenCalled();
+  });
 });
 
 import { SETTINGS_ERROR_CODES } from "@repo/feature-settings/contracts";

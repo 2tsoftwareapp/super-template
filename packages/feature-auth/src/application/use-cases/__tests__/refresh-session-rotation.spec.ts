@@ -100,9 +100,7 @@ describe("RefreshSessionUseCase — concurrent refreshes of the same rotation", 
     // refresh presents a token the session no longer knows, reuse detection
     // fires, and a legitimate user is logged out.
     const harness = await createHarness();
-    const [tabA, tabB] = Array.from({ length: 2 }, () =>
-      harness.openTab(harness.liveRefreshToken),
-    );
+    const [tabA, tabB] = Array.from({ length: 2 }, () => harness.openTab(harness.liveRefreshToken));
 
     const [first, second] = await Promise.all([tabA.refresh(), tabB.refresh()]);
 
@@ -141,9 +139,9 @@ describe("RefreshSessionUseCase — rotation state and reuse detection", () => {
 
     expect(result.refreshToken).not.toBe(presented);
     expect(session?.refreshTokenHash).toBe(await hashRefreshToken(result.refreshToken));
-    expect(
-      await verifyRefreshTokenHash(session?.previousRefreshTokenHash ?? "", presented),
-    ).toBe(true);
+    expect(await verifyRefreshTokenHash(session?.previousRefreshTokenHash ?? "", presented)).toBe(
+      true,
+    );
     expect(session?.previousRotatedAt).toBeInstanceOf(Date);
     expect(harness.store.revokedSessionIds).toEqual([]);
   });

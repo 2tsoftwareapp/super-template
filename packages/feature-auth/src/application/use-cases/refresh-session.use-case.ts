@@ -10,10 +10,7 @@ import type { RefreshSessionCommand } from "../auth.types";
 import type { AuthSessionModel } from "../models/auth-session";
 
 import { resolveRefreshAttempt } from "../../domain/refresh-rotation.policy";
-import {
-  AUTH_ACCESS_PROFILE,
-  type AuthAccessProfile,
-} from "../../public/auth-access-profile.port";
+import { AUTH_ACCESS_PROFILE, type AuthAccessProfile } from "../../public/auth-access-profile.port";
 import {
   AUTH_ORGANIZATION_CONTEXT,
   type AuthOrganizationContext,

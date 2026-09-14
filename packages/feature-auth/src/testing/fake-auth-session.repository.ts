@@ -109,7 +109,11 @@ export class FakeAuthSessionRepository {
 
     const updated = { ...session, ...values, updatedAt: new Date() };
     this.sessions.set(sessionId, updated);
-    this.rotations.push({ sessionId, expectedHash: refreshTokenHash, nextHash: updated.refreshTokenHash });
+    this.rotations.push({
+      sessionId,
+      expectedHash: refreshTokenHash,
+      nextHash: updated.refreshTokenHash,
+    });
     return { ...updated };
   }
 

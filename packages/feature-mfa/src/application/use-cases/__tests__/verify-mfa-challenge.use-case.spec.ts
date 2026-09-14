@@ -147,9 +147,7 @@ describe("VerifyMfaChallengeUseCase", () => {
     );
 
     const codes = outcomes.map((outcome) =>
-      outcome.status === "rejected"
-        ? (outcome.reason as { code?: string }).code
-        : "resolved",
+      outcome.status === "rejected" ? (outcome.reason as { code?: string }).code : "resolved",
     );
 
     expect(attempts).toBe(5);

@@ -8,4 +8,7 @@
 export const SETTINGS_ERROR_CODES = {
   SETTINGS_NOT_FOUND: "SETTINGS_NOT_FOUND",
   REGISTRATION_DISABLED: "REGISTRATION_DISABLED",
+  // Raised when a settings value does not match the per-key definition in the
+  // settings registry (SETTING_DEFINITIONS); the value is rejected before write.
+  SETTINGS_INVALID_VALUE: "SETTINGS_INVALID_VALUE",
 } as const;

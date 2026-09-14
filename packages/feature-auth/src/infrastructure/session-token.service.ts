@@ -16,10 +16,7 @@ import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
 } from "../application/ports/auth-session.repository.port";
-import {
-  resolveRotationIdentity,
-  type RotationIdentity,
-} from "../domain/refresh-rotation.policy";
+import { resolveRotationIdentity, type RotationIdentity } from "../domain/refresh-rotation.policy";
 
 export { type TokenPayload };
 
@@ -198,7 +195,13 @@ export class SessionTokenService implements AuthTokenProviderPort {
     identity?: RotationIdentity,
   ) {
     const accessToken = await this.signToken(userId, sessionId, "access", organizationId, identity);
-    const refreshToken = await this.signToken(userId, sessionId, "refresh", organizationId, identity);
+    const refreshToken = await this.signToken(
+      userId,
+      sessionId,
+      "refresh",
+      organizationId,
+      identity,
+    );
     const refreshTokenHash = await hashRefreshToken(refreshToken);
 
     return { accessToken, refreshToken, refreshTokenHash };

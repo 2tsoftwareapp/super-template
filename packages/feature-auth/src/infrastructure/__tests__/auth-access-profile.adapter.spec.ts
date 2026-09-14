@@ -5,10 +5,7 @@ import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { describe, expect, it, vi } from "vitest";
 
 import { AuthModule } from "../../auth.module";
-import {
-  AUTH_ACCESS_PROFILE,
-  type AuthAccessProfile,
-} from "../../public/auth-access-profile.port";
+import { AUTH_ACCESS_PROFILE, type AuthAccessProfile } from "../../public/auth-access-profile.port";
 import { AuthAccessProfileAdapter } from "../auth-access-profile.adapter";
 
 const buildAccessControlService = () =>

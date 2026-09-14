@@ -1,27 +1,34 @@
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { generateOpaqueToken, hashOpaqueToken } from "@repo/api-kernel";
 import { EnvironmentService } from "@repo/api-runtime";
 import { DATABASE, type DatabaseClient } from "@repo/database-runtime";
-import { decryptTotpSecret, encryptTotpSecret } from "@repo/feature-mfa/contracts";
 import { and, eq, gt, isNull } from "drizzle-orm";
 
 import type {
+  SsoIdentityExchangeRecord,
   SsoLoginStateRecord,
   SsoRepositoryPort,
   SsoSessionExchangeRecord,
 } from "../application/ports/sso.repository.port";
 
 import { externalIdentities, ssoLoginStates, ssoSessionExchanges } from "./persistence";
+import { decryptSsoSecret, encryptSsoSecret, type SsoCipherKeys } from "./sso-cipher";
 
 /**
  * Drizzle SSO repository.
  *
- * SECURITY: encrypts PKCE code_verifier at rest with MFA_ENCRYPTION_KEY;
- * session exchanges store session_id only (tokens re-issued on redeem).
+ * SECURITY: encrypts PKCE code_verifier at rest with a versioned key scheme
+ * (see sso-cipher.ts): `v2` rows use the dedicated SSO_ENCRYPTION_KEY, `v1`/
+ * legacy rows use MFA_ENCRYPTION_KEY; session exchanges store session_id only
+ * (tokens re-issued on redeem).
  */
 @Injectable()
 export class SsoRepository implements SsoRepositoryPort {
+  private readonly logger = new Logger(SsoRepository.name);
+  private warnedLegacyKeyFallback = false;
+
   constructor(
     @Inject(DATABASE) private readonly database: DatabaseClient,
     private readonly environmentService: EnvironmentService,
@@ -38,9 +45,8 @@ export class SsoRepository implements SsoRepositoryPort {
     },
     executor: DatabaseExecutor = this.database,
   ): Promise<SsoLoginStateRecord | null> {
-    const encrypted = encryptTotpSecret(
-      Buffer.from(values.codeVerifier, "utf8"),
-      this.encryptionKey(),
+    const encrypted = encryptSsoSecret(values.codeVerifier, this.cipherKeys(), (message) =>
+      this.warnLegacyKeyFallbackOnce(message),
     );
 
     const [state] = await executor
@@ -176,19 +182,109 @@ export class SsoRepository implements SsoRepositoryPort {
     return identity ?? null;
   }
 
-  private encryptionKey(): string {
-    return this.environmentService.values.MFA_ENCRYPTION_KEY;
+  async storeIdentityExchange(
+    values: {
+      provider: string;
+      identity: { subject: string; email: string; emailVerified: boolean };
+      nonce: string;
+      expiresAt: Date;
+    },
+    executor: DatabaseExecutor = this.database,
+  ): Promise<string> {
+    const handle = generateOpaqueToken();
+    const encrypted = encryptSsoSecret(
+      JSON.stringify(values.identity),
+      this.cipherKeys(),
+      (message) => this.warnLegacyKeyFallbackOnce(message),
+    );
+
+    // Identity exchanges share t_sso_login_states with login states: identical
+    // lifecycle (short TTL, one-time use, encrypted payload, CAS consume), so
+    // no schema change is needed. The handle is server-generated and only ever
+    // hashed into state_hash, so these rows never collide with callback state
+    // lookups (a caller would need a hash preimage of the opaque handle).
+    await executor.insert(ssoLoginStates).values({
+      provider: values.provider,
+      stateHash: hashOpaqueToken(handle),
+      nonce: values.nonce,
+      codeVerifierCiphertext: encrypted.ciphertext,
+      codeVerifierIv: encrypted.iv,
+      codeVerifierAuthTag: encrypted.authTag,
+      // Identity rows do not drive redirects; the column is NOT NULL, so the
+      // empty string marks them instead of a misleading redirect URI.
+      redirectUri: "",
+      expiresAt: values.expiresAt,
+    });
+
+    return handle;
+  }
+
+  async consumeIdentityExchange(
+    handle: string,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<SsoIdentityExchangeRecord | null> {
+    // Single-statement CAS: the row is consumed only when still unconsumed and
+    // unexpired, so two concurrent verifications (possibly on different
+    // instances) can never both observe the identity.
+    const [row] = await executor
+      .update(ssoLoginStates)
+      .set({ consumedAt: new Date() })
+      .where(
+        and(
+          eq(ssoLoginStates.stateHash, hashOpaqueToken(handle)),
+          isNull(ssoLoginStates.consumedAt),
+          gt(ssoLoginStates.expiresAt, new Date()),
+        ),
+      )
+      .returning();
+
+    if (!row) {
+      return null;
+    }
+
+    const identity = JSON.parse(
+      decryptSsoSecret(
+        {
+          ciphertext: row.codeVerifierCiphertext,
+          iv: row.codeVerifierIv,
+          authTag: row.codeVerifierAuthTag,
+        },
+        this.cipherKeys(),
+      ),
+    ) as SsoIdentityExchangeRecord["identity"];
+
+    return { identity, nonce: row.nonce };
+  }
+
+  /**
+   * Encryption keys for SSO secrets at rest, by cipher version:
+   * v1 = legacy MFA_ENCRYPTION_KEY, v2 = dedicated SSO_ENCRYPTION_KEY.
+   */
+  private cipherKeys(): SsoCipherKeys {
+    return {
+      v1: this.environmentService.values.MFA_ENCRYPTION_KEY,
+      v2: this.environmentService.values.SSO_ENCRYPTION_KEY,
+    };
+  }
+
+  private warnLegacyKeyFallbackOnce(message: string): void {
+    if (this.warnedLegacyKeyFallback) {
+      return;
+    }
+
+    this.warnedLegacyKeyFallback = true;
+    this.logger.warn(message);
   }
 
   private toLoginStateRecord(state: typeof ssoLoginStates.$inferSelect): SsoLoginStateRecord {
-    const codeVerifier = decryptTotpSecret(
+    const codeVerifier = decryptSsoSecret(
       {
         ciphertext: state.codeVerifierCiphertext,
         iv: state.codeVerifierIv,
         authTag: state.codeVerifierAuthTag,
       },
-      this.encryptionKey(),
-    ).toString("utf8");
+      this.cipherKeys(),
+    );
 
     return {
       id: state.id,

@@ -57,7 +57,7 @@ export class StartSsoLoginUseCase {
       expiresAt: new Date(Date.now() + durationToMilliseconds(STATE_TTL)),
     });
 
-    const authorizationUrl = provider.buildAuthorizationUrl({
+    const authorizationUrl = await provider.buildAuthorizationUrl({
       state,
       nonce,
       codeChallenge,

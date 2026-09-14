@@ -26,10 +26,7 @@ import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
 import type { RegisterCommand } from "../auth.types";
 
-import {
-  AUTH_ACCESS_PROFILE,
-  type AuthAccessProfile,
-} from "../../public/auth-access-profile.port";
+import { AUTH_ACCESS_PROFILE, type AuthAccessProfile } from "../../public/auth-access-profile.port";
 import { generateOpaqueToken, hashOpaqueToken, hashPassword } from "../auth.helpers";
 import {
   AUTH_SESSION_REPOSITORY,

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { DEV_PLACEHOLDER_SSO_KEY } from "../env.constants";
 import { validateEnvironment } from "../env.schema";
 
 // Minimal set of required variables; everything else has a schema default.
@@ -237,6 +238,32 @@ describe("validateEnvironment", () => {
     const env = validateEnvironment({ ...baseEnv, ...secureProdOverrides });
     expect(env.APP_ENV).toBe("production");
     expect(env.COOKIE_SECURE).toBe(true);
+  });
+
+  it("treats SSO_ENCRYPTION_KEY as optional and trims empty strings to undefined", () => {
+    const env = validateEnvironment({ ...baseEnv, SSO_ENCRYPTION_KEY: "" });
+    expect(env.SSO_ENCRYPTION_KEY).toBeUndefined();
+  });
+
+  it("accepts a valid 32-byte hex SSO_ENCRYPTION_KEY", () => {
+    const env = validateEnvironment({ ...baseEnv, SSO_ENCRYPTION_KEY: "c".repeat(64) });
+    expect(env.SSO_ENCRYPTION_KEY).toBe("c".repeat(64));
+  });
+
+  it("rejects an SSO_ENCRYPTION_KEY that is not a 64-character hex string", () => {
+    expect(() => validateEnvironment({ ...baseEnv, SSO_ENCRYPTION_KEY: "not-a-hex-key" })).toThrow(
+      /SSO_ENCRYPTION_KEY/,
+    );
+  });
+
+  it("rejects reusing the dev placeholder SSO key in production", () => {
+    expect(() =>
+      validateEnvironment({
+        ...baseEnv,
+        ...secureProdOverrides,
+        SSO_ENCRYPTION_KEY: DEV_PLACEHOLDER_SSO_KEY,
+      }),
+    ).toThrow(/placeholder/);
   });
 
   it("rejects DATABASE_SKIP_RLS_CHECK in production", () => {
