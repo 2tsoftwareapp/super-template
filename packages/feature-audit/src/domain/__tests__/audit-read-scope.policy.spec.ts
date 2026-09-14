@@ -55,11 +55,15 @@ describe("audit read scope policy", () => {
     });
 
     it("lets an organization scope read its own row", () => {
-      expect(canReadAuditRow({ kind: "organization", organizationId: "org-1" }, "org-1")).toBe(true);
+      expect(canReadAuditRow({ kind: "organization", organizationId: "org-1" }, "org-1")).toBe(
+        true,
+      );
     });
 
     it("blocks an organization scope from another organization's row", () => {
-      expect(canReadAuditRow({ kind: "organization", organizationId: "org-1" }, "org-2")).toBe(false);
+      expect(canReadAuditRow({ kind: "organization", organizationId: "org-1" }, "org-2")).toBe(
+        false,
+      );
     });
 
     it("blocks an organization scope from platform-scoped rows", () => {

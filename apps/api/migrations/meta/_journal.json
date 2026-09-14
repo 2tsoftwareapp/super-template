@@ -36,6 +36,20 @@
       "when": 1789382400002,
       "tag": "0040_job_child_tables_sentinel_scoping",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1789402908584,
+      "tag": "0041_mail_deliveries_tenant_isolation",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1789402914620,
+      "tag": "0042_outbox_messages_tenant_isolation",
+      "breakpoints": true
     }
   ]
 }

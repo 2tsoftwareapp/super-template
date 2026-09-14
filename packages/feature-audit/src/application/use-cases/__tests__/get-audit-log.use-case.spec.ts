@@ -63,15 +63,17 @@ describe("GetAuditLogUseCase", () => {
   it("lets an organization actor read their own organization's row", async () => {
     const { useCase } = buildUseCase(async () => auditRow({ organizationId: "org-1" }));
 
-    await expect(useCase.execute(actor({ organizationId: "org-1" }), "log-1")).resolves.toMatchObject(
-      { id: "log-1", organizationId: "org-1" },
-    );
+    await expect(
+      useCase.execute(actor({ organizationId: "org-1" }), "log-1"),
+    ).resolves.toMatchObject({ id: "log-1", organizationId: "org-1" });
   });
 
   it("hides another organization's row behind NOT_FOUND", async () => {
     const { useCase } = buildUseCase(async () => auditRow({ organizationId: "org-2" }));
 
-    await expect(useCase.execute(actor({ organizationId: "org-1" }), "log-1")).rejects.toMatchObject({
+    await expect(
+      useCase.execute(actor({ organizationId: "org-1" }), "log-1"),
+    ).rejects.toMatchObject({
       code: AUDIT_ERROR_CODES.AUDIT_LOG_NOT_FOUND,
       statusCode: 404,
     });
@@ -80,7 +82,9 @@ describe("GetAuditLogUseCase", () => {
   it("hides platform-scoped rows from organization actors", async () => {
     const { useCase } = buildUseCase(async () => auditRow({ organizationId: null }));
 
-    await expect(useCase.execute(actor({ organizationId: "org-1" }), "log-1")).rejects.toMatchObject({
+    await expect(
+      useCase.execute(actor({ organizationId: "org-1" }), "log-1"),
+    ).rejects.toMatchObject({
       code: AUDIT_ERROR_CODES.AUDIT_LOG_NOT_FOUND,
       statusCode: 404,
     });

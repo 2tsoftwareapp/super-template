@@ -2,6 +2,8 @@ import type { JsonObject, TransactionExecutor } from "@repo/api-kernel";
 
 export interface OutboxRecord {
   id: string;
+  /** Tenant that published the event; `null` for platform-scope events. */
+  organizationId: string | null;
   topic: string;
   payload: JsonObject;
   status: string;

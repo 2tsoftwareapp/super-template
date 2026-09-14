@@ -45,6 +45,8 @@
     "0037_table_naming_convention_prefixes.sql",
     "0038_org_optional_user_scoped_rls.sql",
     "0039_platform_scope_organization.sql",
-    "0040_job_child_tables_sentinel_scoping.sql"
+    "0040_job_child_tables_sentinel_scoping.sql",
+    "0041_mail_deliveries_tenant_isolation.sql",
+    "0042_outbox_messages_tenant_isolation.sql"
   ]
 }

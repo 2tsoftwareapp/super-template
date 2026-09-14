@@ -1,15 +1,33 @@
-import type { AppLogger } from "@repo/api-kernel";
+import type { AppLogger, TenantContext } from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import { APP_LOGGER } from "@repo/api-kernel";
+import { APP_LOGGER, TenantContextService, WORKER_DISPATCH_CONTEXT } from "@repo/api-kernel";
 
 import {
   OUTBOX_HANDLER_REGISTRY,
   type OutboxHandlerRegistryPort,
   type OutboxMessage,
 } from "../public/outbox-handler.port";
-import { OUTBOX_REPOSITORY, type OutboxRepositoryPort } from "../public/outbox.port";
+import {
+  OUTBOX_REPOSITORY,
+  type OutboxRecord,
+  type OutboxRepositoryPort,
+} from "../public/outbox.port";
+
+/**
+ * Tenant context a claimed message's handler runs under. Messages published
+ * before any tenant existed (registration, seeds) carry no organization and
+ * therefore run in platform scope with `bypass_rls` off — they reach only rows
+ * the database considers platform-scope.
+ */
+function tenantContextForMessage(message: OutboxRecord): TenantContext {
+  return {
+    tenantId: message.organizationId ?? "",
+    userId: "",
+    bypassRls: false,
+  };
+}
 
 /**
  * Generic transactional-outbox dispatcher. Delivers claimed messages to the
@@ -25,6 +43,7 @@ export class OutboxDispatcher {
     @Inject(OUTBOX_REPOSITORY) private readonly outboxRepository: OutboxRepositoryPort,
     @Inject(OUTBOX_HANDLER_REGISTRY)
     private readonly handlerRegistry: OutboxHandlerRegistryPort,
+    private readonly tenantContextService: TenantContextService,
   ) {}
 
   @Cron(CronExpression.EVERY_10_SECONDS)
@@ -33,12 +52,21 @@ export class OutboxDispatcher {
     this.processing = true;
 
     try {
-      await this.outboxRepository.recoverStaleProcessing();
-      const messages = await this.outboxRepository.claimPending(10);
+      // Claiming, stale recovery and status updates sweep every tenant's
+      // messages, so they run under the worker bypass context (`app.bypass_rls`
+      // = true). Handlers then run under their own message's tenant context, so
+      // anything they write is attributed and fenced to that tenant instead of
+      // inheriting the shared worker connection.
+      await this.tenantContextService.runAsync(WORKER_DISPATCH_CONTEXT, async () => {
+        await this.outboxRepository.recoverStaleProcessing();
+        const messages = await this.outboxRepository.claimPending(10);
 
-      for (const message of messages) {
-        await this.deliver(message);
-      }
+        for (const message of messages) {
+          await this.tenantContextService.runAsync(tenantContextForMessage(message), () =>
+            this.deliver(message),
+          );
+        }
+      });
     } catch (error) {
       this.logger.error("Outbox processing failed", {
         error: error instanceof Error ? error.message : String(error),
