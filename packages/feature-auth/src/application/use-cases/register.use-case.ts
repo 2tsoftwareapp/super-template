@@ -9,6 +9,7 @@ import {
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
 } from "@repo/api-kernel";
+import { SETTINGS_ERROR_CODES } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
@@ -18,7 +19,6 @@ import {
   type PersonalOrganizationProvisioner,
 } from "@repo/feature-organization-management/contracts";
 import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
-import { SETTINGS_ERROR_CODES } from "@repo/feature-settings/contracts";
 import {
   APPLICATION_SETTINGS_LOOKUP,
   type ApplicationSettingsLookup,

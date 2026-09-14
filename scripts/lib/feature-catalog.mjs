@@ -2,6 +2,8 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import ts from "typescript";
 
+import { formatGhostDependencyErrors, findGhostDependencies } from "./ghost-dependencies.mjs";
+
 const FEATURE_PACKAGE = /^@repo\/feature-[a-z0-9-]+$/;
 
 /**
@@ -158,7 +160,13 @@ function parseOrganizationModel(node, file) {
   const organizationModel = property("organizationModel");
   return {
     ...(organizationModel
-      ? { organizationModel: stringLiteral(organizationModel, "organizationModel.organizationModel", file) }
+      ? {
+          organizationModel: stringLiteral(
+            organizationModel,
+            "organizationModel.organizationModel",
+            file,
+          ),
+        }
       : {}),
   };
 }
@@ -299,7 +307,12 @@ export function discoverFeatureCatalog(repositoryRoot) {
     }
   }
 
-  return { features, byId, inputOrder };
+  const ghostDependencies = findGhostDependencies(features, byId);
+  if (ghostDependencies.length > 0) {
+    throw new Error(formatGhostDependencyErrors(ghostDependencies).join("\n"));
+  }
+
+  return { features, byId, inputOrder, ghostDependencies };
 }
 
 /**
@@ -358,7 +371,8 @@ export function resolveFeatureSelection(catalog, requestedIds) {
 
   for (const id of [...selected].sort(compareByCatalogOrder)) visit(id, []);
 
-  const resolvedIds = ordered.map((feature) => feature.id);    validateCapabilitySelection(catalog, resolvedIds);
+  const resolvedIds = ordered.map((feature) => feature.id);
+  validateCapabilitySelection(catalog, resolvedIds);
   const database = composeCatalogDatabaseRuntimeOptions(ordered);
   const organizationModel = composeCatalogOrganizationModelOptions(ordered);
 
@@ -425,9 +439,7 @@ export function composeCatalogOrganizationModelOptions(features) {
     ),
   ];
   if (models.length > 1) {
-    throw new Error(
-      `Conflicting organization models: ${models.join(", ")}. Select one variant.`,
-    );
+    throw new Error(`Conflicting organization models: ${models.join(", ")}. Select one variant.`);
   }
 
   return {

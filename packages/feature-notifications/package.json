@@ -29,7 +29,6 @@
     "@repo/feature-jobs": "workspace:*",
     "@repo/feature-organizations": "workspace:*",
     "@repo/feature-user-preferences": "workspace:*",
-    "@repo/feature-user-management": "workspace:*",
     "@repo/feature-users": "workspace:*",
     "class-transformer": "0.5.1",
     "class-validator": "0.15.1",

@@ -1307,12 +1307,6 @@ importers:
       '@repo/feature-audit':
         specifier: workspace:*
         version: link:../feature-audit
-      '@repo/feature-jobs':
-        specifier: workspace:*
-        version: link:../feature-jobs
-      '@repo/feature-mail':
-        specifier: workspace:*
-        version: link:../feature-mail
       '@repo/feature-mfa':
         specifier: workspace:*
         version: link:../feature-mfa
@@ -1328,9 +1322,6 @@ importers:
       '@repo/feature-settings':
         specifier: workspace:*
         version: link:../feature-settings
-      '@repo/feature-user-management':
-        specifier: workspace:*
-        version: link:../feature-user-management
       '@repo/feature-users':
         specifier: workspace:*
         version: link:../feature-users
@@ -1551,9 +1542,6 @@ importers:
       '@repo/feature-activities':
         specifier: workspace:*
         version: link:../feature-activities
-      '@repo/feature-users':
-        specifier: workspace:*
-        version: link:../feature-users
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -1615,6 +1603,9 @@ importers:
       '@repo/feature-jobs':
         specifier: workspace:*
         version: link:../feature-jobs
+      '@repo/feature-organizations':
+        specifier: workspace:*
+        version: link:../feature-organizations
       '@repo/feature-user-preferences':
         specifier: workspace:*
         version: link:../feature-user-preferences
@@ -1752,9 +1743,6 @@ importers:
       '@repo/feature-organizations':
         specifier: workspace:*
         version: link:../feature-organizations
-      '@repo/feature-user-management':
-        specifier: workspace:*
-        version: link:../feature-user-management
       '@repo/feature-user-preferences':
         specifier: workspace:*
         version: link:../feature-user-preferences
@@ -1887,12 +1875,6 @@ importers:
       '@repo/feature-organizations':
         specifier: workspace:*
         version: link:../feature-organizations
-      '@repo/feature-outbox':
-        specifier: workspace:*
-        version: link:../feature-outbox
-      '@repo/feature-users':
-        specifier: workspace:*
-        version: link:../feature-users
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -2137,9 +2119,6 @@ importers:
       '@repo/feature-organization-management':
         specifier: workspace:*
         version: link:../feature-organization-management
-      '@repo/feature-organizations':
-        specifier: workspace:*
-        version: link:../feature-organizations
       '@repo/feature-users':
         specifier: workspace:*
         version: link:../feature-users

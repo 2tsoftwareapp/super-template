@@ -9,15 +9,7 @@ import { SsoModule } from "./sso.module";
 
 export const ssoFeature: FeatureManifest = defineFeature({
   id: "sso",
-  dependsOn: [
-    "auth",
-    "users",
-    "organizations",
-    "organization-management",
-    "access-control",
-    "mfa",
-    "audit",
-  ],
+  dependsOn: ["auth", "users", "organization-management", "access-control", "mfa", "audit"],
   nestModule: SsoModule,
   schema: { externalIdentities, ssoLoginStates, ssoSessionExchanges },
 });

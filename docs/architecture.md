@@ -22,7 +22,9 @@ API capabilities are **compile-time feature plugins** under `packages/feature-*`
 in `src/composition/feature-registry.ts`. Dependency direction matters:
 HTTP/controllers stay at the edge, services own application behavior,
 repositories own database access, and cross-feature calls go through stable
-module exports or `@repo/api-kernel` port tokens.
+module exports or `@repo/api-kernel` port tokens. The full composition map —
+7 dependency layers from the `audit`/`users` foundations up to `auth`/`sso` —
+is diagrammed in [`architecture/feature-dependency-graph.md`](./architecture/feature-dependency-graph.md).
 
 ### Identity features (`packages/feature-*`)
 
@@ -101,6 +103,12 @@ Modules that own real business rules keep them in a framework-free
 `modules/<x>/domain/` directory (jobs lifecycle, files upload policy,
 identity policies). Criteria: `docs/adr/0001-domain-layer-criteria.md`;
 purity is enforced by `scripts/check-source-policy.sh`.
+
+Cross-feature integration follows the port-token pattern (see
+[ADR 0004](./adr/0004-decouple-sso-from-auth-session-issuance-port.md) for the
+SSO → auth session-issuance proposal and
+[`architecture/feature-dependency-graph.md`](./architecture/feature-dependency-graph.md)
+for the kernel-owned ports already in place).
 
 ## Redis
 
