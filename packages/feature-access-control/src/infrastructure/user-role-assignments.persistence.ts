@@ -85,16 +85,23 @@ export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
             (role) => role.organizationId === null || role.organizationId === organizationId,
           ),
         );
-      await executor
-        .insert(userRoles)
-        .values(
-          assignedRoles.map((role) => ({
-            userId,
-            roleId: role.id,
-            organizationId: role.organizationId,
-          })),
-        )
-        .onConflictDoNothing();
+      // Every requested role can be filtered out above (ids that do not exist,
+      // or that belong to another tenant). Drizzle renders
+      // `insert into ... values ` with no tuples for an empty array, which
+      // Postgres rejects, so skip the insert instead of emitting invalid SQL.
+      // Same guard as `replaceRolePermissions`.
+      if (assignedRoles.length > 0) {
+        await executor
+          .insert(userRoles)
+          .values(
+            assignedRoles.map((role) => ({
+              userId,
+              roleId: role.id,
+              organizationId: role.organizationId,
+            })),
+          )
+          .onConflictDoNothing();
+      }
     }
   }
 
