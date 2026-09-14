@@ -221,7 +221,25 @@ export interface FeatureSeedContext {
  * the plugin kit stays free of Nest/CLI concrete types.
  */
 export interface FeatureSeeder {
+  /**
+   * Stable, unique seeder id (kebab-case), e.g. `"users"`, `"auth-session-cleanup"`.
+   * Unique across every composed feature, so it is also the handle other
+   * seeders use in {@link FeatureSeeder.dependsOn}.
+   */
   readonly id: string;
+
+  /**
+   * Ids of other seeders that must run before this one. Seeders communicate
+   * through {@link FeatureSeedContext.bag}, a dependency that does not show up
+   * as a package import and therefore cannot be expressed by the manifest-level
+   * {@link FeatureManifest.dependsOn}. Declaring it here keeps the ordering
+   * explicit instead of relying on feature composition order.
+   *
+   * {@link collectFeatureSeeders} resolves these edges topologically and rejects
+   * unknown ids and cycles.
+   */
+  readonly dependsOn?: readonly string[];
+
   readonly run: (ctx: FeatureSeedContext) => Promise<void> | void;
 }
 
@@ -246,7 +264,10 @@ export interface ComposedFeatures {
   readonly modules: (Type<unknown> | DynamicModule)[];
   /** Deduplicated permission keys preserving first-seen order. */
   readonly permissions: readonly string[];
-  /** Seeders in composition order. */
+  /**
+   * Seeders ordered so every {@link FeatureSeeder.dependsOn} edge is respected;
+   * seeders without dependencies keep feature composition order.
+   */
   readonly seeders: readonly FeatureSeeder[];
   /** Merged authorization contributions (resources + default grants). */
   readonly authorization: ComposedAuthorization;
@@ -466,9 +487,91 @@ export function composeFeaturePermissions(
 }
 
 /**
- * Collect seeders across features in composition order.
+ * Resolve the seeder execution order from the declared
+ * {@link FeatureSeeder.dependsOn} edges.
+ *
+ * Seeders talk to each other through {@link FeatureSeedContext.bag}, a runtime
+ * dependency that leaves no trace in package imports. Ordering them by the
+ * feature composition order alone silently breaks as soon as a feature that
+ * writes a bag value is composed after a feature that reads it, so the edges are
+ * declared on the seeders themselves and resolved here.
+ *
+ * @param seeders Seeders in feature composition order (the tie-break).
+ * @returns Seeders ordered so every seeder runs after its declared dependencies.
+ * @throws When a seeder id is duplicated or missing, or when the edges form a cycle.
  */
+function orderFeatureSeeders(seeders: readonly FeatureSeeder[]): FeatureSeeder[] {
+  const byId = new Map<string, FeatureSeeder>();
+  const collectionIndex = new Map<string, number>();
 
+  for (let i = 0; i < seeders.length; i += 1) {
+    const seeder = seeders[i];
+    if (!seeder) {
+      continue;
+    }
+    if (byId.has(seeder.id)) {
+      throw new Error(
+        `Duplicate seeder id "${seeder.id}". Seeder ids must be unique across the composed set.`,
+      );
+    }
+    byId.set(seeder.id, seeder);
+    collectionIndex.set(seeder.id, i);
+  }
+
+  for (const seeder of seeders) {
+    for (const dep of seeder.dependsOn ?? []) {
+      if (!byId.has(dep)) {
+        throw new Error(`Seeder "${seeder.id}" depends on missing seeder "${dep}".`);
+      }
+    }
+  }
+
+  const visiting = new Set<string>();
+  const visited = new Set<string>();
+  const ordered: FeatureSeeder[] = [];
+
+  const visit = (id: string, stack: string[]): void => {
+    if (visited.has(id)) {
+      return;
+    }
+    if (visiting.has(id)) {
+      const cycleStart = stack.indexOf(id);
+      const cycle = [...stack.slice(cycleStart), id].join(" -> ");
+      throw new Error(`Seeder dependency cycle detected: ${cycle}`);
+    }
+
+    visiting.add(id);
+    const seeder = byId.get(id);
+    if (!seeder) {
+      throw new Error(`Seeder "${id}" is missing from the composed set.`);
+    }
+
+    const deps = [...(seeder.dependsOn ?? [])].sort((a, b) => {
+      return (collectionIndex.get(a) ?? 0) - (collectionIndex.get(b) ?? 0);
+    });
+
+    for (const dep of deps) {
+      visit(dep, [...stack, id]);
+    }
+
+    visiting.delete(id);
+    visited.add(id);
+    ordered.push(seeder);
+  };
+
+  for (const seeder of seeders) {
+    visit(seeder.id, []);
+  }
+
+  return ordered;
+}
+
+/**
+ * Collect seeders across features in feature composition order, then order them
+ * so every declared {@link FeatureSeeder.dependsOn} edge is respected. Seeders
+ * without a dependency relation keep their composition order.
+ * @throws When seeder ids collide, a declared dependency is absent, or the edges form a cycle.
+ */
 export function collectFeatureSeeders(
   features: readonly Pick<FeatureManifest, "seeders">[],
 ): FeatureSeeder[] {
@@ -481,7 +584,7 @@ export function collectFeatureSeeders(
     seeders.push(...feature.seeders);
   }
 
-  return seeders;
+  return orderFeatureSeeders(seeders);
 }
 
 /**
@@ -551,8 +654,14 @@ export function composeFeatureAuthorization(
 
 /**
  * Compute the reverse-dependency closure that must be removed together with
- * `omitId`: every feature whose `dependsOn` can only be
- * satisfied by a removed feature is removed transitively.
+ * `omitId`: every feature whose `dependsOn` — or whose seeders'
+ * {@link FeatureSeeder.dependsOn} — can only be satisfied by a removed feature
+ * is removed transitively.
+ *
+ * Seeder edges are closed over too: dropping the feature that owns the
+ * `bag.seededUsers` writer would otherwise leave readers behind with an
+ * unresolvable seeder dependency. Seeder ids that no feature ever declares are
+ * left alone so {@link collectFeatureSeeders} still reports the real mistake.
  */
 export function computeRemovalClosure(
   features: readonly FeatureManifest[],
@@ -562,10 +671,18 @@ export function computeRemovalClosure(
   let changed = true;
   while (changed) {
     changed = false;
+    const removedSeederIds = new Set(
+      features
+        .filter((feature) => removed.has(feature.id))
+        .flatMap((feature) => (feature.seeders ?? []).map((seeder) => seeder.id)),
+    );
     for (const feature of features) {
       if (removed.has(feature.id)) continue;
       const dependsRemoved = (feature.dependsOn ?? []).some((d) => removed.has(d));
-      if (dependsRemoved) {
+      const seederDependsRemoved = (feature.seeders ?? []).some((seeder) =>
+        (seeder.dependsOn ?? []).some((dep) => removedSeederIds.has(dep)),
+      );
+      if (dependsRemoved || seederDependsRemoved) {
         removed.add(feature.id);
         changed = true;
       }

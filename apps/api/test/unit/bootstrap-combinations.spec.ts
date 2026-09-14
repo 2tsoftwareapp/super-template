@@ -255,6 +255,24 @@ describe("deterministic Nest feature bootstrap matrix", () => {
     validatePipelineProviders();
   });
 
+  it("runs the seeded-users fixture before the seeders that read it from the bag", () => {
+    if (!hasFeature("user-management")) return;
+
+    const ids = composedSeeders.map((seeder) => seeder.id);
+    const writerIndex = ids.indexOf("users");
+    expect(writerIndex, 'the "users" seeder must be composed').toBeGreaterThanOrEqual(0);
+
+    // These seeders read `bag.seededUsers`; a composition-only order put auth
+    // first and failed the whole e2e suite at seed time.
+    for (const reader of ["auth-session-cleanup", "notifications"]) {
+      if (!ids.includes(reader)) continue;
+      expect(
+        writerIndex,
+        `seeder "${reader}" must be ordered after the "users" seeder`,
+      ).toBeLessThan(ids.indexOf(reader));
+    }
+  });
+
   it("host guard catalog keeps feature guards sorted with generic throttler (15) and authorize (25) slots", () => {
     // Full graph: feature guards (settings=10, auth=20) merge to 10/15/20/25.
     const featureOrders = composedHttpPipelineGuards.map((g) => g.order);
