@@ -6,7 +6,13 @@ import type {
 import type { PlatformTransactionPort, TransactionPort } from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { PLATFORM_TRANSACTION_PORT, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-kernel";
+import {
+  APP_LOGGER,
+  PLATFORM_TRANSACTION_PORT,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+} from "@repo/api-kernel";
+import type { AppLogger } from "@repo/api-kernel";
 import { requireOrganizationId, toCsv } from "@repo/api-kernel";
 import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import {
@@ -22,11 +28,15 @@ import {
   FILES_REPOSITORY,
   type FilesRepositoryPort,
 } from "@repo/feature-upload/contracts";
-import { OBJECT_STORAGE, type ObjectStorage } from "@repo/feature-upload/contracts";
+import {
+  OBJECT_STORAGE,
+  STORAGE_TRACKING_PORT,
+  type ObjectStorage,
+  type StorageTrackingPort,
+} from "@repo/feature-upload/contracts";
 import { randomUUID } from "node:crypto";
 
-/** Audit-export files are tagged so the download policy can recognize them. */
-export const AUDIT_EXPORT_FILE_KIND = "AUDIT_EXPORT";
+import { AUDIT_EXPORT_FILE_KIND } from "../domain/audit-export-access.policy";
 
 const CSV_HEADER = [
   "id",
@@ -54,6 +64,8 @@ export class ExportAuditLogsUseCase {
     @Inject(PLATFORM_TRANSACTION_PORT)
     private readonly platformTransactionPort: PlatformTransactionPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+    @Inject(STORAGE_TRACKING_PORT) private readonly storageTracking: StorageTrackingPort,
+    @Inject(APP_LOGGER) private readonly logger: AppLogger,
   ) {}
 
   async execute(
@@ -159,10 +171,39 @@ export class ExportAuditLogsUseCase {
       });
       return result;
     } catch (error) {
-      await this.objectStorage.delete(storageKey).catch((err: unknown) => {
-        console.error(`Failed to cleanup orphaned export object ${storageKey}:`, err);
-      });
+      await this.compensateOrphanedExport(storageKey);
       throw error;
+    }
+  }
+
+  /**
+   * Compensation for an export whose file row never persisted: the uploaded
+   * object would otherwise be orphaned. Delete it now; if that fails too,
+   * record a delete retry in the storage-delete outbox so the upload feature's
+   * cleanup worker owns the retry instead of the object being stranded
+   * silently. (A crash before this point is covered separately: the tracked
+   * OBJECT_STORAGE records every upload in the storage_objects ledger and the
+   * hourly sweep deletes UPLOADED rows no live file references.)
+   */
+  private async compensateOrphanedExport(storageKey: string): Promise<void> {
+    try {
+      await this.objectStorage.delete(storageKey);
+      return;
+    } catch (deleteError) {
+      this.logger.error(`Failed to delete orphaned audit-export object ${storageKey}`, {
+        error: deleteError instanceof Error ? deleteError.message : String(deleteError),
+      });
+    }
+
+    try {
+      await this.storageTracking.enqueueDelete(storageKey);
+    } catch (enqueueError) {
+      this.logger.error(
+        `Failed to enqueue delete retry for orphaned audit-export object ${storageKey}`,
+        {
+          error: enqueueError instanceof Error ? enqueueError.message : String(enqueueError),
+        },
+      );
     }
   }
 }

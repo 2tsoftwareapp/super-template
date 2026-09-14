@@ -1,10 +1,13 @@
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { DATABASE } from "@repo/database-runtime";
+import { DATABASE, runIdempotentInsertMany } from "@repo/database-runtime";
 import { and, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 
-import type { NotificationsRepositoryPort } from "../application/ports/notifications.repository.port";
+import type {
+  CreateNotificationInput,
+  NotificationsRepositoryPort,
+} from "../application/ports/notifications.repository.port";
 
 import { notifications } from "./persistence";
 
@@ -56,6 +59,34 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
         where: sql`${notifications.sourceJobId} is not null`,
       })
       .returning();
+  }
+
+  async createManyIdempotent(
+    sourceJobId: string,
+    recipients: Array<Omit<CreateNotificationInput, "sourceJobId">>,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    if (recipients.length === 0) {
+      return [];
+    }
+
+    // Single ensure-once point for job deliveries (shared with the job-creation
+    // path, which uses runIdempotentInsert): insert-or-replay against the
+    // (sourceJobId, userId) unique index, so a retried job converges on exactly
+    // one inbox row per recipient instead of duplicating them.
+    const result = await runIdempotentInsertMany({
+      expectedKeys: recipients.map((recipient) => recipient.userId),
+      keyOf: (row) => row.userId,
+      insert: () =>
+        this.createMany(
+          recipients.map((recipient) => ({ ...recipient, sourceJobId })),
+          executor,
+        ),
+      findExisting: (missingUserIds) =>
+        this.findBySourceJobAndUsers(sourceJobId, missingUserIds, executor),
+    });
+
+    return result.rows;
   }
 
   async findBySourceJobAndUsers(

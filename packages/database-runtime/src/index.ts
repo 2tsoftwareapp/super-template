@@ -23,7 +23,12 @@ export type {
   ReadReplicaDatabaseClient,
 } from "./database.types";
 export { DrizzleTransactionService } from "./drizzle-transaction.service";
-export { type IdempotentInsertResult, runIdempotentInsert } from "./idempotent-insert";
+export {
+  type IdempotentInsertManyResult,
+  type IdempotentInsertResult,
+  runIdempotentInsert,
+  runIdempotentInsertMany,
+} from "./idempotent-insert";
 export { timestamps } from "./persistence/timestamps";
 export { isPostgresUniqueViolation } from "./postgres-errors";
 export { schema } from "./schema";

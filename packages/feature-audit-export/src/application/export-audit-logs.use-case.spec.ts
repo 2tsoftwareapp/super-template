@@ -4,9 +4,8 @@ import { AppError, PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
 import { FILE_VISIBILITY } from "@repo/feature-upload/contracts";
 
-import { AUDIT_EXPORT_FILE_KIND } from "./export-audit-logs.use-case";
-
 import { ExportAuditLogsUseCase } from "./export-audit-logs.use-case";
+import { AUDIT_EXPORT_FILE_KIND } from "../domain/audit-export-access.policy";
 
 const actor = {
   userId: "user-1",
@@ -48,6 +47,8 @@ describe("ExportAuditLogsUseCase", () => {
     const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
     const platformTransactionPort = { run: vi.fn(async (cb) => cb({} as any)) };
     const auditWriter = { log: vi.fn(async () => undefined) };
+    const storageTracking = { enqueueDelete: vi.fn(async () => undefined) };
+    const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
 
     const useCase = new ExportAuditLogsUseCase(
       auditRepository as never,
@@ -56,6 +57,8 @@ describe("ExportAuditLogsUseCase", () => {
       transactionPort as never,
       platformTransactionPort as never,
       auditWriter as never,
+      storageTracking as never,
+      logger as never,
     );
 
     const result = await useCase.execute(actor, { action: "project.created" });
@@ -107,6 +110,8 @@ describe("ExportAuditLogsUseCase", () => {
     const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
     const platformTransactionPort = { run: vi.fn(async (cb) => cb({} as any)) };
     const auditWriter = { log: vi.fn() };
+    const storageTracking = { enqueueDelete: vi.fn(async () => undefined) };
+    const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
 
     const useCase = new ExportAuditLogsUseCase(
       auditRepository as never,
@@ -115,6 +120,8 @@ describe("ExportAuditLogsUseCase", () => {
       transactionPort as never,
       platformTransactionPort as never,
       auditWriter as never,
+      storageTracking as never,
+      logger as never,
     );
 
     await expect(useCase.execute({ ...actor, organizationId: null }, {})).rejects.toMatchObject({
@@ -139,6 +146,8 @@ describe("ExportAuditLogsUseCase", () => {
     const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
     const platformTransactionPort = { run: vi.fn(async (cb) => cb({} as any)) };
     const auditWriter = { log: vi.fn() };
+    const storageTracking = { enqueueDelete: vi.fn(async () => undefined) };
+    const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
 
     const useCase = new ExportAuditLogsUseCase(
       auditRepository as never,
@@ -147,6 +156,8 @@ describe("ExportAuditLogsUseCase", () => {
       transactionPort as never,
       platformTransactionPort as never,
       auditWriter as never,
+      storageTracking as never,
+      logger as never,
     );
 
     const superAdminActor = {
@@ -183,6 +194,8 @@ describe("ExportAuditLogsUseCase", () => {
     const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
     const platformTransactionPort = { run: vi.fn(async (cb) => cb({} as any)) };
     const auditWriter = { log: vi.fn() };
+    const storageTracking = { enqueueDelete: vi.fn(async () => undefined) };
+    const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
 
     const useCase = new ExportAuditLogsUseCase(
       auditRepository as never,
@@ -191,6 +204,8 @@ describe("ExportAuditLogsUseCase", () => {
       transactionPort as never,
       platformTransactionPort as never,
       auditWriter as never,
+      storageTracking as never,
+      logger as never,
     );
 
     await useCase.execute(actor, { q: "project" });
@@ -222,6 +237,8 @@ describe("ExportAuditLogsUseCase", () => {
     const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
     const platformTransactionPort = { run: vi.fn(async (cb) => cb({} as any)) };
     const auditWriter = { log: vi.fn(async () => undefined) };
+    const storageTracking = { enqueueDelete: vi.fn(async () => undefined) };
+    const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
 
     const useCase = new ExportAuditLogsUseCase(
       auditRepository as never,
@@ -230,11 +247,107 @@ describe("ExportAuditLogsUseCase", () => {
       transactionPort as never,
       platformTransactionPort as never,
       auditWriter as never,
+      storageTracking as never,
+      logger as never,
     );
 
     await expect(useCase.execute(actor, {})).rejects.toThrow("insert failed");
 
     expect(objectStorage.delete).toHaveBeenCalledWith(expect.stringContaining("exports/audit/"));
+    // The delete succeeded, so no outbox retry is needed.
+    expect(storageTracking.enqueueDelete).not.toHaveBeenCalled();
     expect(auditWriter.log).not.toHaveBeenCalled();
+  });
+
+  it("records a delete retry in the outbox when the compensation delete also fails", async () => {
+    const auditRepository = {
+      listForExport: vi.fn(async () => [auditRow]),
+      count: vi.fn(async () => 1),
+    };
+    const filesRepository = {
+      create: vi.fn(async () => {
+        throw new Error("insert failed");
+      }),
+    };
+    const objectStorage = {
+      upload: vi.fn(async () => ({ key: "exports/audit/some-key.csv" })),
+      delete: vi.fn(async () => {
+        throw new Error("storage unavailable");
+      }),
+    };
+    const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
+    const platformTransactionPort = { run: vi.fn(async (cb) => cb({} as any)) };
+    const auditWriter = { log: vi.fn(async () => undefined) };
+    const storageTracking = { enqueueDelete: vi.fn(async () => undefined) };
+    const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
+
+    const useCase = new ExportAuditLogsUseCase(
+      auditRepository as never,
+      filesRepository as never,
+      objectStorage as never,
+      transactionPort as never,
+      platformTransactionPort as never,
+      auditWriter as never,
+      storageTracking as never,
+      logger as never,
+    );
+
+    await expect(useCase.execute(actor, {})).rejects.toThrow("insert failed");
+
+    // Compensation attempted, failed loudly, and the object is recorded for the
+    // cleanup worker instead of being stranded silently.
+    expect(objectStorage.delete).toHaveBeenCalledWith(expect.stringContaining("exports/audit/"));
+    expect(storageTracking.enqueueDelete).toHaveBeenCalledWith(
+      expect.stringContaining("exports/audit/"),
+    );
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.stringContaining("orphaned audit-export object"),
+      expect.objectContaining({ error: "storage unavailable" }),
+    );
+    expect(auditWriter.log).not.toHaveBeenCalled();
+  });
+
+  it("still rethrows the original error when recording the delete retry fails too", async () => {
+    const auditRepository = {
+      listForExport: vi.fn(async () => [auditRow]),
+      count: vi.fn(async () => 1),
+    };
+    const filesRepository = {
+      create: vi.fn(async () => {
+        throw new Error("insert failed");
+      }),
+    };
+    const objectStorage = {
+      upload: vi.fn(async () => ({ key: "exports/audit/some-key.csv" })),
+      delete: vi.fn(async () => {
+        throw new Error("storage unavailable");
+      }),
+    };
+    const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
+    const platformTransactionPort = { run: vi.fn(async (cb) => cb({} as any)) };
+    const auditWriter = { log: vi.fn(async () => undefined) };
+    const storageTracking = {
+      enqueueDelete: vi.fn(async () => {
+        throw new Error("outbox write failed");
+      }),
+    };
+    const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
+
+    const useCase = new ExportAuditLogsUseCase(
+      auditRepository as never,
+      filesRepository as never,
+      objectStorage as never,
+      transactionPort as never,
+      platformTransactionPort as never,
+      auditWriter as never,
+      storageTracking as never,
+      logger as never,
+    );
+
+    await expect(useCase.execute(actor, {})).rejects.toThrow("insert failed");
+
+    expect(storageTracking.enqueueDelete).toHaveBeenCalled();
+    // Both failures are visible in the logs — never silent.
+    expect(logger.error).toHaveBeenCalledTimes(2);
   });
 });

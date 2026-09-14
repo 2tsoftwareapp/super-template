@@ -1,5 +1,5 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-kernel";
-import type { TransactionPort } from "@repo/api-kernel";
+import type { TransactionExecutor, TransactionPort } from "@repo/api-kernel";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, requireOrganizationId, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-kernel";
@@ -290,58 +290,13 @@ export class NotificationDeliveryUseCase {
         throw new Error("Notification job is missing organizationId");
       }
 
-      // Collect all notifications for SSE emission after transaction commits
-      const allNotificationViews: {
-        view: NotificationView;
-        userId: string;
-        organizationId: string;
-      }[] = [];
-
-      await this.transactionPort.run(async (tx) => {
-        let deliveredCount = 0;
-
-        for (let offset = 0; offset < recipientIds.length; offset += RECIPIENT_BATCH_SIZE) {
-          const batch = recipientIds.slice(offset, offset + RECIPIENT_BATCH_SIZE);
-          const inserted = await this.notificationsRepository.createMany(
-            batch.map((userId) => ({
-              organizationId,
-              userId,
-              type: locked.type,
-              title: locked.title,
-              body: locked.body,
-              data: locked.data ?? null,
-              sourceJobId: locked.id,
-            })),
-            tx,
-          );
-
-          // On retry, createMany returns only newly inserted rows (ON CONFLICT DO NOTHING).
-          // Load any existing rows to ensure delivery rows are created for all recipients.
-          const existing =
-            inserted.length < batch.length
-              ? await this.notificationsRepository.findBySourceJobAndUsers(locked.id, batch, tx)
-              : [];
-
-          // Dedupe by id: findBySourceJobAndUsers runs in the same transaction
-          // so it also returns rows that were just inserted by createMany above.
-          const allInBatch = [
-            ...new Map([...inserted, ...existing].map((row) => [row.id, row])).values(),
-          ];
-
-          for (const notification of allInBatch) {
-            await this.dispatchService.upsertDeliveriesForNotification(
-              this.notificationsMapper.toNotificationView(notification),
-              tx,
-            );
-            allNotificationViews.push({
-              view: this.notificationsMapper.toNotificationView(notification),
-              userId: notification.userId,
-              organizationId: notification.organizationId ?? organizationId,
-            });
-          }
-
-          deliveredCount += allInBatch.length;
-        }
+      const sseViews = await this.transactionPort.run(async (tx) => {
+        const { deliveredCount, views } = await this.deliverRecipientsOnce(
+          locked,
+          recipientIds,
+          organizationId,
+          tx,
+        );
 
         await this.notificationJobsRepository.markCompleted(
           locked.id,
@@ -349,10 +304,12 @@ export class NotificationDeliveryUseCase {
           locked.attempts,
           tx,
         );
+
+        return views;
       });
 
       // Emit SSE after transaction commits — best-effort, inbox state is the source of truth
-      for (const { view, organizationId: orgId } of allNotificationViews) {
+      for (const { view, organizationId: orgId } of sseViews) {
         try {
           this.dispatchService.emitSSE(view, orgId);
         } catch {
@@ -366,6 +323,61 @@ export class NotificationDeliveryUseCase {
         locked.attempts,
       );
     }
+  }
+
+  /**
+   * Materialize inbox rows + delivery rows for a claimed job.
+   *
+   * Single idempotency point for the delivery pipeline, shared by both paths
+   * that reach it (immediate `processJob` after createDeliveryJob, and the
+   * cron `processDueJobs` → `processClaimedJob`): every write is
+   * create-or-replay — inbox rows via `createManyIdempotent` against the
+   * (sourceJobId, userId) unique index, delivery rows via
+   * `upsertDeliveriesForNotification` against the (notification, deviceToken,
+   * channel) index — so re-running a job after a failure converges on the same
+   * rows instead of duplicating notifications or deliveries.
+   */
+  private async deliverRecipientsOnce(
+    locked: NotificationJobRecord,
+    recipientIds: string[],
+    organizationId: string,
+    tx: TransactionExecutor,
+  ): Promise<{
+    deliveredCount: number;
+    views: { view: NotificationView; organizationId: string }[];
+  }> {
+    const views: { view: NotificationView; organizationId: string }[] = [];
+    let deliveredCount = 0;
+
+    for (let offset = 0; offset < recipientIds.length; offset += RECIPIENT_BATCH_SIZE) {
+      const batch = recipientIds.slice(offset, offset + RECIPIENT_BATCH_SIZE);
+
+      const notifications = await this.notificationsRepository.createManyIdempotent(
+        locked.id,
+        batch.map((userId) => ({
+          organizationId,
+          userId,
+          type: locked.type,
+          title: locked.title,
+          body: locked.body,
+          data: locked.data ?? null,
+        })),
+        tx,
+      );
+
+      for (const notification of notifications) {
+        const view = this.notificationsMapper.toNotificationView(notification);
+        await this.dispatchService.upsertDeliveriesForNotification(view, tx);
+        views.push({
+          view,
+          organizationId: notification.organizationId ?? organizationId,
+        });
+      }
+
+      deliveredCount += notifications.length;
+    }
+
+    return { deliveredCount, views };
   }
 
   async processJob(jobId: string) {

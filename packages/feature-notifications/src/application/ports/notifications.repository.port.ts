@@ -41,6 +41,17 @@ export interface NotificationsRepositoryPort {
     values: CreateNotificationInput[],
     executor?: TransactionExecutor,
   ): Promise<NotificationRecord[]>;
+  /**
+   * Idempotent create for job-sourced inbox rows: exactly one row per
+   * (sourceJobId, userId). Rows the unique index already holds are replayed
+   * instead of duplicated, so retrying a job converges on the same rows.
+   * Every created row shares `sourceJobId`.
+   */
+  createManyIdempotent(
+    sourceJobId: string,
+    recipients: Array<Omit<CreateNotificationInput, "sourceJobId">>,
+    executor?: TransactionExecutor,
+  ): Promise<NotificationRecord[]>;
   findBySourceJobAndUsers(
     sourceJobId: string,
     userIds: string[],
