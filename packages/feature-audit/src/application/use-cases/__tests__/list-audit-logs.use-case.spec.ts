@@ -1,5 +1,6 @@
 import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
+import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { describe, expect, it, vi } from "vitest";
 
 import { AuditMapper } from "../../audit.mapper";
@@ -51,7 +52,10 @@ describe("ListAuditLogsUseCase", () => {
   it("does not scope SUPER_ADMIN, even without an organization", async () => {
     const { useCase, auditRepository } = buildUseCase();
 
-    await useCase.execute(actor({ roles: ["SUPER_ADMIN"], organizationId: null }), query);
+    await useCase.execute(
+      actor({ roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN], organizationId: null }),
+      query,
+    );
 
     expect(auditRepository.list).toHaveBeenCalledWith(
       expect.not.objectContaining({ organizationId: expect.anything() }),

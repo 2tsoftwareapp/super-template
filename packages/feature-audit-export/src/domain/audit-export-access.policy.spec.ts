@@ -1,10 +1,9 @@
+import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { describe, expect, it } from "vitest";
 
-import {
-  AUDIT_EXPORT_FILE_KIND,
-  canDownloadAuditExport,
-  PLATFORM_SUPER_ADMIN,
-} from "./audit-export-access.policy";
+import { AUDIT_EXPORT_FILE_KIND, canDownloadAuditExport } from "./audit-export-access.policy";
+
+const PLATFORM_SUPER_ADMIN = PLATFORM_ROLE_NAMES.SUPER_ADMIN;
 
 describe("canDownloadAuditExport", () => {
   it("rejects non-audit-export kinds", () => {

@@ -1,14 +1,6 @@
 import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
-import { AppError } from "@repo/api-kernel";
-
-/**
- * Platform super-role name (single source of truth for audit read scope).
- * Kept local instead of importing ROLE_NAMES from @repo/feature-access-control:
- * access-control depends on this feature's audit writer, so the import would
- * create a package cycle.
- */
-export const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";
+import { AppError, PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 
 /** Platform-generic auth code; the aggregated catalog lives in api-runtime. */
 const AUTH_FORBIDDEN = "AUTH_FORBIDDEN";
@@ -25,7 +17,7 @@ export type AuditReadScope =
   | { readonly kind: "organization"; readonly organizationId: string };
 
 export const isPlatformSuperAdmin = (actor: Pick<AuditReadActor, "roles">): boolean =>
-  actor.roles.includes(PLATFORM_SUPER_ADMIN);
+  actor.roles.includes(PLATFORM_ROLE_NAMES.SUPER_ADMIN);
 
 /**
  * Resolve the audit read scope for an actor. Shared by the list and get use

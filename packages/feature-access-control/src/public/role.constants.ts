@@ -1,5 +1,13 @@
+import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
+
+/**
+ * Role catalog for this feature. `SUPER_ADMIN` is owned by the shared kernel
+ * (`PLATFORM_ROLE_NAMES`) so audit, audit-export and organization management
+ * can apply the same platform role without depending on this feature; the
+ * remaining fixed roles stay local to access-control.
+ */
 export const ROLE_NAMES = {
-  SUPER_ADMIN: "SUPER_ADMIN",
+  SUPER_ADMIN: PLATFORM_ROLE_NAMES.SUPER_ADMIN,
   ADMIN: "ADMIN",
   USER: "USER",
 } as const;

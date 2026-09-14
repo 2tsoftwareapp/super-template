@@ -5,6 +5,7 @@ import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
 
+import { ROLE_NAMES } from "../../access-control.constants";
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
@@ -18,9 +19,9 @@ interface RoleSeedEntry {
 }
 
 const ROLE_SEED_ENTRIES: RoleSeedEntry[] = [
-  { name: "SUPER_ADMIN", description: "Platform owner role", isSystem: true },
-  { name: "ADMIN", description: "Administrative role", isSystem: true },
-  { name: "USER", description: "Standard user role", isSystem: true },
+  { name: ROLE_NAMES.SUPER_ADMIN, description: "Platform owner role", isSystem: true },
+  { name: ROLE_NAMES.ADMIN, description: "Administrative role", isSystem: true },
+  { name: ROLE_NAMES.USER, description: "Standard user role", isSystem: true },
 ];
 
 /**

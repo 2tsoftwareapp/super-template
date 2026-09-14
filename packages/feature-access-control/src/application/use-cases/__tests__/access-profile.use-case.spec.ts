@@ -1,5 +1,6 @@
 import type { AccessControlRepositoryPort } from "../../ports/access-control.repository.port";
 
+import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { AccessProfileCache } from "@repo/api-runtime";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -73,20 +74,22 @@ describe("AccessProfileUseCase", () => {
     });
 
     it("queries repository and populates cache for global scope (null org)", async () => {
-      vi.mocked(repository.findRoleNamesForUser!).mockResolvedValue(["SUPER_ADMIN"]);
+      vi.mocked(repository.findRoleNamesForUser!).mockResolvedValue([
+        PLATFORM_ROLE_NAMES.SUPER_ADMIN,
+      ]);
       vi.mocked(repository.findPermissionNamesForUser!).mockResolvedValue(["*"]);
 
       const result = await useCase.getAccessProfile("user-super", null);
 
       expect(result).toEqual({
-        roles: ["SUPER_ADMIN"],
+        roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN],
         permissions: ["*"],
       });
       expect(repository.findRoleNamesForUser).toHaveBeenCalledWith("user-super", null);
       expect(repository.findPermissionNamesForUser).toHaveBeenCalledWith("user-super", null);
       expect(cache.set).toHaveBeenCalledWith(
         "user-super",
-        { roles: ["SUPER_ADMIN"], permissions: ["*"] },
+        { roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN], permissions: ["*"] },
         null,
       );
     });

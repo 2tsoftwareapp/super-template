@@ -1,5 +1,5 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-kernel";
-import type { TransactionExecutor, TransactionPort } from "@repo/api-kernel";
+import type { TransactionPort } from "@repo/api-kernel";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-kernel";
@@ -7,7 +7,7 @@ import { ERROR_CODES } from "@repo/api-runtime";
 import { AuditWriter } from "@repo/feature-audit/contracts";
 import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
 
-import type { CreateRoleCommand, PermissionView, RoleView } from "../access-control.types";
+import type { CreateRoleCommand, RoleView } from "../access-control.types";
 
 import { isFixedRoleName } from "../../access-control.constants";
 import { ROLE_NAMES } from "../../access-control.constants";
@@ -17,6 +17,7 @@ import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
 } from "../ports/access-control.repository.port";
+import { CatalogPermissionResolver } from "../services/catalog-permission-resolver.service";
 
 function normalizeRoleName(name: string): string {
   return name.trim().toUpperCase();
@@ -29,6 +30,7 @@ export class CreateCustomRoleUseCase {
     private readonly accessControlRepository: AccessControlRepositoryPort,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+    private readonly catalogPermissionResolver: CatalogPermissionResolver,
     private readonly accessControlMapper: AccessControlMapper,
   ) {}
 
@@ -68,12 +70,12 @@ export class CreateCustomRoleUseCase {
           "A role with this name already exists in the organization",
           HttpStatus.CONFLICT,
         );
-      const permissions = await this.resolveCatalogPermissions(
+      const permissions = await this.catalogPermissionResolver.resolve({
         actor,
-        command.permissionIds,
-        organizationId,
-        tx,
-      );
+        permissionIds: command.permissionIds,
+        targetOrganizationId: organizationId,
+        executor: tx,
+      });
       const role = await this.accessControlRepository.createRole(
         {
           name: normalizedName,
@@ -125,50 +127,5 @@ export class CreateCustomRoleUseCase {
         permissions.map((p) => this.accessControlMapper.toPermissionView(p)),
       );
     });
-  }
-
-  private async resolveCatalogPermissions(
-    actor: AuthenticatedRequestUser,
-    permissionIds: string[],
-    targetOrganizationId: string | null,
-    executor?: TransactionExecutor,
-  ): Promise<PermissionView[]> {
-    const permissions = await this.accessControlRepository.findPermissionsByIds(
-      permissionIds,
-      executor,
-    );
-    if (permissions.length !== permissionIds.length)
-      throw new AppError(
-        ERROR_CODES.VALIDATION_FAILED,
-        "One or more permissions do not exist",
-        HttpStatus.BAD_REQUEST,
-      );
-    const invalidPermission = permissions.find((p) => !p.isSystem);
-    if (invalidPermission)
-      throw new AppError(
-        ERROR_CODES.VALIDATION_FAILED,
-        "Custom roles can only use system catalog permissions",
-        HttpStatus.BAD_REQUEST,
-      );
-    const isOrgScoped = targetOrganizationId !== null;
-    for (const permission of permissions) {
-      if (isOrgScoped && permission.scope === "platform")
-        throw new AppError(
-          ERROR_CODES.AUTH_FORBIDDEN,
-          `Permission "${permission.name}" is platform-scoped and cannot be assigned to organization roles`,
-          HttpStatus.FORBIDDEN,
-        );
-    }
-    if (!actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
-      const actorPermissionSet = new Set(actor.permissions ?? []);
-      for (const permission of permissions)
-        if (!actorPermissionSet.has(permission.name))
-          throw new AppError(
-            ERROR_CODES.AUTH_FORBIDDEN,
-            `You do not have the "${permission.name}" permission to delegate it`,
-            HttpStatus.FORBIDDEN,
-          );
-    }
-    return permissions.map((p) => this.accessControlMapper.toPermissionView(p as PermissionView));
   }
 }

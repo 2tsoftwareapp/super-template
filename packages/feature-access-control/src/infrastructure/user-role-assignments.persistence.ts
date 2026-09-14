@@ -1,9 +1,10 @@
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
-import type { UserRoleAssignments } from "@repo/feature-access-control/contracts";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE, getPrimaryDatabaseClient } from "@repo/database-runtime";
 import { and, eq, inArray, isNull, or, sql, type SQL } from "drizzle-orm";
+
+import type { UserRoleAssignments } from "../public/user-role-assignments.port";
 
 import { permissions, rolePermissions, roles, userRoles } from "./persistence";
 

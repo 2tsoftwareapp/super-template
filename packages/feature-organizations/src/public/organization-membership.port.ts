@@ -1,6 +1,12 @@
 import type { TransactionExecutor } from "@repo/api-kernel";
 
-export type OrganizationMemberRole = "OWNER" | "ADMIN" | "MEMBER";
+import type { OrganizationMemberRole } from "../domain/organization-access.policy";
+/**
+ * Role of a user inside an organization. The domain owns the type (it is the
+ * layer that encodes the role ordering rules); this port re-exports it so
+ * consumers keep a single definition instead of a parallel union.
+ */
+export type { OrganizationMemberRole } from "../domain/organization-access.policy";
 
 export interface OrganizationMemberRecord {
   organizationId: string;

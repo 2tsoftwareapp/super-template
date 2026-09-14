@@ -1,5 +1,6 @@
 import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
+import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { describe, expect, it, vi } from "vitest";
 
 import type { AuditLogRecord } from "../../ports/audit.repository.port";
@@ -56,7 +57,10 @@ describe("GetAuditLogUseCase", () => {
     const { useCase } = buildUseCase(async () => auditRow({ organizationId: null }));
 
     await expect(
-      useCase.execute(actor({ roles: ["SUPER_ADMIN"], organizationId: null }), "log-1"),
+      useCase.execute(
+        actor({ roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN], organizationId: null }),
+        "log-1",
+      ),
     ).resolves.toMatchObject({ id: "log-1", organizationId: null });
   });
 

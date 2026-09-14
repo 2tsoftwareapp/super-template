@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { AppError } from "@repo/api-kernel";
+import { AppError, PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
 import { FILE_VISIBILITY } from "@repo/feature-upload/contracts";
 
@@ -149,7 +149,11 @@ describe("ExportAuditLogsUseCase", () => {
       auditWriter as never,
     );
 
-    const superAdminActor = { ...actor, organizationId: null, roles: ["SUPER_ADMIN"] };
+    const superAdminActor = {
+      ...actor,
+      organizationId: null,
+      roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN],
+    };
     await useCase.execute(superAdminActor, {});
 
     expect(auditRepository.listForExport).toHaveBeenCalledWith({ limit: 5000 }, expect.anything());

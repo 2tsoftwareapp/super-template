@@ -1,12 +1,13 @@
-import { AppError } from "@repo/api-kernel";
+import { AppError, PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { describe, expect, it } from "vitest";
 
 import {
   canReadAuditRow,
   isPlatformSuperAdmin,
-  PLATFORM_SUPER_ADMIN,
   resolveAuditReadScope,
 } from "../audit-read-scope.policy";
+
+const PLATFORM_SUPER_ADMIN = PLATFORM_ROLE_NAMES.SUPER_ADMIN;
 
 const actor = (roles: string[], organizationId: string | null) => ({ roles, organizationId });
 

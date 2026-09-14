@@ -1,3 +1,4 @@
+import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { describe, expect, it, vi } from "vitest";
 
 import { UpdateMemberRoleUseCase } from "../update-member-role.use-case";
@@ -114,7 +115,12 @@ describe("UpdateMemberRoleUseCase", () => {
     });
 
     const useCase = buildUseCase(m);
-    await useCase.execute("org-1", { userId: "admin", roles: ["SUPER_ADMIN"] }, "target", "ADMIN");
+    await useCase.execute(
+      "org-1",
+      { userId: "admin", roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN] },
+      "target",
+      "ADMIN",
+    );
 
     expect(m.membership.updateMemberRole).toHaveBeenCalled();
   });
