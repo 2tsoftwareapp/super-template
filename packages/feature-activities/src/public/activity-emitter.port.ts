@@ -20,4 +20,4 @@ export interface ActivityEmitter {
   emit(input: ActivityEmitInput, executor?: TransactionExecutor): Promise<void>;
 }
 
-export const ACTIVITY_EMITTER = Symbol("ACTIVITY_EMITTER");
+export { ACTIVITY_EMITTER } from "./activity-emitter.token";

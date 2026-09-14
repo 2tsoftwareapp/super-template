@@ -9,7 +9,7 @@ import type { AuthenticatedRequestUser } from "@repo/api-kernel";
  * concrete implementation. Removing the identity feature removes the binding
  * (the guard then has no authenticator and every non-public route is rejected).
  */
-export const ACCESS_TOKEN_AUTHENTICATOR = Symbol("ACCESS_TOKEN_AUTHENTICATOR");
+export { ACCESS_TOKEN_AUTHENTICATOR } from "./access-token-authenticator.token";
 
 export interface AccessTokenAuthenticator {
   /**

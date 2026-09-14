@@ -34,7 +34,6 @@
       "@repo/feature-auth/testing": ["../feature-auth/src/testing/index.ts"],
       "@repo/feature-health": ["./src/health.feature.ts"],
       "@repo/feature-health/contracts": ["./src/public/contracts.ts"],
-      "@repo/feature-health/schema": ["./src/infrastructure/persistence/index.ts"],
       "@repo/feature-health/module": ["./src/health.module.ts"],
       "@repo/feature-health/testing": ["./src/testing/index.ts"],
       "@repo/feature-import-export": ["../feature-import-export/src/import-export.feature.ts"],

@@ -15,6 +15,7 @@ export {
 export { ORGANIZATION_ERROR_CODES } from "./error-codes";
 export { ORGANIZATION_ACCESS_CONTROL } from "./organization-access-control.token";
 export { ORGANIZATION_CUSTOM_ROLES_PURGE } from "./organization-custom-roles-purge.token";
+export { ORGANIZATION_LOOKUP } from "./organization-lookup.token";
 export * from "./organization-lookup.port";
 export type * from "./organization-membership.port";
 export { ORGANIZATION_MEMBERSHIP } from "./organization-membership.token";

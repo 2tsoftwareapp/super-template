@@ -47,4 +47,4 @@ export interface AuthAccessProfile {
   ): Promise<unknown>;
 }
 
-export const AUTH_ACCESS_PROFILE = Symbol("AUTH_ACCESS_PROFILE");
+export { AUTH_ACCESS_PROFILE } from "./auth-access-profile.token";

@@ -19,6 +19,6 @@ export interface OutboxRepositoryPort {
   recoverStaleProcessing(): Promise<void>;
 }
 
-export const OUTBOX_REPOSITORY = Symbol("OUTBOX_REPOSITORY");
+export { OUTBOX_REPOSITORY } from "./outbox.token";
 
 export { OUTBOX_APPENDER, type OutboxAppenderPort } from "./outbox-appender.port";

@@ -24,4 +24,4 @@ export interface OrganizationLookup {
   ): Promise<{ role: OrganizationMemberRole } | null>;
 }
 
-export const ORGANIZATION_LOOKUP = Symbol("ORGANIZATION_LOOKUP");
+export { ORGANIZATION_LOOKUP } from "./organization-lookup.token";

@@ -57,9 +57,6 @@
       "@repo/feature-outbox": ["../../packages/feature-outbox/src/index.ts"],
       "@repo/feature-health": ["../../packages/feature-health/src/health.feature.ts"],
       "@repo/feature-health/contracts": ["../../packages/feature-health/src/public/contracts.ts"],
-      "@repo/feature-health/schema": [
-        "../../packages/feature-health/src/infrastructure/persistence/index.ts"
-      ],
       "@repo/feature-health/module": ["../../packages/feature-health/src/health.module.ts"],
       "@repo/feature-health/testing": ["../../packages/feature-health/src/testing/index.ts"],
       "@repo/feature-health/*": ["../../packages/feature-health/src/*"],

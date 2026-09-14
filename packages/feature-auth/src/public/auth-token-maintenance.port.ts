@@ -9,4 +9,4 @@ export interface AuthTokenMaintenance {
   revokeAllSessionsForUser(userId: string, executor?: TransactionExecutor): Promise<void>;
 }
 
-export const AUTH_TOKEN_MAINTENANCE = Symbol("AUTH_TOKEN_MAINTENANCE");
+export { AUTH_TOKEN_MAINTENANCE } from "./auth-token-maintenance.token";

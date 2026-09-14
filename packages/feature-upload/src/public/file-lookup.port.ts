@@ -7,4 +7,4 @@ export interface FileLookup {
   findById(fileId: string): Promise<FileOwnerRecord | null>;
 }
 
-export const FILE_LOOKUP = Symbol("FILE_LOOKUP");
+export { FILE_LOOKUP } from "./file-lookup.token";

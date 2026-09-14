@@ -32,7 +32,6 @@
       "@repo/feature-auth/testing": ["../feature-auth/src/testing/index.ts"],
       "@repo/feature-health": ["../feature-health/src/health.feature.ts"],
       "@repo/feature-health/contracts": ["../feature-health/src/public/contracts.ts"],
-      "@repo/feature-health/schema": ["../feature-health/src/infrastructure/persistence/index.ts"],
       "@repo/feature-health/module": ["../feature-health/src/health.module.ts"],
       "@repo/feature-health/testing": ["../feature-health/src/testing/index.ts"],
       "@repo/feature-import-export": ["../feature-import-export/src/import-export.feature.ts"],

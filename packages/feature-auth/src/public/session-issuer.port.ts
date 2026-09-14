@@ -60,4 +60,4 @@ export interface SessionIssuer {
   ): Promise<SessionIssuanceResult>;
 }
 
-export const SESSION_ISSUER = Symbol("SESSION_ISSUER");
+export { SESSION_ISSUER } from "./session-issuer.token";

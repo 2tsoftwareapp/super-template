@@ -30,4 +30,4 @@ export interface UserOrganizationScope {
   listMemberUserIds(organizationId: string, executor?: TransactionExecutor): Promise<string[]>;
 }
 
-export const USER_ORGANIZATION_SCOPE = Symbol("USER_ORGANIZATION_SCOPE");
+export { USER_ORGANIZATION_SCOPE } from "./user-organization-scope.token";

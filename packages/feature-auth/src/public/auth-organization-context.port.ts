@@ -24,4 +24,4 @@ export interface AuthOrganizationContext {
   ): Promise<void>;
 }
 
-export const AUTH_ORGANIZATION_CONTEXT = Symbol("AUTH_ORGANIZATION_CONTEXT");
+export { AUTH_ORGANIZATION_CONTEXT } from "./auth-organization-context.token";
