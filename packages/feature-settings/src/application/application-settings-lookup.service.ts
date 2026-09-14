@@ -41,16 +41,30 @@ interface LocalCacheEntry {
  * settings store. Consumers that only need to enforce toggles depend on the
  * api-kernel port instead of the settings repository directly.
  *
- * Flag values are cached briefly (default 5s) so the global MaintenanceModeGuard
- * does not hit the DB on every request. With Redis configured the cache is
- * shared across instances: reads hit Redis and UpdateSettingUseCase deletes the
- * key on write, so an admin toggle propagates to every replica immediately.
- * Without Redis it falls back to in-process memory (single-instance / test).
+ * Maintenance mode is answered straight from the store: it is a kill-switch, so
+ * a cached `false` would keep letting traffic through for the rest of the TTL
+ * after an operator enabled it, and no cache-aside scheme can rule that out
+ * without extra infrastructure (a reader that loaded the pre-commit row can
+ * always write it back after the writer's delete, on any replica).
+ *
+ * The remaining flags are cached briefly (default 5s) so callers do not hit the
+ * DB on every check. With Redis configured the cache is shared across
+ * instances: reads hit Redis and UpdateSettingUseCase deletes the key around
+ * the commit, so a toggle propagates to every replica. Without Redis it falls
+ * back to in-process memory (single-instance / test). A read that overlapped an
+ * invalidation is never written to the cache — see readFlag().
  */
 @Injectable()
 export class ApplicationSettingsLookupService implements ApplicationSettingsLookup {
   private readonly logger = new Logger(ApplicationSettingsLookupService.name);
   private readonly localEntries = new Map<string, LocalCacheEntry>();
+  /**
+   * Per-key counter bumped on every invalidation. A read captures it before
+   * touching the store and only caches its result when the counter is unchanged,
+   * so a value read before the write committed cannot be written back into the
+   * cache afterwards.
+   */
+  private readonly invalidationEpochs = new Map<string, number>();
   private redisClient: RedisCacheClient | null = null;
   private redisReady: Promise<void> | null = null;
 
@@ -66,15 +80,19 @@ export class ApplicationSettingsLookupService implements ApplicationSettingsLook
   }
 
   async isMaintenanceMode(): Promise<boolean> {
-    return this.readFlag(MAINTENANCE_MODE_KEY, false);
+    return this.readStoreFlag(MAINTENANCE_MODE_KEY, false);
   }
 
   /**
    * Drop the cached flag for a setting key so the next read hits the store.
    * With Redis, deleting the key also clears the entry on every other instance,
    * so toggles take effect across all replicas immediately.
+   *
+   * Never throws: a failing cache must not fail the write it is invalidating.
    */
   async invalidate(key: string): Promise<void> {
+    this.invalidationEpochs.set(key, this.invalidationEpoch(key) + 1);
+
     const redis = await this.ensureRedis();
 
     if (redis) {
@@ -98,13 +116,29 @@ export class ApplicationSettingsLookupService implements ApplicationSettingsLook
       return cached;
     }
 
+    const epochBeforeRead = this.invalidationEpoch(key);
+    const value = await this.readStoreFlag(key, defaultValue);
+
+    // The read overlapped an invalidation: another writer committed a different
+    // value while this one was in flight, so caching the value read here would
+    // resurrect the state the write replaced.
+    if (this.invalidationEpoch(key) === epochBeforeRead) {
+      await this.writeCache(key, value);
+    }
+
+    return value;
+  }
+
+  private async readStoreFlag(key: string, defaultValue: boolean): Promise<boolean> {
     const setting = await this.settingsRepository.findByKey(key);
-    const value = setting
+
+    return setting
       ? readEnabledFlag(isJsonObject(setting.value) ? setting.value : undefined)
       : defaultValue;
+  }
 
-    await this.writeCache(key, value);
-    return value;
+  private invalidationEpoch(key: string): number {
+    return this.invalidationEpochs.get(key) ?? 0;
   }
 
   private async readCache(key: string): Promise<boolean | null> {

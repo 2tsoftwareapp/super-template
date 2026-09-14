@@ -11,6 +11,8 @@ export interface ImportJobRecord {
   successCount: number | null;
   errorCount: number | null;
   errors: ImportValidationError[] | null;
+  /** SHA-256 of the validated source file; null for jobs created before it was recorded. */
+  contentHash: string | null;
   organizationId: string;
   createdById: string;
   confirmedAt: Date | null;
@@ -36,6 +38,7 @@ export interface UpdateImportJobValues {
   successCount?: number | null;
   errorCount?: number | null;
   errors?: ImportValidationError[] | null;
+  contentHash?: string | null;
   confirmedAt?: Date | null;
   completedAt?: Date | null;
 }

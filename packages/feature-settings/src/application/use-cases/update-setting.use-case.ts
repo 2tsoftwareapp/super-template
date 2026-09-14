@@ -68,12 +68,21 @@ export class UpdateSettingUseCase {
         tx,
       );
 
+      // Drop the cached flag before the commit, so the window in which a reader
+      // can still hold the previous value is as short as possible. Invalidating
+      // is idempotent and only ever removes data: if this transaction rolls
+      // back, the cache is simply empty and readers fall back to the unchanged
+      // row — a wasted read, never a wrong answer. (Writing the new value into
+      // the cache here would be wrong for exactly that reason.)
+      await this.settingsLookup.invalidate(key);
+
       return setting;
     });
 
-    // The lookup service caches flags for a few seconds; invalidate the updated
-    // key so guards (maintenance/registration) pick up the change immediately.
-    // With Redis this also clears the entry on every other instance.
+    // Clear again after the commit: a reader that started before the commit may
+    // have re-filled the cache from the pre-commit row between the invalidate
+    // above and the commit itself. With Redis this also clears the entry on
+    // every other instance.
     await this.settingsLookup.invalidate(key);
 
     return SettingsMapper.toDto(updated);

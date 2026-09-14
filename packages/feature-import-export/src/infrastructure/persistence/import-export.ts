@@ -29,6 +29,11 @@ export const importJobs = pgTable(
     successCount: integer("success_count"),
     errorCount: integer("error_count"),
     errors: jsonb("errors").$type<ImportValidationError[] | null>(),
+    /**
+     * SHA-256 of the source file as validated at create time. Confirm recomputes
+     * it and refuses the import when the stored object changed in between.
+     */
+    contentHash: text("content_hash"),
     createdById: uuid("created_by_id").notNull(),
     confirmedAt: timestamp("confirmed_at", { withTimezone: true }),
     completedAt: timestamp("completed_at", { withTimezone: true }),

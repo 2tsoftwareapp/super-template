@@ -138,37 +138,23 @@ export class AuditRepository implements AuditRepositoryPort {
     batchSize: number,
     executor: DatabaseExecutor = this.database,
   ): Promise<number> {
+    // Table and columns come from the Drizzle object, not from string literals:
+    // renaming `l_audit_logs` in the schema is then a one-file change. The
+    // subquery form (DELETE ... WHERE id IN (SELECT ... LIMIT n)) keeps the
+    // batch bounded by rows rather than by a lock window.
     const result = await executor.execute(
       sql`
-        DELETE FROM l_audit_logs
-        WHERE id IN (
-          SELECT id FROM l_audit_logs
-          WHERE created_at <= ${cutoff}
-          ORDER BY created_at
+        DELETE FROM ${auditLogs}
+        WHERE ${auditLogs.id} IN (
+          SELECT ${auditLogs.id} FROM ${auditLogs}
+          WHERE ${auditLogs.createdAt} <= ${cutoff}
+          ORDER BY ${auditLogs.createdAt}
           LIMIT ${batchSize}
         )
       `,
     );
 
     return result.rowCount ?? 0;
-  }
-
-  async tryAdvisoryLock(
-    lockId: number,
-    executor: DatabaseExecutor = this.database,
-  ): Promise<boolean> {
-    const result = await executor.execute(sql`SELECT pg_try_advisory_lock(${lockId}) AS acquired`);
-    const row = result.rows?.[0] as { acquired: boolean } | undefined;
-    return row?.acquired === true;
-  }
-
-  async unlockAdvisoryLock(
-    lockId: number,
-    executor: DatabaseExecutor = this.database,
-  ): Promise<boolean> {
-    const result = await executor.execute(sql`SELECT pg_advisory_unlock(${lockId}) AS released`);
-    const row = result.rows?.[0] as { released: boolean } | undefined;
-    return row?.released === true;
   }
 
   async findById(id: string, executor: DatabaseExecutor = this.database) {

@@ -47,6 +47,7 @@
     "0039_platform_scope_organization.sql",
     "0040_job_child_tables_sentinel_scoping.sql",
     "0041_mail_deliveries_tenant_isolation.sql",
-    "0042_outbox_messages_tenant_isolation.sql"
+    "0042_outbox_messages_tenant_isolation.sql",
+    "0043_import_jobs_content_hash.sql"
   ]
 }
