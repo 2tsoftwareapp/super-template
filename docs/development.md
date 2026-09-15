@@ -115,15 +115,16 @@ minio-init` if the bucket was removed.
 
 Most suites run against mocks and are covered by `pnpm test`. Three suites need real
 services and stay behind an explicit switch, so a checkout without Docker still gets a
-green default run. A fourth — the database topology pair — is skipped unconditionally
-here, because this repository does not provision a read replica; see its own
-subsection below.
+green default run. A fourth — the database topology pair — needs a compose profile that is
+not part of the default stack; `scripts/topology-e2e.sh` starts it, migrates it, and runs
+the suite (see its own subsection below).
 
 | Suite                            | Command                                          | Prerequisite                                        |
 | -------------------------------- | ------------------------------------------------ | --------------------------------------------------- |
 | S3/MinIO object storage          | `pnpm --filter @repo/feature-upload test:integration` | MinIO up and `S3_BUCKET` created (`minio-init`) |
 | Standalone worker (PostgreSQL)   | `pnpm --filter worker test:e2e`                  | PostgreSQL reachable at `POSTGRES_HOST`/`POSTGRES_PORT` |
 | API end-to-end                   | `pnpm --filter api test:e2e`                     | same as above                                       |
+| Database topology (primary + replica) | `scripts/topology-e2e.sh`                    | Docker; starts the `topology` compose profile        |
 
 Each script exports the variable that unhides its suite (`RUN_S3_INTEGRATION=1`,
 `WORKER_E2E=1`). Running the same specs without it reports them as **skipped** rather than
@@ -134,25 +135,50 @@ troubleshooting for the storage boundary:
 Both PostgreSQL suites reset the same `fullstack_starter_test` database, and both take the
 same Postgres advisory lock
 ([`apps/api/test/support/test-database-lock.ts`](../apps/api/test/support/test-database-lock.ts)
-— the worker suite imports that file directly). They can therefore run at the same time
-without one dropping the schema the other is testing against; the second one waits.
+— the worker suite keeps a hand-synced copy of that file). They can therefore run at the
+same time without one dropping the schema the other is testing against; the second one
+waits.
 
-### Database topology suite — cannot run from this repo
+The API suite takes that lock once for the **whole run** (`globalSetup` in
+[`apps/api/vitest.e2e.config.ts`](../apps/api/vitest.e2e.config.ts)), not once per file: with
+per-file granularity two runs alternate file by file, and every hand-over is a window where
+one process resets `public` while the other boots an app against it. A second `test:e2e` —
+or a worker e2e run — therefore waits for the first run to finish instead of interleaving
+with it, and says so in its log (`[e2e] another e2e run holds the test database lock;
+waiting...`). Unit runs (`pnpm --filter api test`, `test:coverage`) keep using
+`vitest.config.ts`, which has no `globalSetup`, so they never touch Postgres.
 
-`apps/api/test/database-topology.e2e.spec.ts` is the one suite that stays skipped
-everywhere in this repository. It asserts the primary/read-replica boundary:
-tenant A/B RLS isolation on both endpoints, that writes stay pinned to the primary,
-that an auth rotation is visible on the primary immediately, and — optionally —
-that a privileged replica role is rejected.
+### Database topology suite — primary + streaming replica pair
 
-It needs a real PostgreSQL **primary + streaming read replica** pair, and
-[`infra/docker-compose.yml`](../infra/docker-compose.yml) starts a single `postgres`
-service. There is no replica container, no `primary_conninfo`, and no
-`hot_standby = on`, so nothing in the repo can supply the second endpoint. That is
-the reason the suite is skipped, and why a green `pnpm --filter api test:e2e` is not
-evidence for the replica boundary.
+`apps/api/test/database-topology.e2e.spec.ts` asserts the primary/read-replica boundary:
+tenant A/B RLS isolation on both endpoints, that writes stay pinned to the primary, that an
+auth rotation is visible on the primary immediately, and — optionally — that a privileged
+replica role is detected. It needs a real PostgreSQL **primary + streaming read replica**
+pair whose endpoints both use a **restricted role** (not superuser, no `BYPASSRLS`).
 
-The spec gates itself on three variables — set all three or it reports as skipped:
+[`infra/docker-compose.yml`](../infra/docker-compose.yml) carries that pair behind the
+`topology` profile, on ports of its own so the default dev `postgres` service on
+`POSTGRES_EXPOSED_PORT` is untouched:
+
+| Service            | Host port                       | What it is                                                          |
+| ------------------ | ------------------------------- | ------------------------------------------------------------------- |
+| `topology-primary` | `TOPOLOGY_PRIMARY_PORT` (65434) | `wal_level=replica`, `hot_standby=on`, replication role `replicator` |
+| `topology-replica` | `TOPOLOGY_REPLICA_PORT` (65435) | `pg_basebackup` restore of the primary, streaming standby            |
+
+`scripts/topology-e2e.sh` does the whole sequence: start the pair, wait for health, create
+the test database, apply migrations with `pnpm --filter api db:migrate`, seed it with
+`pnpm --filter api db:seed` (the rotation/revocation test reads one user row), wait for the
+replica to replay both, and run the suite with the four `DATABASE_TOPOLOGY_*` variables
+exported.
+
+```sh
+scripts/topology-e2e.sh            # the topology spec only (pnpm test:e2e:topology)
+scripts/topology-e2e.sh --all      # the whole API e2e suite against the pair
+scripts/topology-e2e.sh --skip-up  # reuse an already running pair
+scripts/topology-e2e.sh --down     # remove the pair and its data volumes
+```
+
+The spec gates itself on the variables — set all of them or it reports as skipped:
 
 | Variable                                   | What it must point at                                                          |
 | ------------------------------------------ | ------------------------------------------------------------------------------ |
@@ -161,19 +187,19 @@ The spec gates itself on three variables — set all three or it reports as skip
 | `DATABASE_TOPOLOGY_ADMIN_URL`              | the primary database, used to create and drop the temporary probe table          |
 | `DATABASE_TOPOLOGY_PRIVILEGED_REPLICA_URL` | optional; a superuser/`BYPASSRLS` role on the replica, for the negative test    |
 
-Running it therefore requires infrastructure this repository deliberately does not
-provision: a second PostgreSQL instance in hot standby streaming from the primary,
-migrated to the same schema, plus a privileged role on the replica. Then:
-
-```sh
-DATABASE_TOPOLOGY_PRIMARY_URL='postgresql://app@primary/app' \
-DATABASE_TOPOLOGY_REPLICA_URL='postgresql://app@replica/app' \
-DATABASE_TOPOLOGY_ADMIN_URL='postgresql://admin@primary/app' \
-pnpm --filter api exec vitest run test/database-topology.e2e.spec.ts --maxWorkers=1
-```
-
-There is no separate enable flag; the URLs themselves are the switch. Full contract:
+There is no separate enable flag; the URLs themselves are the switch, so a normal
+`pnpm --filter api test:e2e` reports this file as **skipped** and a green default e2e run is
+not evidence for the replica boundary. The runner additionally pins
+`POSTGRES_EXPOSED_PORT`/`POSTGRES_PORT`/`DATABASE_URL_TEST`/`DATABASE_URL_TEST_ADMIN` at the
+pair, because `@repo/env-loader` otherwise rewrites every `DATABASE_*` URL to the port of the
+running dev `postgres` service — which would migrate, and take the run-scope advisory lock
+in, the wrong instance. Full contract:
 [`docs/database.md`](database.md#topology-integration-test).
+
+The pair keeps its data in the `topology-primary-data`/`topology-replica-data` volumes. If the
+primary is recreated while the replica volume survives, the standby still points at the old
+system identifier and replication stops; `scripts/topology-e2e.sh --down` (which deletes both
+volumes) followed by a plain run resets them.
 
 ## Emulator Networking
 
