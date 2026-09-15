@@ -41,6 +41,7 @@
     "generate:feature-indexes": "node scripts/generate-feature-indexes.mjs",
     "check:feature-indexes": "node scripts/generate-feature-indexes.mjs --check",
     "test:e2e:preflight": "node scripts/test-e2e-preflight.mjs",
+    "test:e2e:topology": "bash scripts/topology-e2e.sh",
     "verify": "sh ./scripts/verify.sh",
     "verify:offline": "node scripts/verify-offline.mjs",
     "format:check": "prettier --ignore-unknown --check \"packages/**\" \"apps/api\" \"apps/admin\" \"apps/web\"",

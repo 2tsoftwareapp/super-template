@@ -6,7 +6,6 @@ import { Test } from "@nestjs/testing";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { TenantContextService } from "@repo/api-runtime";
 import { DATABASE, type DatabaseClient } from "@repo/database-runtime";
-import { loadEnvFiles } from "@repo/env-loader";
 import { sql } from "drizzle-orm";
 import { Pool } from "pg";
 import request from "supertest";
@@ -14,88 +13,19 @@ import request from "supertest";
 import { AppModule } from "../../src/app.module";
 import { applySqlMigrations } from "../../src/cli/migrations";
 import { seedDatabase } from "../../src/cli/seeds/seed-data";
+import {
+  ensureTestDatabaseExists,
+  loadTestDatabaseEnv,
+  resolveTestDatabaseAdminUrl,
+  resolveTestDatabaseUrl,
+  TEST_APP_ROLE_NAME,
+  TEST_APP_ROLE_PASSWORD,
+} from "./test-database-env";
 import { acquireTestDatabaseLock } from "./test-database-lock";
 
-loadEnvFiles();
+loadTestDatabaseEnv();
 
-const TEST_APP_ROLE_NAME = "fullstack_starter_app";
-const TEST_APP_ROLE_PASSWORD = "fullstack_starter_app";
-const TEST_DATABASE_NAME = "fullstack_starter_test";
-
-const buildDatabaseUrl = (role: string, password: string, database: string): string => {
-  const host = process.env.POSTGRES_HOST ?? "localhost";
-  const port = process.env.POSTGRES_PORT ?? "5432";
-
-  return `postgresql://${encodeURIComponent(role)}:${encodeURIComponent(password)}@${host}:${port}/${database}`;
-};
-
-/** Keep e2e on the restricted app role even when a stale .env still points at postgres. */
-export const configureTestDatabaseUrls = (): void => {
-  process.env.APP_ENV = "test";
-
-  const appTestUrl = buildDatabaseUrl(
-    TEST_APP_ROLE_NAME,
-    TEST_APP_ROLE_PASSWORD,
-    TEST_DATABASE_NAME,
-  );
-  const adminTestUrl = buildDatabaseUrl(
-    process.env.POSTGRES_USER ?? "postgres",
-    process.env.POSTGRES_PASSWORD ?? "postgres",
-    TEST_DATABASE_NAME,
-  );
-
-  const currentTestUrl = process.env.DATABASE_URL_TEST;
-  const usesPrivilegedTestRole =
-    !currentTestUrl ||
-    /\/\/postgres[:@]/i.test(currentTestUrl) ||
-    !currentTestUrl.includes(`${TEST_APP_ROLE_NAME}@`);
-
-  if (usesPrivilegedTestRole) {
-    process.env.DATABASE_URL_TEST = appTestUrl;
-  }
-
-  // Always derive the admin URL from POSTGRES_HOST/PORT instead of trusting whatever
-  // is already in process.env: loadEnvFiles() falls back to .env.example for keys
-  // .env doesn't set, and .env.example's DATABASE_URL_TEST_ADMIN hardcodes the
-  // placeholder port 5432, which silently points migrations/reset at the wrong
-  // Postgres instance whenever the real .env uses a different POSTGRES_PORT.
-  process.env.DATABASE_URL_TEST_ADMIN = adminTestUrl;
-};
-
-configureTestDatabaseUrls();
-
-const resolveTestDatabaseUrl = () => process.env.DATABASE_URL_TEST;
-const resolveTestDatabaseAdminUrl = () =>
-  process.env.DATABASE_URL_TEST_ADMIN ?? process.env.DATABASE_URL_TEST;
-
-const ensureTestDatabaseExists = async (databaseUrl: string, adminDatabaseUrl: string) => {
-  const databaseName = new URL(databaseUrl).pathname.replace(/^\//, "");
-
-  if (!databaseName) {
-    throw new Error("Test database name could not be resolved");
-  }
-
-  const adminUrl = new URL(adminDatabaseUrl);
-  adminUrl.pathname = "/postgres";
-
-  const adminPool = new Pool({
-    connectionString: adminUrl.toString(),
-  });
-
-  try {
-    const result = await adminPool.query<{ exists: boolean }>(
-      'select exists(select 1 from pg_database where datname = $1) as "exists"',
-      [databaseName],
-    );
-
-    if (!result.rows[0]?.exists) {
-      const safeDatabaseName = `"${databaseName.replace(/"/g, '""')}"`;
-      await adminPool.query(`create database ${safeDatabaseName}`);
-    }
-  } finally {
-    await adminPool.end();
-  }
-};
+export { configureTestDatabaseUrls } from "./test-database-env";
 
 const ensureRestrictedTestRole = async (adminDatabaseUrl: string) => {
   const pool = new Pool({
@@ -220,6 +150,21 @@ export const createTestApp = async (
   await app.init();
   console.log("[DEBUG] createTestApp: seedDatabase");
   await seedDatabase(app);
+
+  // Bind the HTTP server once for the whole file instead of leaving it unbound.
+  //
+  // Supertest only starts a server it finds unbound, and it closes that server again as
+  // soon as *its* response arrives (`supertest/lib/test.js`: `if (!addr) this._server =
+  // app.listen(0)` ... `if (server && server._handle) return server.close(...)`). Several
+  // suites fire concurrent requests through `Promise.all`/`Promise.allSettled` on the one
+  // shared server, so the request that happened to bind it would tear the listener down
+  // while its siblings were still in flight. Observed as intermittent `socket hang up`
+  // plus responses that could not have come from this app at all (an empty 401 body, and
+  // `{"ok":false,"error":"Not found"}` - this codebase's error shape is
+  // `{error:{code,message,details},meta:{...}}`), i.e. a request landing on whichever
+  // process had just grabbed the freed ephemeral port. Listening here keeps one port for
+  // the file's lifetime; `app.close()` in `afterAll` still shuts it down.
+  await app.listen(0);
   console.log("[DEBUG] createTestApp: done");
   return app;
 };
