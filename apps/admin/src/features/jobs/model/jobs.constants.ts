@@ -1,3 +1,6 @@
+// Values must cover every status the API accepts on `GET /jobs?status=`
+// (see JobsQueryDto/AdminJobsQueryDto in feature-jobs). `BLOCKED` is terminal:
+// PropagationService parks a job here when a dependency failed or was cancelled.
 export const STATUS_OPTIONS = [
   { value: "", label: "All statuses" },
   { value: "PENDING", label: "Pending" },
@@ -5,6 +8,7 @@ export const STATUS_OPTIONS = [
   { value: "COMPLETED", label: "Completed" },
   { value: "FAILED", label: "Failed" },
   { value: "CANCELLED", label: "Cancelled" },
+  { value: "BLOCKED", label: "Blocked" },
 ] as const;
 
 export const EVENT_STYLES: Record<string, { label: string; dot: string; text: string }> = {
@@ -74,6 +78,13 @@ export function jobStatusProps(status: string): {
     return {
       variant: "outline",
       className: "text-muted-foreground border-muted-foreground/30",
+    };
+  // BLOCKED shares the failure tone with FAILED (see the `dependency_failed`
+  // event style above); the badge label is what tells the two apart.
+  if (status === "BLOCKED")
+    return {
+      variant: "outline",
+      className: "text-destructive border-destructive/40",
     };
   return { variant: "outline" };
 }

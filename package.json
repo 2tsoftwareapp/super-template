@@ -43,10 +43,6 @@
     "test:e2e:preflight": "node scripts/test-e2e-preflight.mjs",
     "verify": "sh ./scripts/verify.sh",
     "verify:offline": "node scripts/verify-offline.mjs",
-    "extension:plan": "node .agents/skills/playwright-extension-live-browser/scripts/run-plan.mjs",
-    "extension:session:reset": "node .agents/skills/playwright-extension-live-browser/scripts/reset-session.mjs",
-    "browser-control:plan": "node .agents/skills/playwright-extension-live-browser/scripts/run-plan.mjs",
-    "browser-control:session:reset": "node .agents/skills/playwright-extension-live-browser/scripts/reset-session.mjs",
     "format:check": "prettier --ignore-unknown --check \"packages/**\" \"apps/api\" \"apps/admin\" \"apps/web\"",
     "hooks:install": "node scripts/hooks/install.mjs"
   },

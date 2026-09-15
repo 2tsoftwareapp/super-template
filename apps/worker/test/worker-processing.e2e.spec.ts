@@ -25,11 +25,12 @@ import { eq, inArray } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { WorkerModule } from "../src/worker.module";
-// Canonical e2e database lock, shared with the API suite on purpose: both suites reset the
-// same `fullstack_starter_test` database, and the lock only excludes anything while every
-// process takes the same key in that database. Importing the file instead of copying the
-// helper keeps a single source of truth for the key and the wait-for-peer behaviour.
-import { acquireTestDatabaseLock } from "../../api/test/support/test-database-lock";
+// E2e database lock, deliberately aligned with the API suite: both suites reset the same
+// `fullstack_starter_test` database, and the lock only excludes anything while every process
+// takes the same key in that database. `turbo boundaries` forbids imports that leave the app
+// package, so this is a local copy of the helper under `apps/api/test/support/` rather than a
+// relative import into `apps/api` - see that copy's header for the sync contract.
+import { acquireTestDatabaseLock } from "./support/test-database-lock";
 
 interface WorkerTenant {
   organizationId: string;

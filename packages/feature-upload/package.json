@@ -30,7 +30,6 @@
     "@repo/api-plugin-kit": "workspace:*",
     "@repo/api-runtime": "workspace:*",
     "@repo/database-runtime": "workspace:*",
-    "@repo/feature-access-control": "workspace:*",
     "@repo/feature-activities": "workspace:*",
     "@repo/feature-audit": "workspace:*",
     "@repo/feature-organizations": "workspace:*",

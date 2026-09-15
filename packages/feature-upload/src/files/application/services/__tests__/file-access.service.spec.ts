@@ -1,9 +1,9 @@
 import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
+import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { describe, expect, it, vi } from "vitest";
 
 import { ERROR_CODES, perm, ACTION } from "@repo/api-runtime";
-import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { FILE_ERROR_CODES, FILE_KIND, FILE_VISIBILITY } from "@repo/feature-upload/contracts";
 
 import { FileAccessService } from "../file-access.service";
@@ -35,7 +35,8 @@ function buildActor(overrides: Partial<AuthenticatedRequestUser> = {}): Authenti
     email: "user@example.local",
     displayName: "User",
     status: "ACTIVE",
-    roles: [ROLE_NAMES.USER],
+    // "USER"/"ADMIN" are owned by feature-access-control; the literals keep this spec import-free.
+    roles: ["USER"],
     permissions: [perm("files", ACTION.READ)],
     organizationId: "org-1",
     ...overrides,
@@ -85,10 +86,7 @@ describe("FileAccessService.findAccessibleFile", () => {
     const { service } = buildService();
 
     await expect(
-      service.findAccessibleFile(
-        buildActor({ userId: "admin-1", roles: [ROLE_NAMES.ADMIN] }),
-        "file-1",
-      ),
+      service.findAccessibleFile(buildActor({ userId: "admin-1", roles: ["ADMIN"] }), "file-1"),
     ).resolves.toEqual(orgFile);
   });
 
@@ -98,7 +96,11 @@ describe("FileAccessService.findAccessibleFile", () => {
 
     await expect(
       service.findAccessibleFile(
-        buildActor({ userId: "root", roles: [ROLE_NAMES.SUPER_ADMIN], organizationId: "org-1" }),
+        buildActor({
+          userId: "root",
+          roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN],
+          organizationId: "org-1",
+        }),
         "file-1",
       ),
     ).resolves.toEqual(foreignFile);
@@ -123,7 +125,7 @@ describe("FileAccessService.findAccessibleFile", () => {
   it("keeps AUDIT_EXPORT files behind audit.read for an ADMIN", async () => {
     const auditExport = fileWith({ kind: FILE_KIND.AUDIT_EXPORT });
     const { service } = buildService(auditExport);
-    const admin = buildActor({ userId: "admin-1", roles: [ROLE_NAMES.ADMIN] });
+    const admin = buildActor({ userId: "admin-1", roles: ["ADMIN"] });
 
     await expect(service.findAccessibleFile(admin, "file-1")).rejects.toMatchObject({
       code: ERROR_CODES.AUTH_FORBIDDEN,

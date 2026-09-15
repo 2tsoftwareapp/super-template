@@ -1,9 +1,9 @@
 import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
+import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { describe, expect, it, vi } from "vitest";
 
 import { ERROR_CODES, ACTION, perm } from "@repo/api-runtime";
-import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { FILE_KIND, FILE_VISIBILITY } from "@repo/feature-upload/contracts";
 
 import { ListFilesUseCase, type ListFilesQuery } from "../list-files.use-case";
@@ -46,7 +46,8 @@ function buildActor(overrides: Partial<AuthenticatedRequestUser> = {}): Authenti
     email: "user@example.local",
     displayName: "User",
     status: "ACTIVE",
-    roles: [ROLE_NAMES.USER],
+    // "USER"/"ADMIN" are owned by feature-access-control; the literals keep this spec import-free.
+    roles: ["USER"],
     permissions: [perm("files", ACTION.READ)],
     organizationId: "org-1",
     ...overrides,
@@ -87,7 +88,7 @@ describe("ListFilesUseCase", () => {
     await useCase.execute(
       buildActor({
         userId: "admin-1",
-        roles: [ROLE_NAMES.ADMIN],
+        roles: ["ADMIN"],
         permissions: [perm("files", ACTION.READ), perm("audit", ACTION.READ)],
       }),
       { ...query, uploadedById: "user-2" },
@@ -104,7 +105,7 @@ describe("ListFilesUseCase", () => {
   it("drops every exclusion for a SUPER_ADMIN", async () => {
     const { useCase, filesRepository } = buildUseCase([]);
 
-    await useCase.execute(buildActor({ roles: [ROLE_NAMES.SUPER_ADMIN] }), query);
+    await useCase.execute(buildActor({ roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN] }), query);
 
     const [params] = filesRepository.list.mock.calls[0]! as unknown as [Record<string, unknown>];
     expect(params.excludeKinds).toBeUndefined();

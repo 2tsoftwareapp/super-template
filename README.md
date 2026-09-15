@@ -360,11 +360,14 @@ Add `FCM_PROJECT_ID`, `FCM_CLIENT_EMAIL`, `FCM_PRIVATE_KEY` to `.env.local` and 
 Live-browser control for agents comes from ZCode's `browser-use` plugin
 (`control-browser`, `web-gui-tester`), not from a package in this repo.
 
-`pnpm run browser-control:plan` (alias `extension:plan`) and
-`pnpm run browser-control:session:reset` drive it through
-`.agents/skills/playwright-extension-live-browser/scripts/`. That skill ships with
-the kit and is **not** committed here, so these two scripts fail until the skill is
-present in `.agents/skills/`.
+There is **no browser-control / extension harness in this repo**: no
+`playwright-extension-live-browser` skill and no `browser-control:*` or
+`extension:*` npm scripts exist here, so don't go looking for them. The former
+`browser-control:plan` / `extension:plan` and `browser-control:session:reset` /
+`extension:session:reset` entries pointed at
+`.agents/skills/playwright-extension-live-browser/scripts/*.mjs`, a skill that
+ships with the kit and is not committed here, so the scripts could never run and
+were removed.
 
 </details>
 

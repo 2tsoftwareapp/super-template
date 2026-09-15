@@ -3,7 +3,6 @@ import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 import { describe, expect, it, vi } from "vitest";
 
 import { ERROR_CODES, ACTION, perm } from "@repo/api-runtime";
-import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { FILE_ERROR_CODES, FILE_KIND, FILE_VISIBILITY } from "@repo/feature-upload/contracts";
 
 import { FileAccessService } from "../../services/file-access.service";
@@ -33,7 +32,8 @@ const actor = {
   email: "user@example.local",
   displayName: "User",
   status: "ACTIVE",
-  roles: [ROLE_NAMES.USER],
+  // "USER" is owned by feature-access-control; the literal keeps this spec import-free.
+  roles: ["USER"],
   permissions: [perm("files", ACTION.READ)],
   organizationId: "org-1",
 } as AuthenticatedRequestUser;
