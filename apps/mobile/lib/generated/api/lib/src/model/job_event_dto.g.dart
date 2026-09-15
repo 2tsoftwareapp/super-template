@@ -14,6 +14,8 @@ const JobEventDtoTypeEnum _$jobEventDtoTypeEnum_completed =
     const JobEventDtoTypeEnum._('completed');
 const JobEventDtoTypeEnum _$jobEventDtoTypeEnum_failed =
     const JobEventDtoTypeEnum._('failed');
+const JobEventDtoTypeEnum _$jobEventDtoTypeEnum_processingError =
+    const JobEventDtoTypeEnum._('processingError');
 const JobEventDtoTypeEnum _$jobEventDtoTypeEnum_retryScheduled =
     const JobEventDtoTypeEnum._('retryScheduled');
 const JobEventDtoTypeEnum _$jobEventDtoTypeEnum_cancelled =
@@ -29,6 +31,8 @@ JobEventDtoTypeEnum _$jobEventDtoTypeEnumValueOf(String name) {
       return _$jobEventDtoTypeEnum_completed;
     case 'failed':
       return _$jobEventDtoTypeEnum_failed;
+    case 'processingError':
+      return _$jobEventDtoTypeEnum_processingError;
     case 'retryScheduled':
       return _$jobEventDtoTypeEnum_retryScheduled;
     case 'cancelled':
@@ -45,6 +49,7 @@ final BuiltSet<JobEventDtoTypeEnum> _$jobEventDtoTypeEnumValues =
   _$jobEventDtoTypeEnum_claimed,
   _$jobEventDtoTypeEnum_completed,
   _$jobEventDtoTypeEnum_failed,
+  _$jobEventDtoTypeEnum_processingError,
   _$jobEventDtoTypeEnum_retryScheduled,
   _$jobEventDtoTypeEnum_cancelled,
   _$jobEventDtoTypeEnum_noHandler,
@@ -59,6 +64,7 @@ class _$JobEventDtoTypeEnumSerializer
     'claimed': 'claimed',
     'completed': 'completed',
     'failed': 'failed',
+    'processingError': 'processing_error',
     'retryScheduled': 'retry_scheduled',
     'cancelled': 'cancelled',
     'noHandler': 'no_handler',
@@ -67,6 +73,7 @@ class _$JobEventDtoTypeEnumSerializer
     'claimed': 'claimed',
     'completed': 'completed',
     'failed': 'failed',
+    'processing_error': 'processingError',
     'retry_scheduled': 'retryScheduled',
     'cancelled': 'cancelled',
     'no_handler': 'noHandler',

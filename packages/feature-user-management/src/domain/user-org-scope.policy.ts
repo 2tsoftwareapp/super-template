@@ -1,14 +1,23 @@
 import type { AuthenticatedRequestUser } from "@repo/api-kernel";
-import type { OrganizationMembership } from "@repo/feature-organizations/contracts";
 
-import { AppError } from "@repo/api-kernel";
+import { AppError, PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
-import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
+
+/**
+ * The slice of the organization-membership port this policy uses: "does a
+ * membership row exist for this (organization, user) pair". Declared here as a
+ * structural type instead of importing the port from the organizations feature
+ * — a `domain/` file must not depend on a sibling feature (ADR 0001 rule 1).
+ * The injected port satisfies it, and only the answer's nullability is read.
+ */
+export interface OrganizationMembershipLookup {
+  findMembership(organizationId: string, userId: string): Promise<unknown>;
+}
 
 export function resolveUsersListOrganizationId(
   actor: AuthenticatedRequestUser,
 ): string | undefined {
-  if (actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+  if (actor.roles.includes(PLATFORM_ROLE_NAMES.SUPER_ADMIN)) {
     return undefined;
   }
 
@@ -24,7 +33,7 @@ export function resolveUsersListOrganizationId(
 }
 
 export function assertActorHasOrganizationContext(actor: AuthenticatedRequestUser): string {
-  if (actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+  if (actor.roles.includes(PLATFORM_ROLE_NAMES.SUPER_ADMIN)) {
     throw new AppError(
       ERROR_CODES.INTERNAL_ERROR,
       "Organization context assertion called for SUPER_ADMIN",
@@ -40,11 +49,11 @@ export function assertActorHasOrganizationContext(actor: AuthenticatedRequestUse
 }
 
 export async function assertUserBelongsToOrganization(
-  membership: OrganizationMembership,
+  membership: OrganizationMembershipLookup,
   actor: AuthenticatedRequestUser,
   targetUserId: string,
 ): Promise<void> {
-  if (actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+  if (actor.roles.includes(PLATFORM_ROLE_NAMES.SUPER_ADMIN)) {
     return;
   }
 

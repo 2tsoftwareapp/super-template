@@ -90,13 +90,21 @@ test("findLiteralViolations allows shared codes and rejects undeclared literals"
 });
 
 test("findLiteralViolations honours a recorded exception for that exact file only", () => {
-  const [exception] = LITERAL_CODE_EXCEPTIONS;
+  // Synthetic entry: this test covers the escape hatch itself, so it must not
+  // depend on the repository currently carrying debt in LITERAL_CODE_EXCEPTIONS.
+  const exception = {
+    code: "DEMO_LEGACY_CODE",
+    file: "packages/feature-demo/src/use-case.ts",
+    reason: "synthetic entry exercising the exception mechanism in this test",
+  };
   const shared = new Set(["AUTH_FORBIDDEN"]);
   const text = `throw new AppError("${exception.code}", "no", HttpStatus.UNAUTHORIZED);`;
 
-  assert.deepEqual(findLiteralViolations({ file: exception.file, text }, shared), []);
+  assert.deepEqual(findLiteralViolations({ file: exception.file, text }, shared, [exception]), []);
   assert.equal(
-    findLiteralViolations({ file: "packages/feature-other/src/use-case.ts", text }, shared).length,
+    findLiteralViolations({ file: "packages/feature-other/src/use-case.ts", text }, shared, [
+      exception,
+    ]).length,
     1,
   );
 });
@@ -114,6 +122,13 @@ test("the repository itself passes the guard", () => {
 
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /Error-code guard passed/);
+  // Recorded debt stays visible: every run prints how many exceptions remain,
+  // and that number must match the list this suite just read.
+  assert.match(
+    result.stdout,
+    new RegExp(`${LITERAL_CODE_EXCEPTIONS.length} recorded exception\\(s\\)`),
+    result.stdout,
+  );
 });
 
 test("the guard is wired into the policy gate", () => {

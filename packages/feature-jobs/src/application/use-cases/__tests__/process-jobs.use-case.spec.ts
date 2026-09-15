@@ -438,13 +438,19 @@ describe("ProcessJobsUseCase", () => {
 
     await expect(harness.useCase.execute()).resolves.toBeUndefined();
 
-    const isolated = harness.eventsOfType("failed");
+    // The job never reached a terminal status, so the event must not claim one:
+    // no "failed" event, and the error is visible as a processing error instead.
+    expect(harness.eventsOfType("failed")).toHaveLength(0);
+
+    const isolated = harness.eventsOfType("processing_error");
     expect(isolated).toHaveLength(1);
     expect(isolated[0]).toMatchObject({
       jobId: "job-1",
-      message: "Batch isolation: attempt insert failed",
+      message:
+        "Job left PROCESSING; error before a terminal status was recorded: attempt insert failed",
     });
 
+    expect(harness.jobsRepository.markFailed).not.toHaveBeenCalled();
     expect(harness.jobsRepository.markCompleted).toHaveBeenCalledTimes(1);
     expect(harness.jobsRepository.markCompleted).toHaveBeenCalledWith(
       "job-2",

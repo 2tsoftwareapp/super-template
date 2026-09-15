@@ -53,6 +53,27 @@ A spec that does not compile therefore fails `pnpm typecheck`. Fix the spec; do
 not widen the config. `build` stays test-free. Convention and the two
 documented deviations: [`packages/tsconfig/README.md`](../packages/tsconfig/README.md).
 
+### `apps/admin/next-env.d.ts` flips after a production build
+
+`apps/admin/next-env.d.ts` is committed (Next generates it; the file itself says
+it must not be edited). Its third line depends on which Next command ran last:
+
+| Last command | Line Next writes                          |
+| ------------ | ----------------------------------------- |
+| `next dev`   | `import "./.next/dev/types/routes.d.ts";` |
+| `next build` | `import "./.next/types/routes.d.ts";`     |
+
+The committed copy is the `next dev` variant, so `pnpm build` (or
+`pnpm --filter admin build`) leaves exactly that one line modified in
+`git status`. It is generated output, not a real change: keep the file tracked —
+`apps/admin/tsconfig.json` includes it, and tracking it keeps the checked-in
+state equal to what a local `next dev` produces — and discard the line instead of
+committing it. Verified 2026-09-15 on `apps/admin` (Next 16.2.9).
+
+`apps/web` carries the same file but ignores it (stock `create-next-app`
+`.gitignore`), so only the admin app shows this churn. Making admin match web is a
+deliberate call for the project owner, not a mechanical cleanup.
+
 ## Running Individual Apps
 
 - API: `make dev-api`

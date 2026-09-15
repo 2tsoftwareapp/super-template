@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { AppError } from "@repo/api-kernel";
-import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
+import { AppError, PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 
 import {
   assertActorHasOrganizationContext,
@@ -14,12 +13,12 @@ const superAdmin = {
   email: "super@test.com",
   displayName: "Super",
   status: "ACTIVE" as const,
-  roles: [ROLE_NAMES.SUPER_ADMIN],
+  roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN],
   permissions: [] as string[],
   organizationId: "org-1",
 };
 
-const orgAdmin = { ...superAdmin, userId: "admin", roles: [ROLE_NAMES.ADMIN] };
+const orgAdmin = { ...superAdmin, userId: "admin", roles: ["ADMIN"] };
 const orgUserNoOrg = { ...orgAdmin, organizationId: null as string | null };
 
 describe("user-org-scope.policy", () => {

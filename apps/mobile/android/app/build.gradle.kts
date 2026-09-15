@@ -19,7 +19,9 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        // Both `namespace` and `applicationId` are rebranded by
+        // `node scripts/rename.mjs "<Project Name>"` (com.<project-name>.app);
+        // edit them by hand only if you need a different identifier.
         applicationId = "com.example.mobile_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
@@ -31,8 +33,9 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // Release signing needs a keystore owned by the project owner, so it
+            // cannot ship preconfigured. Signing with the debug keys for now, so
+            // `flutter run --release` works. Setup: apps/mobile/README.md -> "Release signing".
             signingConfig = signingConfigs.getByName("debug")
         }
     }

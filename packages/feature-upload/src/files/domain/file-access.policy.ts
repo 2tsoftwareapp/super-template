@@ -1,7 +1,16 @@
+import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { ACTION, perm } from "@repo/api-runtime";
-import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 
 import { FILE_KIND, FILE_VISIBILITY } from "../../constants/file.constants";
+
+/**
+ * Organization-admin role name. `SUPER_ADMIN` is a platform role owned by the
+ * kernel (`PLATFORM_ROLE_NAMES`, and re-exported by feature-access-control);
+ * `ADMIN` is owned by feature-access-control, whose contract a `domain/` file
+ * must not depend on (ADR 0001 rule 1), so the literal stays local to the rule
+ * that needs it.
+ */
+const ORGANIZATION_ADMIN_ROLE = "ADMIN";
 
 export interface FileAccessActor {
   userId: string;
@@ -28,8 +37,8 @@ export interface FileAccessSubject {
  */
 export function canAccessFile(input: { actor: FileAccessActor; file: FileAccessSubject }): boolean {
   const { actor, file } = input;
-  const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
-  const isAdmin = actor.roles.includes(ROLE_NAMES.ADMIN) || isSuperAdmin;
+  const isSuperAdmin = actor.roles.includes(PLATFORM_ROLE_NAMES.SUPER_ADMIN);
+  const isAdmin = actor.roles.includes(ORGANIZATION_ADMIN_ROLE) || isSuperAdmin;
 
   if (file.organizationId !== actor.organizationId && !isSuperAdmin) {
     return false;
@@ -48,8 +57,8 @@ export function listFilesAccessScope(actor: FileAccessActor): {
   excludeKinds?: string[];
   excludeVisibilities?: string[];
 } {
-  const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
-  const isAdmin = actor.roles.includes(ROLE_NAMES.ADMIN) || isSuperAdmin;
+  const isSuperAdmin = actor.roles.includes(PLATFORM_ROLE_NAMES.SUPER_ADMIN);
+  const isAdmin = actor.roles.includes(ORGANIZATION_ADMIN_ROLE) || isSuperAdmin;
   const hasAuditAccess = isSuperAdmin || actor.permissions.includes(perm("audit", ACTION.READ));
 
   return {

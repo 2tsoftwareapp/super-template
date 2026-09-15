@@ -1598,8 +1598,11 @@ export interface components {
             metadata?: {
                 [key: string]: unknown;
             } | null;
-            /** @enum {string} */
-            type: "claimed" | "completed" | "failed" | "retry_scheduled" | "cancelled" | "no_handler";
+            /**
+             * @description `failed` means the job reached FAILED; `processing_error` means an error escaped the processing cycle before a terminal status was recorded, so the job stays PROCESSING.
+             * @enum {string}
+             */
+            type: "claimed" | "completed" | "failed" | "processing_error" | "retry_scheduled" | "cancelled" | "no_handler";
         };
         JobListDto: {
             attempts: number;

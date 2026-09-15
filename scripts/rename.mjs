@@ -12,6 +12,12 @@
  *   SuperTemplate    (Pascal)  -> <Pascal>         Dart class, OTP issuer
  *   Super Template   (Title)   -> <Title>          UI display strings
  *   truongnat        (author)  -> <author>         repo owner in URLs / badge
+ *   com.example.mobile_app     -> <app id>         Android namespace + applicationId
+ *   com.example.mobileApp      -> <app id>         iOS PRODUCT_BUNDLE_IDENTIFIER
+ *
+ * The mobile application identifier is derived, not prompted: `com.<name>.app`
+ * where <name> is the project name folded to lowercase alphanumerics (see
+ * `toAppIdentifier`). Both platforms get the same value.
  *
  * The generated Dart client under apps/mobile/lib/generated/ is rewritten too so
  * the tree is consistent immediately; `pnpm generate` reproduces it deterministically.
@@ -37,6 +43,11 @@ const OLD = {
   pascal: 'SuperTemplate',
   title: 'Super Template',
   author: 'truongnat',
+  // Android `namespace` + `applicationId`, and the mirrored Firebase templates.
+  androidAppId: 'com.example.mobile_app',
+  // iOS `PRODUCT_BUNDLE_IDENTIFIER` (plus the `.RunnerTests` variants, which
+  // start with this prefix) — Flutter's default reverse-DNS form.
+  iosBundleId: 'com.example.mobileApp',
 };
 
 const BINARY_EXT = new Set([
@@ -128,7 +139,8 @@ Usage:
   node scripts/rename.mjs "<Project Name>" [--author <handle>] [--dry-run]
 
 Arguments:
-  <Project Name>   Free-form name; all casings are derived from it.
+  <Project Name>   Free-form name; all casings are derived from it, including the
+                   mobile application id ("Acme App" -> com.acmeapp.app).
 
 Options:
   --author <handle>  GitHub owner/handle replacing "${OLD.author}" in URLs/badge.
@@ -150,6 +162,28 @@ const toKebab = (name) => words(name).join('-');
 const toSnake = (name) => words(name).join('_');
 const toTitle = (name) => words(name).map((w) => w[0].toUpperCase() + w.slice(1)).join(' ');
 const toPascal = (name) => words(name).map((w) => w[0].toUpperCase() + w.slice(1)).join('');
+
+/** Strip diacritics so a non-ASCII name still folds to ASCII (Ứng -> Ung, đ -> d). */
+const foldDiacritics = (value) =>
+  value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd');
+
+/**
+ * Application identifier for both mobile platforms: `com.<name>.app`.
+ *
+ * <name> is the project name folded to lowercase `[a-z0-9]` with all separators
+ * dropped ("Acme App" -> `com.acmeapp.app`, "Ứng Dụng" -> `com.ungdung.app`).
+ * Dropping rather than keeping hyphens/underscores is required by both stores: a
+ * Java package segment must match `[a-zA-Z_$][a-zA-Z0-9_$]*`, so `com.acme-app.app`
+ * is not even a valid Android namespace — and a leading digit is illegal there
+ * too, hence the `app` prefix when the folded name would start with one. Apple
+ * bundle ids accept alphanumerics, hyphens and periods, so the same value is
+ * valid on iOS.
+ */
+const toAppIdentifier = (name) => {
+  const folded = foldDiacritics(words(name).join('')).replace(/[^a-z0-9]/g, '');
+  const segment = /^[0-9]/.test(folded) ? `app${folded}` : folded || 'app';
+  return `com.${segment}.app`;
+};
 
 /** Escape a string for use as a literal RegExp. */
 const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -186,6 +220,7 @@ const main = async () => {
     pascal: toPascal(projectName),
     title: toTitle(projectName),
     author,
+    appId: toAppIdentifier(projectName),
   };
 
   if (!NEW.kebab) {
@@ -195,6 +230,8 @@ const main = async () => {
 
   // Build replacement rules in apply order (URL-bearing casings before author).
   const rules = [
+    [OLD.androidAppId, NEW.appId],
+    [OLD.iosBundleId, NEW.appId],
     [OLD.snake, NEW.snake],
     [OLD.kebab, NEW.kebab],
     [OLD.pascal, NEW.pascal],
@@ -208,6 +245,8 @@ const main = async () => {
   stdout.write(`  pascal: ${OLD.pascal}   ->  ${NEW.pascal}\n`);
   stdout.write(`  title:  ${OLD.title}    ->  ${NEW.title}\n`);
   stdout.write(`  author: ${OLD.author}      ->  ${NEW.author}\n`);
+  stdout.write(`  app id: ${OLD.androidAppId}  ->  ${NEW.appId}\n`);
+  stdout.write(`          ${OLD.iosBundleId}   ->  ${NEW.appId}\n`);
   stdout.write(args.dryRun ? `\n[dry-run] no files will be written\n\n` : `\n`);
 
   const { files: tracked, fromGit } = listRenameTargets(repoRoot);
@@ -270,7 +309,12 @@ const main = async () => {
       `  1. Review the diff:  git diff\n` +
       `  2. Update LICENSE copyright holder and README badge URLs if needed.\n` +
       `  3. Reinstall + regenerate:  pnpm install && pnpm generate\n` +
-      `  4. Verify:  pnpm lint && pnpm typecheck && pnpm build\n`,
+      `  4. Verify:  pnpm lint && pnpm typecheck && pnpm build\n` +
+      `  5. Optional: move apps/mobile/android/app/src/main/kotlin/${OLD.androidAppId.replace(/\./g, '/')}/\n` +
+      `     to match ${NEW.appId}. The build works either way (Kotlin does not require\n` +
+      `     directory == package); only the folder name is left behind.\n` +
+      `  6. Mobile release signing is project-owner work:\n` +
+      `     apps/mobile/README.md -> "Release signing".\n`,
     );
   }
 };

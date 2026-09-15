@@ -79,9 +79,13 @@ node scripts/rename.mjs "Your Project Name" --author your-github-handle
 
 This rewrites every casing of the template name (`super-template`, `super_template`,
 `SuperTemplate`, `Super Template`) and the original repo owner across all tracked
-files — package names, the Dart client, docker services, UI strings, and URLs. Add
-`--dry-run` to preview without writing. Afterward, update the `LICENSE` copyright
-holder, then run `pnpm install && pnpm generate` and `pnpm lint && pnpm typecheck`.
+files — package names, the Dart client, docker services, UI strings, and URLs. It
+also sets the mobile application identifier: Android `namespace` + `applicationId`
+and the iOS `PRODUCT_BUNDLE_IDENTIFIER` become `com.<project name>.app` (see
+`apps/mobile/README.md`). Add `--dry-run` to preview without writing. Afterward,
+update the `LICENSE` copyright holder, then run `pnpm install && pnpm generate` and
+`pnpm lint && pnpm typecheck`. Mobile release signing stays project-owner work —
+see `apps/mobile/README.md` → "Release signing".
 
 <br />
 

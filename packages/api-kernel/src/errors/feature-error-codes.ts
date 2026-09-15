@@ -12,3 +12,16 @@ export const SETTINGS_ERROR_CODES = {
   // settings registry (SETTING_DEFINITIONS); the value is rejected before write.
   SETTINGS_INVALID_VALUE: "SETTINGS_INVALID_VALUE",
 } as const;
+
+/**
+ * Auth codes a second feature raises for its own auth-domain check:
+ * feature-user-management answers "wrong current password" on
+ * `PATCH /users/me/password` with `AUTH_INVALID_CREDENTIALS`, and must not
+ * depend on `@repo/feature-auth` for the constant. Only codes with more than
+ * one raiser live here — the rest of the auth catalog stays feature-owned, and
+ * `@repo/feature-auth` re-exports this value through its `public/error-codes.ts`
+ * so its contract keeps the same codes and values.
+ */
+export const AUTH_ERROR_CODES = {
+  AUTH_INVALID_CREDENTIALS: "AUTH_INVALID_CREDENTIALS",
+} as const;

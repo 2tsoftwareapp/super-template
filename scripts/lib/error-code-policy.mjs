@@ -28,21 +28,14 @@
  * that is out of scope for this guard (a new feature dependency edge or a
  * change to another package's public contract).
  *
+ * Empty since 2026-09-15: the single entry (`AUTH_INVALID_CREDENTIALS` raised by
+ * feature-user-management) moved to the kernel-shared catalog, so that site now
+ * references `AUTH_ERROR_CODES.AUTH_INVALID_CREDENTIALS` and there is nothing
+ * left to excuse.
+ *
  * @type {readonly {code: string, file: string, reason: string}[]}
  */
-export const LITERAL_CODE_EXCEPTIONS = Object.freeze([
-  {
-    code: "AUTH_INVALID_CREDENTIALS",
-    file: "packages/feature-user-management/src/application/use-cases/change-password.use-case.ts",
-    reason:
-      "feature-user-management raises the auth-domain code for the wrong-current-password check, but " +
-      "must not depend on @repo/feature-auth. Referencing AUTH_ERROR_CODES would add a feature-to-feature " +
-      "dependency edge; moving the code to the kernel-shared catalog would change the shape of " +
-      "@repo/feature-auth's public error-codes module. Both are deliberate architecture decisions, so " +
-      "the literal is recorded here instead of being removed unilaterally. The value, HTTP status and " +
-      "message are unchanged.",
-  },
-]);
+export const LITERAL_CODE_EXCEPTIONS = Object.freeze([]);
 
 const CATALOG_PATTERN = /export\s+const\s+([A-Z0-9_]+)\s*=\s*\{([\s\S]*?)\}\s*as\s+const;/g;
 const PAIR_PATTERN = /^\s*([A-Z][A-Z0-9_]*)\s*:\s*"([A-Z][A-Z0-9_]*)"\s*,?\s*$/gm;

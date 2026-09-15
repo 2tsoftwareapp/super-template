@@ -18,8 +18,20 @@ export const jobEvents = pgTable(
     attemptId: uuid("attempt_id").references(() => jobAttempts.id, {
       onDelete: "set null",
     }),
+    // Type-level vocabulary only: the column is plain `text` (migration 0013),
+    // so adding a value here needs no migration. `failed` means the job reached
+    // FAILED; `processing_error` means an error escaped the processing cycle
+    // before any terminal status was recorded (job stays PROCESSING).
     type: text("type", {
-      enum: ["claimed", "completed", "failed", "retry_scheduled", "cancelled", "no_handler"],
+      enum: [
+        "claimed",
+        "completed",
+        "failed",
+        "processing_error",
+        "retry_scheduled",
+        "cancelled",
+        "no_handler",
+      ],
     }).notNull(),
     message: text("message"),
     // Pre-redacted before insert; never store raw secrets from job payloads here.

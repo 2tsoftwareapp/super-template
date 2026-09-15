@@ -2,7 +2,7 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-kernel"
 import type { TransactionPort } from "@repo/api-kernel";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, SYSTEM_SCOPE } from "@repo/api-kernel";
+import { AppError, AUTH_ERROR_CODES, SYSTEM_SCOPE } from "@repo/api-kernel";
 import { TRANSACTION_PORT } from "@repo/api-kernel";
 import { hashPassword, verifyPassword } from "@repo/api-kernel";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
@@ -36,7 +36,9 @@ export class ChangePasswordUseCase {
 
     if (!passwordMatches) {
       throw new AppError(
-        "AUTH_INVALID_CREDENTIALS",
+        // Kernel-shared catalog: the auth-domain code for a rejected credential,
+        // raised here without a dependency on @repo/feature-auth.
+        AUTH_ERROR_CODES.AUTH_INVALID_CREDENTIALS,
         "Current password is incorrect",
         HttpStatus.UNAUTHORIZED,
       );

@@ -19,6 +19,14 @@ export const EVENT_STYLES: Record<string, { label: string; dot: string; text: st
     dot: "bg-destructive",
     text: "text-destructive",
   },
+  // Not a terminal job status: the worker hit an error before recording one, so
+  // the job is still PROCESSING and stale-lease recovery will re-claim it. Same
+  // error tone as `failed`, but the label says what actually happened.
+  processing_error: {
+    label: "Processing error",
+    dot: "bg-destructive",
+    text: "text-destructive",
+  },
   retry_scheduled: {
     label: "Retry scheduled",
     dot: "bg-chart-2",

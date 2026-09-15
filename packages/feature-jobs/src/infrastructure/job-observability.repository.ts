@@ -14,6 +14,7 @@ type JobEventType =
   | "claimed"
   | "completed"
   | "failed"
+  | "processing_error"
   | "retry_scheduled"
   | "cancelled"
   | "no_handler";
