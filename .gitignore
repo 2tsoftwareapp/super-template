@@ -35,6 +35,11 @@ apps/api/storage/uploads/
 apps/api/storage/exports/
 *.tsbuildinfo
 
+# Next.js writes this next to tsconfig.json and rewrites its third line on every
+# `next dev` / `next build` (see docs/development.md). It is generated output, so
+# no committed copy can stay in sync — ignore it in every Next app.
+next-env.d.ts
+
 # Firebase — copy from *.example after creating your Firebase project
 apps/mobile/android/app/google-services.json
 apps/mobile/ios/Runner/GoogleService-Info.plist

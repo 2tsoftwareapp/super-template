@@ -58,7 +58,7 @@ These results establish that the current code is buildable and that the tested u
 | G-07 | P2 | Upload adapter coverage | Real S3 behavior is not exercised by the package test suite. | Unit tests cover tracking and cleanup with mocks; local and S3 drivers are not tested against a provider-compatible service. | Provider-specific behavior such as presigned URLs, content types, and delete failures can regress unnoticed. |
 | G-08 | P2 | Upload integration placement | Upload package-level integration and E2E directories are compatibility boundaries rather than executable suites. | `test/unit`, `test/integration`, and `test/e2e` contain README files only; executable tests remain colocated under `src/**/__tests__`. | The requested architecture is discoverable, but test ownership is split between package internals and the API app. |
 | G-09 | P2 | Placeholder boundaries | Several upload compatibility directories intentionally export nothing. | `domain/entities`, `domain/value-objects`, `domain/events`, and infrastructure config have empty barrels. | The tree matches the target shape but can create a false impression that those domain capabilities already exist. |
-| G-10 | P2 | Generated-file hygiene | The Next build modified `apps/admin/next-env.d.ts`. | The file changed from `.next/dev/types/routes.d.ts` to `.next/types/routes.d.ts`; Next marks it as generated. | Build output can pollute the working tree and obscure reviewable source changes. |
+| G-10 | P2 | Generated-file hygiene | The Next build modified `apps/admin/next-env.d.ts`. | The file changed from `.next/dev/types/routes.d.ts` to `.next/types/routes.d.ts`; Next marks it as generated. | Build output can pollute the working tree and obscure reviewable source changes. **Resolved 2026-09-16** — the file is ignored in both Next apps; see §8. |
 | G-11 | P3 | Public API validation | Export-path checks validate file existence, not importability or symbol shape. | Manifest checks verify declared paths and dependency usage, while no automated test imports every declared export. | A path can exist but export the wrong symbol or fail under package resolution. |
 | G-12 | P3 | Script consistency | Some infrastructure packages intentionally have no test script, while all feature packages do; the convention is not documented. | `eslint-config`, `test-config`, `tsconfig`, and `web-test` have no test command, while feature packages do. | Workspace-wide commands require assumptions about whether a package is executable, declarative, or test-only. |
 
@@ -118,7 +118,15 @@ The upload compatibility tree currently contains empty barrels for entities, val
 
 The full build changed `apps/admin/next-env.d.ts`, which is a generated Next.js file. The change is not part of the package architecture work. It should either be restored before commit or handled by the repository's generated-file policy.
 
-**Recommended action:** revert the generated `next-env.d.ts` change if it is unrelated to the intended work. If the new Next path is required by the installed Next version, update the repository's generation policy deliberately and document the change separately.
+**Resolved 2026-09-16 by an explicit generated-file policy.** `next-env.d.ts` is now
+listed once in the root `.gitignore` and untracked in both Next apps
+(`git rm --cached apps/admin/next-env.d.ts`); `apps/web/.gitignore` no longer
+carries its own copy of the rule. The tracked convention could not work: `next
+build` rewrites the third line of the file (`.next/dev/types/routes.d.ts` →
+`.next/types/routes.d.ts`), so a committed copy went dirty on every build. Both
+apps' `tsc --noEmit` pass with the file absent, and both `tsconfig.json` include
+`.next/types/**/*.ts` and `.next/dev/types/**/*.ts`, so nothing depends on the
+committed copy. See [development.md](./development.md#next-envdts-is-ignored-not-committed-both-next-apps).
 
 ## Recommended implementation sequence
 
@@ -137,7 +145,7 @@ The first remediation pass is complete for the highest-value tooling and test ga
 
 Coverage reporting is enabled for `feature-upload`, `config`, and `utils`. The upload baseline currently passes the temporary thresholds with **53.53% lines, 53.11% statements, 41.6% branches, and 34.4% functions**. The shared config and utils packages exceed their stricter thresholds. A fast E2E preflight now validates PostgreSQL connectivity and rejects a superuser connection that bypasses row-level security. The local `.env` test URL was corrected to use the restricted application role.
 
-The remaining gaps are narrower. `feature-users` still needs repository and authorization tests beyond the mapper contract. Upload persistence repositories and database RLS paths still require executable database integration tests, and the S3 tests use mocked AWS SDK calls rather than a live provider-compatible service. The generated `apps/admin/next-env.d.ts` change remains a working-tree hygiene issue and should be reverted or explicitly adopted according to the Next.js version policy.
+The remaining gaps are narrower. `feature-users` still needs repository and authorization tests beyond the mapper contract. Upload persistence repositories and database RLS paths still require executable database integration tests, and the S3 tests use mocked AWS SDK calls rather than a live provider-compatible service. The generated `apps/admin/next-env.d.ts` drift (G-10) is closed: the file is ignored in both Next apps and never committed again.
 
 ## Final assessment
 

@@ -24,9 +24,7 @@
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",
     "@repo/web-test": "workspace:*",
-    "@testing-library/jest-dom": "6.9.1",
     "@types/node": "24.10.1",
-    "jsdom": "29.1.1",
     "typescript": "5.9.3",
     "vitest": "4.1.9"
   },

@@ -34,8 +34,7 @@
     "drizzle-orm": "0.45.2",
     "express": "5.2.1",
     "firebase-admin": "13.6.0",
-    "rxjs": "7.8.2",
-    "zod": "4.4.3"
+    "rxjs": "7.8.2"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",
