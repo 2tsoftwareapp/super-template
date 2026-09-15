@@ -1,4 +1,22 @@
 import { z } from "zod";
+import { isAbsolute, resolve } from "node:path";
+
+import { resolveWorkspaceRoot } from "@repo/env-loader";
+
+/**
+ * Filesystem path anchored to the workspace root when relative.
+ *
+ * pnpm runs every package script with that package as cwd, so a cwd-relative shared
+ * directory silently becomes a *different* directory per host: the worker wrote exports to
+ * `apps/worker/storage` while the API read `apps/api/storage`, which made every
+ * worker-produced file undownloadable. Absolute values (containers, CI, temp dirs) pass
+ * through untouched.
+ */
+export const workspaceRelativePath = (fallback: string) =>
+  z.preprocess((value) => {
+    const candidate = typeof value === "string" && value.trim().length > 0 ? value : fallback;
+    return isAbsolute(candidate) ? candidate : resolve(resolveWorkspaceRoot(), candidate);
+  }, z.string().min(1));
 
 export const booleanFromString = z.preprocess((value) => {
   if (typeof value === "boolean") {

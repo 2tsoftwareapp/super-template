@@ -150,12 +150,11 @@ export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
     const role = await this.accessControlRepository.findRoleByName("USER", null, executor);
 
     if (role) {
-      await this.accessControlRepository.assignUserRole(
-        user.id,
-        role.id,
-        context.organizationId,
-        executor,
-      );
+      // The default USER role is platform-scoped (roles.organization_id = NULL), and
+      // `check_user_role_scope` rejects any assignment whose organization_id differs
+      // from the role's own scope. Assign it in platform scope like self-registration
+      // does; organization access is granted separately above via addMember.
+      await this.accessControlRepository.assignUserRole(user.id, role.id, null, executor);
     }
   }
 }

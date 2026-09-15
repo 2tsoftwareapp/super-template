@@ -31,9 +31,17 @@ android/app/release
 !.env.development
 !.env.staging.example
 !.env.production.example
+# Local object-storage root (STORAGE_DRIVER=local). Anchored to the workspace root so the
+# API and the worker share one directory; the apps/* paths are the legacy cwd-relative
+# locations that only the API ever used.
+/storage/
 apps/api/storage/uploads/
 apps/api/storage/exports/
+apps/worker/storage/
 *.tsbuildinfo
+
+# verify-stack harness output: results.json, per-row logs, HTML report
+.verify-stack/
 
 # Next.js writes this next to tsconfig.json and rewrites its third line on every
 # `next dev` / `next build` (see docs/development.md). It is generated output, so
