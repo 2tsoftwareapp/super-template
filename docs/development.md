@@ -18,6 +18,8 @@ runtime, otherwise it reports `Unsupported engine` and local results can diverge
 | Start API + Web + Admin  | `make dev`                | `pnpm dev`                    |
 | Regenerate contracts     | `make generate`           | `pnpm run generate:contracts` |
 | CI-style verify          | `make verify`             | `pnpm verify`                 |
+| Whole-stack matrix       | —                         | `pnpm run verify:stack`       |
+| Render matrix report     | —                         | `pnpm run report:matrix`      |
 | Mobile doctor            | `pnpm run mobile:doctor`  | same                          |
 | Install git hooks        | automatic after bootstrap | `pnpm hooks:install`          |
 
