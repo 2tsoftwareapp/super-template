@@ -277,6 +277,7 @@ test role. Never commit connection strings or credentials.
 | `make generate`                                   | Regenerate OpenAPI + clients         |
 | `make generate-check` / `pnpm run generate:check` | Verify generated output is committed |
 | `make verify` / `pnpm verify`                     | Local CI-style verify                |
+| `pnpm run verify:stack`                           | Boot infra + API + worker + Web + Admin and run the [test matrix](docs/testing/test-matrix.md) |
 | `make test-mobile`                                | Flutter tests                        |
 
 </details>

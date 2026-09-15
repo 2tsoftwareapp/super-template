@@ -10,6 +10,7 @@ import {
   optionalHexKey,
   optionalSecretMin,
   optionalUrl,
+  workspaceRelativePath,
 } from "./env-utils";
 import {
   DEV_PLACEHOLDER_MFA_KEY,
@@ -139,7 +140,7 @@ export const envSchema = z
     FCM_PRIVATE_KEY: emptyStringToUndefined,
     // Object storage configuration for file uploads and generated artifacts.
     STORAGE_DRIVER: z.enum(["local", "s3"]).default("local"),
-    STORAGE_LOCAL_PATH: z.string().min(1).default("./storage"),
+    STORAGE_LOCAL_PATH: workspaceRelativePath("./storage"),
     S3_BUCKET: emptyStringToUndefined,
     S3_REGION: emptyStringToUndefined,
     S3_ACCESS_KEY_ID: emptyStringToUndefined,

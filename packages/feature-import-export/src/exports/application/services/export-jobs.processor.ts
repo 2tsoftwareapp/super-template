@@ -2,7 +2,14 @@ import type { AppLogger, TransactionPort } from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import { APP_LOGGER, AppError, SYSTEM_SCOPE, toCsv, TRANSACTION_PORT } from "@repo/api-kernel";
+import {
+  APP_LOGGER,
+  AppError,
+  SYSTEM_SCOPE,
+  toCsv,
+  TRANSACTION_PORT,
+  WORKER_DISPATCH_CONTEXT,
+} from "@repo/api-kernel";
 import { ERROR_CODES, ErrorReporterService, TenantContextService } from "@repo/api-runtime";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
@@ -47,9 +54,18 @@ export class ExportJobsProcessor {
     this.processing = true;
 
     try {
+      // Claiming sweeps every tenant's jobs, so it runs under the worker bypass
+      // context (`app.bypass_rls` = true). RLS on `t_export_jobs` is forced and
+      // its policy only matches the active tenant, so an unscoped claim from the
+      // shared worker connection would silently select zero rows and leave every
+      // export PENDING forever. Per-job work then runs under its own tenant
+      // context (see processExport), mirroring the outbox dispatcher.
+      //
       // Atomic claim: PENDING -> PROCESSING with FOR UPDATE SKIP LOCKED, so
       // concurrent instances each take disjoint jobs and never double-export.
-      const jobs = await this.exportJobsRepository.claimPending(CLAIM_BATCH_SIZE);
+      const jobs = await this.tenantContextService.runAsync(WORKER_DISPATCH_CONTEXT, () =>
+        this.exportJobsRepository.claimPending(CLAIM_BATCH_SIZE),
+      );
 
       for (const job of jobs) {
         await this.processExport(job.id);
@@ -79,7 +95,11 @@ export class ExportJobsProcessor {
   }
 
   private async processExport(jobId: string): Promise<void> {
-    const job = await this.exportJobsRepository.findById(jobId);
+    // The claimed job may belong to any organization, so the lookup runs under
+    // the worker bypass context like the claim that produced its id.
+    const job = await this.tenantContextService.runAsync(WORKER_DISPATCH_CONTEXT, () =>
+      this.exportJobsRepository.findById(jobId),
+    );
 
     if (job?.status !== "PROCESSING") {
       return;
@@ -91,119 +111,118 @@ export class ExportJobsProcessor {
     }
     const organizationId = job.organizationId;
 
-    let storageKey: string | undefined;
+    // The user who created the job is long gone (no request context), so set the
+    // tenant context explicitly for the pool-backed adapter queries and the
+    // completion transaction's RLS policies. Everything the export touches is
+    // fenced to the owning organization instead of the shared worker connection.
+    await this.tenantContextService.runAsync(
+      { tenantId: organizationId, userId: job.createdById },
+      async () => {
+        let storageKey: string | undefined;
 
-    try {
-      const adapter = this.importExportAdapters.resolve(job.type);
+        try {
+          const adapter = this.importExportAdapters.resolve(job.type);
 
-      // The user who created the job is long gone (no request context), so set
-      // the tenant context explicitly for the pool-backed adapter queries and
-      // the completion transaction's RLS policies.
-      const rows = await this.tenantContextService.runAsync(
-        { tenantId: organizationId, userId: job.createdById },
-        async () => {
-          const fetched = await adapter.listForExport({
+          const rows = await adapter.listForExport({
             organizationId,
             ownerId: job.createdById,
             limit: MAX_EXPORT_ROWS + 1,
           });
 
-          if (fetched.length > MAX_EXPORT_ROWS) {
+          if (rows.length > MAX_EXPORT_ROWS) {
             throw new AppError(
               ERROR_CODES.VALIDATION_FAILED,
               `Export exceeds the maximum of ${MAX_EXPORT_ROWS} rows; narrow your filters and try again`,
             );
           }
 
-          return fetched;
-        },
-      );
+          const csv = toCsv(
+            adapter.csvHeader,
+            rows.map((row) => adapter.toCsvRow(row)),
+          );
+          storageKey = `exports/${job.createdById}/${randomUUID()}.csv`;
+          const body = Buffer.from(csv, "utf8");
 
-      const csv = toCsv(
-        adapter.csvHeader,
-        rows.map((row) => adapter.toCsvRow(row)),
-      );
-      storageKey = `exports/${job.createdById}/${randomUUID()}.csv`;
-      const body = Buffer.from(csv, "utf8");
-
-      await this.objectStorage.upload({
-        key: storageKey,
-        body,
-        mimeType: "text/csv",
-      });
-
-      await this.transactionPort.run(async (tx) => {
-        const file = await this.filesRepository.create(
-          {
-            organizationId,
-            storageKey: storageKey!,
-            originalName: `${job.type}-export-${Date.now()}.csv`,
+          await this.objectStorage.upload({
+            key: storageKey,
+            body,
             mimeType: "text/csv",
-            sizeBytes: body.length,
-            uploadedById: job.createdById,
-          },
-          tx,
-        );
+          });
 
-        if (!file) {
-          throw new Error("Export file insert returned no rows");
+          await this.transactionPort.run(async (tx) => {
+            const file = await this.filesRepository.create(
+              {
+                organizationId,
+                storageKey: storageKey!,
+                originalName: `${job.type}-export-${Date.now()}.csv`,
+                mimeType: "text/csv",
+                sizeBytes: body.length,
+                uploadedById: job.createdById,
+              },
+              tx,
+            );
+
+            if (!file) {
+              throw new Error("Export file insert returned no rows");
+            }
+
+            await this.exportJobsRepository.update(
+              job.id,
+              {
+                status: "COMPLETED",
+                fileId: file.id,
+                completedAt: new Date(),
+              },
+              tx,
+            );
+
+            await this.auditWriter.log(
+              {
+                actorId: job.createdById,
+                action: "export.completed",
+                entityType: "export_job",
+                entityId: job.id,
+                metadata: { type: job.type, fileId: file.id, rowCount: rows.length },
+                scope: SYSTEM_SCOPE.ORGANIZATION,
+                organizationId,
+              },
+              tx,
+            );
+
+            await this.activityEmitter.emit(
+              {
+                organizationId,
+                summary: `Export "${job.type}" completed (${rows.length} rows)`,
+                entityType: "export_job",
+                entityId: job.id,
+                actorId: job.createdById,
+                visibility: "INTERNAL",
+                metadata: { type: job.type, fileId: file.id, rowCount: rows.length },
+              },
+              tx,
+            );
+          });
+        } catch {
+          if (storageKey) {
+            await this.objectStorage.delete(storageKey).catch((err) => {
+              this.logger.error(`Failed to cleanup orphaned export object ${storageKey}`, {
+                error: err instanceof Error ? err.message : String(err),
+              });
+            });
+          }
+
+          await this.exportJobsRepository
+            .update(job.id, {
+              status: "FAILED",
+              completedAt: new Date(),
+            })
+            .catch((err) => {
+              this.logger.error(`Failed to mark export job ${job.id} as FAILED`, {
+                error: err instanceof Error ? err.message : String(err),
+              });
+            });
         }
-
-        await this.exportJobsRepository.update(
-          job.id,
-          {
-            status: "COMPLETED",
-            fileId: file.id,
-            completedAt: new Date(),
-          },
-          tx,
-        );
-
-        await this.auditWriter.log(
-          {
-            actorId: job.createdById,
-            action: "export.completed",
-            entityType: "export_job",
-            entityId: job.id,
-            metadata: { type: job.type, fileId: file.id, rowCount: rows.length },
-            scope: SYSTEM_SCOPE.ORGANIZATION,
-            organizationId,
-          },
-          tx,
-        );
-
-        await this.activityEmitter.emit(
-          {
-            organizationId,
-            summary: `Export "${job.type}" completed (${rows.length} rows)`,
-            entityType: "export_job",
-            entityId: job.id,
-            actorId: job.createdById,
-            visibility: "INTERNAL",
-            metadata: { type: job.type, fileId: file.id, rowCount: rows.length },
-          },
-          tx,
-        );
-      });
-    } catch {
-      if (storageKey) {
-        await this.objectStorage.delete(storageKey).catch((err) => {
-          this.logger.error(`Failed to cleanup orphaned export object ${storageKey}`, {
-            error: err instanceof Error ? err.message : String(err),
-          });
-        });
-      }
-
-      await this.exportJobsRepository
-        .update(job.id, {
-          status: "FAILED",
-          completedAt: new Date(),
-        })
-        .catch((err) => {
-          this.logger.error(`Failed to mark export job ${job.id} as FAILED`, {
-            error: err instanceof Error ? err.message : String(err),
-          });
-        });
-    }
+      },
+    );
   }
 }

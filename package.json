@@ -44,6 +44,8 @@
     "test:e2e:topology": "bash scripts/topology-e2e.sh",
     "verify": "sh ./scripts/verify.sh",
     "verify:offline": "node scripts/verify-offline.mjs",
+    "verify:stack": "node scripts/verify-stack.mjs",
+    "report:matrix": "node scripts/report-test-matrix.mjs",
     "format:check": "prettier --ignore-unknown --check \"packages/**\" \"apps/api\" \"apps/admin\" \"apps/web\"",
     "hooks:install": "node scripts/hooks/install.mjs"
   },

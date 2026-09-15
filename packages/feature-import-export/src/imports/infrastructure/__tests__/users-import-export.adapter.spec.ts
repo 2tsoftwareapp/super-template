@@ -222,10 +222,14 @@ describe("UsersImportExportAdapter", () => {
 
       expect(accessRepo.findRoleByName).toHaveBeenCalledWith("USER", null, undefined);
 
+      // Platform scope (null), because the resolved USER role is platform-scoped and the
+      // `check_user_role_scope` trigger rejects an assignment whose organization_id does
+      // not match the role's own organization_id. Organization access comes from
+      // addMember above, not from this assignment.
       expect(accessRepo.assignUserRole).toHaveBeenCalledWith(
         "user-created-1",
         "user-role-id",
-        "org-1",
+        null,
         undefined,
       );
     });

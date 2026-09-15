@@ -21,6 +21,17 @@ const findRepoRoot = (start: string): string => {
   return start;
 };
 
+/**
+ * Absolute path of the monorepo root, or [start] (default `process.cwd()`) when no
+ * workspace marker is found — a packaged or deployed app keeps plain cwd semantics.
+ *
+ * Callers need this to turn a *relative* configured path into a location every host in
+ * the workspace agrees on: pnpm runs each package script with that package's cwd, so
+ * `./storage` means `apps/api/storage` for the API but `apps/worker/storage` for the
+ * worker. Anchoring to the workspace root keeps shared on-disk state actually shared.
+ */
+export const resolveWorkspaceRoot = (start: string = process.cwd()): string => findRepoRoot(start);
+
 export type AppEnvName = "development" | "test" | "staging" | "production";
 
 export interface LoadEnvOptions {
