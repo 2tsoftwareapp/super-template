@@ -4,6 +4,27 @@
 > **Scope:** Full monorepo audit — FE (admin, web), BE (api, api-identity, api-platform), shared packages
 > **Goal:** Find the cleanest, highest-quality, most reusable architecture & UI design
 
+> **Status (updated 2026-09-15):** This is a record **as of 2026-08-20**, an audit
+> of the layout **before** ADR 0002 (`apps/api/src/{identity,platform}`,
+> `packages/api-core`, `packages/web-core`). The original findings are kept
+> verbatim; the following were addressed during the 2026-09 remediation:
+>
+> - §3.4 "ghost package" `@repo/web-core`: **addressed** — `packages/web-core` and
+>   `packages/api-core` no longer exist; the template is now `packages/feature-*` +
+>   `packages/web-*` (see [`docs/adr/0002-feature-plugin-architecture.md`](../adr/0002-feature-plugin-architecture.md)).
+>   No document still tells readers to import `@repo/web-core`.
+> - §3.5 shared components locked in admin: **addressed** —
+>   `common-resource-page`, `resource-data-table`, `resource-filter-bar`,
+>   `resource-detail-pane`, `resource-property-grid`, `resource-stat-cards` now live
+>   in `packages/web-ui`.
+> - §3.2 naming drift: **addressed** in the same round (`999a31cf`); the convention
+>   now lives in `docs/architecture/NAMING_CONVENTIONS.md`.
+> - §5 Documentation Fragmentation: **partly open** — conventions still live in
+>   `AGENTS.md`, `CLAUDE.md`, `DESIGN.md`, `CODING_RULES.md` and
+>   `apps/*/AGENTS.md`, with no single canonical source yet.
+> - §6 Redesign Plan (Phases 1–5): **out of scope for this round** and not
+>   re-verified — still a proposal.
+
 ---
 
 ## Table of Contents

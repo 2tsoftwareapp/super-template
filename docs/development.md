@@ -115,7 +115,9 @@ minio-init` if the bucket was removed.
 
 Most suites run against mocks and are covered by `pnpm test`. Three suites need real
 services and stay behind an explicit switch, so a checkout without Docker still gets a
-green default run:
+green default run. A fourth — the database topology pair — is skipped unconditionally
+here, because this repository does not provision a read replica; see its own
+subsection below.
 
 | Suite                            | Command                                          | Prerequisite                                        |
 | -------------------------------- | ------------------------------------------------ | --------------------------------------------------- |
@@ -134,6 +136,44 @@ same Postgres advisory lock
 ([`apps/api/test/support/test-database-lock.ts`](../apps/api/test/support/test-database-lock.ts)
 — the worker suite imports that file directly). They can therefore run at the same time
 without one dropping the schema the other is testing against; the second one waits.
+
+### Database topology suite — cannot run from this repo
+
+`apps/api/test/database-topology.e2e.spec.ts` is the one suite that stays skipped
+everywhere in this repository. It asserts the primary/read-replica boundary:
+tenant A/B RLS isolation on both endpoints, that writes stay pinned to the primary,
+that an auth rotation is visible on the primary immediately, and — optionally —
+that a privileged replica role is rejected.
+
+It needs a real PostgreSQL **primary + streaming read replica** pair, and
+[`infra/docker-compose.yml`](../infra/docker-compose.yml) starts a single `postgres`
+service. There is no replica container, no `primary_conninfo`, and no
+`hot_standby = on`, so nothing in the repo can supply the second endpoint. That is
+the reason the suite is skipped, and why a green `pnpm --filter api test:e2e` is not
+evidence for the replica boundary.
+
+The spec gates itself on three variables — set all three or it reports as skipped:
+
+| Variable                                   | What it must point at                                                          |
+| ------------------------------------------ | ------------------------------------------------------------------------------ |
+| `DATABASE_TOPOLOGY_PRIMARY_URL`            | the primary, with migrations applied (`pnpm db:migrate`) and a restricted role  |
+| `DATABASE_TOPOLOGY_REPLICA_URL`            | a streaming replica of that primary, same migrations, restricted role           |
+| `DATABASE_TOPOLOGY_ADMIN_URL`              | the primary database, used to create and drop the temporary probe table          |
+| `DATABASE_TOPOLOGY_PRIVILEGED_REPLICA_URL` | optional; a superuser/`BYPASSRLS` role on the replica, for the negative test    |
+
+Running it therefore requires infrastructure this repository deliberately does not
+provision: a second PostgreSQL instance in hot standby streaming from the primary,
+migrated to the same schema, plus a privileged role on the replica. Then:
+
+```sh
+DATABASE_TOPOLOGY_PRIMARY_URL='postgresql://app@primary/app' \
+DATABASE_TOPOLOGY_REPLICA_URL='postgresql://app@replica/app' \
+DATABASE_TOPOLOGY_ADMIN_URL='postgresql://admin@primary/app' \
+pnpm --filter api exec vitest run test/database-topology.e2e.spec.ts --maxWorkers=1
+```
+
+There is no separate enable flag; the URLs themselves are the switch. Full contract:
+[`docs/database.md`](database.md#topology-integration-test).
 
 ## Emulator Networking
 

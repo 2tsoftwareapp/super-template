@@ -55,7 +55,7 @@ body. Blocking unknowns → **Confirm-first** + **Ask method** in
 - Tiny clear fix → **`quick-fix`** (Path=Quick). Unclear → Lite/Full lifecycle.
 - Inventory: `docs/config/first-party-skills.json`. Profiles: `core` default.
 - Validate: `validate_artifacts.py` + `lint_artifacts.py`. Handoff pack: `build_context.py`.
-- Kit vs Work: [AGENT_WORK.md](./policy/AGENT_WORK.md).
+- Kit vs Work: [AGENT_WORK.md](./.agents/AGENT_WORK.md).
 - Docs taxonomy (source): [README.md](./README.md).
 
 ## Skill compliance

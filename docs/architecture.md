@@ -112,8 +112,8 @@ Browser requests to the Nest API from admin go through Next.js route handlers. A
 
 ### Frontend architecture (both Next.js apps)
 
-Established by the 2026-07 re-architecture (roadmap:
-`docs/superpowers/specs/2026-07-11-project-rearchitecture-roadmap.md`):
+Established by the 2026-07 re-architecture, whose decisions are recorded in
+[`docs/adr/0002-feature-plugin-architecture.md`](adr/0002-feature-plugin-architecture.md):
 
 - **Design system**: `@repo/web-ui/components/*` is the single source of UI
   primitives; apps never keep local copies. Full convention set in

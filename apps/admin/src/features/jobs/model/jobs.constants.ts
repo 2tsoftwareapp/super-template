@@ -37,6 +37,21 @@ export const EVENT_STYLES: Record<string, { label: string; dot: string; text: st
     dot: "bg-muted-foreground",
     text: "text-muted-foreground",
   },
+  // Recorded on the *dependent* job when PropagationService parks it as BLOCKED
+  // because a job it depends on reached a blocking status. Same failure tone as
+  // `failed`; the event message names the dependency that failed.
+  dependency_failed: {
+    label: "Dependency failed",
+    dot: "bg-destructive",
+    text: "text-destructive",
+  },
+  // Recorded when the worker found no handler for the job type and marked the
+  // job FAILED; same failure tone as `failed`.
+  no_handler: {
+    label: "No handler",
+    dot: "bg-destructive",
+    text: "text-destructive",
+  },
 };
 
 export function jobStatusProps(status: string): {

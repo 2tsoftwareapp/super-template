@@ -11,6 +11,21 @@
 > kể từ commit `31c3fc8`. Các tham chiếu đến `api-workspace`, `projects`, `invitations`,
 > `comments` trong báo cáo này không còn phản ánh trạng thái hiện tại của template.
 
+> **Trạng thái (cập nhật 2026-09-15):** Đây là **bản ghi bàn giao tại thời điểm
+> 2026-06-30** (nền `66c19c8`), tức trước ADR 0002. Phát hiện gốc được giữ nguyên;
+> các mục dưới đây đã thay đổi trong đợt sửa tồn đọng 2026-09:
+>
+> - `packages/extension` (browser-control) được báo cáo ở đây **đã bị xoá** (`ffbe947b`);
+>   điều khiển browser cho agent nay do plugin `browser-use` cung cấp, không phải package
+>   trong repo.
+> - Các package `api-core`, `api-bootstrap`, `api-identity`, `api-platform`, `web-core`,
+>   `api-workspace` được nhắc trong báo cáo **không còn tồn tại**; template nay là
+>   `packages/feature-*` + `packages/web-*`.
+> - Nợ lint/typecheck của bộ test/program được dọn ở `999a31cf`; không còn shim chết
+>   (`55154f15`, `8bb0f68c`); không còn `TODO`/`FIXME` trong repo (`d9c879bf`).
+> - **Còn lại**: các mục P1/P2 về mobile monorepo integration và public API boundary là
+>   ghi nhận gốc, chưa có mục nào được xác minh lại trong đợt này.
+
 ---
 
 ## 1. Kết luận điều hành

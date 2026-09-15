@@ -357,9 +357,14 @@ Add `FCM_PROJECT_ID`, `FCM_CLIENT_EMAIL`, `FCM_PRIVATE_KEY` to `.env.local` and 
 <details>
 <summary><strong>Agent browser control</strong></summary>
 
-`packages/extension` connects Playwright MCP to a real browser for agent-driven testing (`make extension-dev`).
+Live-browser control for agents comes from ZCode's `browser-use` plugin
+(`control-browser`, `web-gui-tester`), not from a package in this repo.
 
-→ [packages/extension/README.md](packages/extension/README.md)
+`pnpm run browser-control:plan` (alias `extension:plan`) and
+`pnpm run browser-control:session:reset` drive it through
+`.agents/skills/playwright-extension-live-browser/scripts/`. That skill ships with
+the kit and is **not** committed here, so these two scripts fail until the skill is
+present in `.agents/skills/`.
 
 </details>
 

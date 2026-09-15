@@ -22,6 +22,8 @@ const JobEventDtoTypeEnum _$jobEventDtoTypeEnum_cancelled =
     const JobEventDtoTypeEnum._('cancelled');
 const JobEventDtoTypeEnum _$jobEventDtoTypeEnum_noHandler =
     const JobEventDtoTypeEnum._('noHandler');
+const JobEventDtoTypeEnum _$jobEventDtoTypeEnum_dependencyFailed =
+    const JobEventDtoTypeEnum._('dependencyFailed');
 
 JobEventDtoTypeEnum _$jobEventDtoTypeEnumValueOf(String name) {
   switch (name) {
@@ -39,6 +41,8 @@ JobEventDtoTypeEnum _$jobEventDtoTypeEnumValueOf(String name) {
       return _$jobEventDtoTypeEnum_cancelled;
     case 'noHandler':
       return _$jobEventDtoTypeEnum_noHandler;
+    case 'dependencyFailed':
+      return _$jobEventDtoTypeEnum_dependencyFailed;
     default:
       throw ArgumentError(name);
   }
@@ -53,6 +57,7 @@ final BuiltSet<JobEventDtoTypeEnum> _$jobEventDtoTypeEnumValues =
   _$jobEventDtoTypeEnum_retryScheduled,
   _$jobEventDtoTypeEnum_cancelled,
   _$jobEventDtoTypeEnum_noHandler,
+  _$jobEventDtoTypeEnum_dependencyFailed,
 ]);
 
 Serializer<JobEventDtoTypeEnum> _$jobEventDtoTypeEnumSerializer =
@@ -68,6 +73,7 @@ class _$JobEventDtoTypeEnumSerializer
     'retryScheduled': 'retry_scheduled',
     'cancelled': 'cancelled',
     'noHandler': 'no_handler',
+    'dependencyFailed': 'dependency_failed',
   };
   static const Map<Object, String> _fromWire = const <Object, String>{
     'claimed': 'claimed',
@@ -77,6 +83,7 @@ class _$JobEventDtoTypeEnumSerializer
     'retry_scheduled': 'retryScheduled',
     'cancelled': 'cancelled',
     'no_handler': 'noHandler',
+    'dependency_failed': 'dependencyFailed',
   };
 
   @override

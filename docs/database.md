@@ -314,15 +314,18 @@ local test success. Source: `apps/api/test/database-topology.e2e.spec.ts`,
 `infra/docker-compose.yml`.
 
 The live topology suite is opt-in because it requires a separately reachable
-replica and a restricted test role on both endpoints. Invoke Vitest directly so
-only that spec runs, and set `DATABASE_URL_TEST_READ_REPLICA` alongside
-`DATABASE_URL_TEST`:
+replica and a restricted test role on both endpoints. Its switch is the presence
+of the three `DATABASE_TOPOLOGY_*` URLs shown above — there is no separate
+enable flag, and invoking the file without them reports it as skipped:
 
 ```sh
-RUN_DATABASE_TOPOLOGY_E2E=1 pnpm --filter api exec vitest run test/database-topology.e2e.spec.ts
+pnpm --filter api exec vitest run test/database-topology.e2e.spec.ts
 ```
 
-Without those external PostgreSQL endpoints, the deterministic provider,
+`DATABASE_URL_TEST_READ_REPLICA` is a different knob: it is what
+`database.provider.ts` needs when the composed application itself composes
+`readReplica: true` in a test environment, and the topology spec does not read
+it. Without the external PostgreSQL endpoints, the deterministic provider,
 environment, and unit tests are the available verification boundary.
 
 ## Transaction Convention

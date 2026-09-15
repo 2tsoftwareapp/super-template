@@ -92,8 +92,10 @@ Mailpit UI: http://localhost:8025 · Swagger: http://localhost:3001/api/docs
   This is baked into `generate-contracts.sh`.
 - **Tailwind `@source`**: admin/web `globals.css` must include `@source` for
   `packages/web-ui/src`, or shared utility classes silently vanish from compiled CSS.
-- **Cross-module circular DI** in the platform context (`apps/api/src/platform`) can cause a silent `process.abort()`
-  in e2e; use `abortOnError: false` + `forwardRef` both directions.
+- **Cross-module circular DI** between platform-scoped feature packages
+  (`packages/feature-audit`, `packages/feature-settings` — the ones whose rows carry no
+  `organization_id`) can cause a silent `process.abort()` in e2e; use
+  `abortOnError: false` + `forwardRef` both directions.
 
 ## Making this template your own
 

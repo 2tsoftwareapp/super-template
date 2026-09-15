@@ -1,5 +1,23 @@
 # Architecture Blueprint Compliance Plan
 
+> **Status (updated 2026-09-15):** This record carries no date of its own; its last
+> change before the 2026-09 cleanup was `06870e5f` (2026-09-12), and its body
+> reflects the state **while the compatibility entrypoints still existed**. The
+> original findings are kept verbatim; the following changed during the 2026-09
+> remediation:
+>
+> - The **compatibility barrels** (`upload.schema.ts`, `upload.repository.ts`,
+>   `upload.controller.ts`, the DTO barrel, the aliasing `s3-storage.adapter.ts`)
+>   were **deleted** in `55154f15`/`8bb0f68c`. `packages/feature-upload` now
+>   exports four real subpaths only — `.`, `./contracts`, `./schema`, `./module` —
+>   and the implementation lives directly under `src/{files,attachments,storage}`.
+> - The "value-objects/domain-events as empty barrels" requirement **no longer
+>   applies**: those empty directories were removed instead of kept as placeholders.
+> - `packages/feature-upload/test/e2e` still holds only a README; the
+>   composition-level e2e lives in `apps/api/test/files-catalog.e2e.spec.ts`.
+> - Still valid: the commands in the closing "Validation commands" section are the
+>   ones CI and acceptance still run.
+
 ## Executive conclusion
 
 The repository now satisfies the requested API composition layout and contains all requested platform and feature packages. The `feature-upload` package provides the requested capability through a richer bounded-context design that separates files, attachments, and storage. Compatibility entrypoints have been added without moving or duplicating the existing implementation.

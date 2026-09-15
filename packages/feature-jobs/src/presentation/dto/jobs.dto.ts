@@ -4,6 +4,8 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { PaginationQueryDto } from "@repo/api-runtime";
 import { IsDateString, IsEnum, IsOptional, IsString, IsUUID } from "class-validator";
 
+import { JOB_EVENT_TYPES, type JobEventType } from "../../domain/job-event-type";
+
 export class JobDto {
   @ApiProperty()
   id: string;
@@ -116,20 +118,14 @@ export class JobEventDto {
   attemptId: string | null;
 
   @ApiProperty({
-    enum: [
-      "claimed",
-      "completed",
-      "failed",
-      "processing_error",
-      "retry_scheduled",
-      "cancelled",
-      "no_handler",
-    ],
+    enum: JOB_EVENT_TYPES,
     description:
       "`failed` means the job reached FAILED; `processing_error` means an error escaped " +
-      "the processing cycle before a terminal status was recorded, so the job stays PROCESSING.",
+      "the processing cycle before a terminal status was recorded, so the job stays PROCESSING; " +
+      "`dependency_failed` means the job was moved to BLOCKED because this event's dependency " +
+      "(named in `message`) reached a blocking status.",
   })
-  type: string;
+  type: JobEventType;
 
   @ApiPropertyOptional({ type: String, nullable: true })
   message: string | null;
