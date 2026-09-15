@@ -198,13 +198,13 @@ describe("UpdateAdminUserUseCase", () => {
     });
 
     it("checks the target account against its access profile roles", async () => {
-      const deps = buildUseCase({ targetRoles: ["SUPER_ADMIN"] });
+      const deps = buildUseCase({ targetRoles: [ROLE_NAMES.SUPER_ADMIN] });
 
       await deps.useCase.execute(superAdmin(), "user-target", { displayName: "Renamed" });
 
       expect(deps.accessControlService.assertCanManageUserAccount).toHaveBeenCalledWith(
         superAdmin(),
-        ["SUPER_ADMIN"],
+        [ROLE_NAMES.SUPER_ADMIN],
       );
     });
   });

@@ -1,13 +1,13 @@
 import { type CanActivate, type ExecutionContext, HttpStatus, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { AppError } from "@repo/api-kernel";
+import { AppError, PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 
 import { AUTHORIZE_KEY, type AuthorizeOptions } from "../decorators/authorize.decorator";
 import { IS_PUBLIC_KEY } from "../decorators/public.decorator";
 import { ERROR_CODES } from "../error-codes";
 
-/** Platform super-role literal; role ownership lives in feature-access-control. */
-const SUPER_ADMIN_ROLE = "SUPER_ADMIN";
+/** Platform super-role; role ownership lives in feature-access-control. */
+const SUPER_ADMIN_ROLE = PLATFORM_ROLE_NAMES.SUPER_ADMIN;
 
 @Injectable()
 export class AuthorizeGuard implements CanActivate {

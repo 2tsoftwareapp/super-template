@@ -1,3 +1,4 @@
+import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { describe, expect, it, vi } from "vitest";
 
 import { ListOrganizationMembersUseCase } from "../list-organization-members.use-case";
@@ -84,7 +85,7 @@ describe("ListOrganizationMembersUseCase", () => {
       email: "super@example.com",
       displayName: "Super",
       status: "ACTIVE",
-      roles: ["SUPER_ADMIN"],
+      roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN],
       permissions: [],
       organizationId: null,
     });

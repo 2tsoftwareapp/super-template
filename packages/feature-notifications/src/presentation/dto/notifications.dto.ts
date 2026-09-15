@@ -132,35 +132,6 @@ export class SendNotificationRequestDto {
   idempotencyKey?: string;
 }
 
-/** @deprecated Use SendNotificationRequestDto with audience USER */
-export class SendNotificationDto {
-  @ApiProperty()
-  @IsUUID()
-  userId: string;
-
-  @ApiProperty()
-  @IsString()
-  type: string;
-
-  @ApiProperty()
-  @IsString()
-  title: string;
-
-  @ApiProperty()
-  @IsString()
-  body: string;
-
-  @ApiPropertyOptional({ type: "object", additionalProperties: true })
-  @IsOptional()
-  @IsObject()
-  data?: JsonObject;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsUUID()
-  organizationId?: string;
-}
-
 export class NotificationJobDto {
   @ApiProperty()
   id: string;

@@ -1,13 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
 
 import type { AuthenticatedRequestUser } from "@repo/api-kernel";
+import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 
 import { UpdateSettingUseCase } from "../update-setting.use-case";
 
 const actor = {
   userId: "user-1",
   organizationId: "org-1",
-  roles: ["SUPER_ADMIN"],
+  roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN],
 } as unknown as AuthenticatedRequestUser;
 
 describe("UpdateSettingUseCase", () => {

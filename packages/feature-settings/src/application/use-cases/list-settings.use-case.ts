@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError } from "@repo/api-kernel";
+import { AppError, PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
 
 import {
@@ -17,7 +17,7 @@ export class ListSettingsUseCase {
   ) {}
 
   async execute(actor?: AuthenticatedRequestUser) {
-    if (!actor?.roles.includes("SUPER_ADMIN")) {
+    if (!actor?.roles.includes(PLATFORM_ROLE_NAMES.SUPER_ADMIN)) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
         "Only SUPER_ADMIN can list application settings",

@@ -3,7 +3,7 @@ import type { ExecutionContext } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { describe, expect, it, vi } from "vitest";
 
-import { AppError } from "@repo/api-kernel";
+import { AppError, PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 
 import { AuthorizeGuard } from "../authorize.guard";
 
@@ -59,7 +59,7 @@ describe("AuthorizeGuard", () => {
 
   it("allows when user has at least one required role", () => {
     const { reflector, context } = makeContext({
-      authorize: { roles: ["ADMIN", "SUPER_ADMIN"] },
+      authorize: { roles: ["ADMIN", PLATFORM_ROLE_NAMES.SUPER_ADMIN] },
       user: { roles: ["ADMIN"], permissions: [] },
     });
     const guard = new AuthorizeGuard(reflector);
@@ -69,7 +69,7 @@ describe("AuthorizeGuard", () => {
 
   it("blocks when user has none of the required roles", () => {
     const { reflector, context } = makeContext({
-      authorize: { roles: ["SUPER_ADMIN"] },
+      authorize: { roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN] },
       user: { roles: ["USER"], permissions: [] },
     });
     const guard = new AuthorizeGuard(reflector);
@@ -79,8 +79,8 @@ describe("AuthorizeGuard", () => {
 
   it("allows super admin to bypass role and permission checks", () => {
     const { reflector, context } = makeContext({
-      authorize: { roles: ["SUPER_ADMIN"], permissions: ["users.delete"] },
-      user: { roles: ["SUPER_ADMIN"], permissions: [] },
+      authorize: { roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN], permissions: ["users.delete"] },
+      user: { roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN], permissions: [] },
     });
     const guard = new AuthorizeGuard(reflector);
 

@@ -1,6 +1,7 @@
 import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
+import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 
 import type { OrganizationMembership } from "../../public/contracts";
 
@@ -9,9 +10,6 @@ import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
 } from "../ports/organizations.repository.port";
-
-/** Platform super-role literal; importing access-control here would create a package cycle. */
-const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";
 
 @Injectable()
 export class ListOrganizationsForUserUseCase {
@@ -23,7 +21,7 @@ export class ListOrganizationsForUserUseCase {
   ) {}
 
   async execute(user: AuthenticatedRequestUser, memberOnly = false) {
-    if (user.roles.includes(PLATFORM_SUPER_ADMIN) && !memberOnly) {
+    if (user.roles.includes(PLATFORM_ROLE_NAMES.SUPER_ADMIN) && !memberOnly) {
       const allOrgs = await this.organizationsRepository.listAll();
       return allOrgs.map((org) => ({
         id: org.id,

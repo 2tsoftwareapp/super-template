@@ -1,4 +1,5 @@
 import type { AuthenticatedRequestUser } from "@repo/api-kernel";
+import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 
 import { describe, expect, it, vi } from "vitest";
 
@@ -84,7 +85,12 @@ describe("ListOrganizationsForUserUseCase", () => {
     const { useCase, organizationsRepository, organizationMembership } = buildUseCase();
 
     await expect(
-      useCase.execute(actor({ roles: ["SUPER_ADMIN"], organizationId: CURRENT_ORGANIZATION_ID })),
+      useCase.execute(
+        actor({
+          roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN],
+          organizationId: CURRENT_ORGANIZATION_ID,
+        }),
+      ),
     ).resolves.toEqual([
       {
         id: "org-1",
@@ -112,7 +118,7 @@ describe("ListOrganizationsForUserUseCase", () => {
     const { useCase, organizationsRepository, organizationMembership } = buildUseCase();
 
     const result = await useCase.execute(
-      actor({ roles: ["SUPER_ADMIN"], organizationId: CURRENT_ORGANIZATION_ID }),
+      actor({ roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN], organizationId: CURRENT_ORGANIZATION_ID }),
       true,
     );
 

@@ -46,10 +46,3 @@ export const jobsApi = {
     });
   },
 };
-
-/** @deprecated Prefer `jobsApi` */
-export const fetchJobs = (params: JobsParams) => jobsApi.list(params);
-export const fetchJobMetrics = () => jobsApi.metrics();
-export const fetchJobDetail = (jobId: string) => jobsApi.get(jobId);
-export const fetchJobLogs = (jobId: string) => jobsApi.logs(jobId);
-export const cancelJob = (jobId: string) => jobsApi.cancel(jobId);

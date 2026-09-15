@@ -1,3 +1,4 @@
+import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { ORGANIZATION_ERROR_CODES } from "@repo/feature-organizations/contracts";
 import { describe, expect, it, vi } from "vitest";
 
@@ -87,7 +88,7 @@ describe("GetOrganizationUseCase", () => {
       email: "super@example.com",
       displayName: "Super",
       status: "ACTIVE",
-      roles: ["SUPER_ADMIN"],
+      roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN],
       permissions: [],
       organizationId: null,
     });

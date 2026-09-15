@@ -40,14 +40,4 @@ export class NotificationsMapper {
       updatedAt: job.updatedAt.toISOString(),
     };
   }
-
-  /** @deprecated Use toNotificationView */
-  toNotificationDto(notification: NotificationRecord): NotificationView {
-    return this.toNotificationView(notification);
-  }
-
-  /** @deprecated Use toNotificationJobView */
-  toNotificationJobDto(job: NotificationJobRecord): NotificationJobView {
-    return this.toNotificationJobView(job);
-  }
 }

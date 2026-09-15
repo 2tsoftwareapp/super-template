@@ -102,6 +102,38 @@ Rules:
   (Base UI vs Radix). Do not add a third primitive library; new composites should
   reuse the stack already used by neighboring components.
 
+### 2.2 Declaration-only packages vs. executing packages
+
+Workspace-wide commands (`turbo run <task>`) must distinguish two kinds of package:
+
+| Kind                 | Packages                                                     | Scripts                                      |
+| -------------------- | ------------------------------------------------------------ | -------------------------------------------- |
+| **Declaration-only** | `@repo/tsconfig`, `@repo/eslint-config`, `@repo/test-config` | `format` only; no `build`/`typecheck`/`test` |
+| **Executing**        | every `apps/*` and the remaining `packages/*`                | real `build`, `typecheck`, `test`, `lint`    |
+
+Declaration-only packages ship config artifacts — tsconfig JSONs, the shareable ESLint
+config, the vitest alias/setup helper — and `@repo/test-config` has no scripts at all.
+Their layers are declared as `layer:tsconfig`, `layer:eslint` and `layer:test` in their
+own `turbo.json`.
+
+Rules:
+
+- **A green workspace-wide run does not prove every package was checked.** Turbo keeps
+  a package in the task graph but runs no command when the script is missing
+  (`turbo run test --dry=json` reports `<NONEXISTENT>` for the three packages above).
+  A green `pnpm test` therefore means "every package that has tests passed".
+- **Never add stub scripts to a declaration-only package.** A `"test": "exit 0"` in
+  `@repo/tsconfig` would make the workspace command report work that never ran; the
+  absence of the script is the correct signal.
+- **Use the turbo tasks, not `--filter` over a package list.** `pnpm test` /
+  `pnpm typecheck` fan out through turbo, which skips declaration-only packages for
+  free; an explicit list of packages has to be kept in sync by hand and will silently
+  drift as packages are added.
+- **`--passWithNoTests` is the sanctioned way for an executing package to own no
+  specs.** It keeps an empty suite green without pretending the package is
+  declaration-only; per-package coverage expectations live in
+  [`docs/coverage-governance.md`](../coverage-governance.md).
+
 ## 3. Composition roots
 
 `apps/api` is a composition root.

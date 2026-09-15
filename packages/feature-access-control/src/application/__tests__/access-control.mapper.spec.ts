@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
+
 import { AccessControlMapper } from "../access-control.mapper";
 
 const mapper = new AccessControlMapper();
@@ -36,14 +38,14 @@ describe("AccessControlMapper.toRoleView", () => {
       mapper.toRoleView({
         id: "role-1",
         organizationId: null,
-        name: "SUPER_ADMIN",
+        name: PLATFORM_ROLE_NAMES.SUPER_ADMIN,
         description: null,
         isSystem: true,
       }),
     ).toEqual({
       id: "role-1",
       organizationId: null,
-      name: "SUPER_ADMIN",
+      name: PLATFORM_ROLE_NAMES.SUPER_ADMIN,
       description: null,
       scope: "platform",
       isSystem: true,

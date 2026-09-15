@@ -2,6 +2,13 @@
 
 See [onboarding.md](./onboarding.md) for a first-day walkthrough.
 
+## Node runtime
+
+The workspace requires **Node.js ≥ 24.14.0**: the root `package.json` declares
+`engines.node` as `>=24.14.0` and `.nvmrc` pins `24.14.0`. Activate it (`nvm use` or your
+version manager) **before** running any `pnpm` command — pnpm itself must run under that
+runtime, otherwise it reports `Unsupported engine` and local results can diverge from CI.
+
 ## Common Commands
 
 | Goal                     | macOS / Linux             | Cross-platform                |

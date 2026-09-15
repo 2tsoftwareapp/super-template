@@ -1,6 +1,6 @@
 import type { AuthenticatedRequestUser, TenantContext } from "@repo/api-kernel";
 
-import { SYSTEM_SCOPE } from "@repo/api-kernel";
+import { PLATFORM_ROLE_NAMES, SYSTEM_SCOPE } from "@repo/api-kernel";
 import { ORGANIZATION_ERROR_CODES } from "@repo/feature-organizations/contracts";
 import { describe, expect, it, vi } from "vitest";
 
@@ -178,7 +178,7 @@ describe("UpdateOrganizationUseCase", () => {
 
     const result = await useCase.execute(
       ORGANIZATION_ID,
-      actor({ roles: ["SUPER_ADMIN"], organizationId: null }),
+      actor({ roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN], organizationId: null }),
       { name: "Renamed Org" },
     );
 
