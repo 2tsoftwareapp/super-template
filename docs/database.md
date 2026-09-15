@@ -293,13 +293,22 @@ continue using the default `DATABASE` client.
 `apps/api/test/database-topology.e2e.spec.ts` is an opt-in real-PostgreSQL
 suite. It requires a migrated primary/replica pair using restricted roles plus
 `DATABASE_TOPOLOGY_ADMIN_URL` targeting the primary for temporary probe-table
-setup and cleanup:
+setup and cleanup. `scripts/topology-e2e.sh` starts such a pair (the `topology`
+compose profile in `infra/docker-compose.yml`), migrates it, and runs the spec:
+
+```bash
+scripts/topology-e2e.sh
+```
+
+To drive an existing pair by hand, export the same variables and point Vitest at
+the e2e config (the config is what gives the run its whole-run database lock):
 
 ```bash
 DATABASE_TOPOLOGY_PRIMARY_URL='postgresql://app@primary/app' \
 DATABASE_TOPOLOGY_REPLICA_URL='postgresql://app@replica/app' \
 DATABASE_TOPOLOGY_ADMIN_URL='postgresql://admin@primary/app' \
-pnpm --filter api exec vitest run test/database-topology.e2e.spec.ts
+pnpm --filter api exec vitest run --config vitest.e2e.config.ts \
+  test/database-topology.e2e.spec.ts --maxWorkers=1
 ```
 
 The test covers tenant A/B isolation on both endpoints, independent endpoint
@@ -307,11 +316,12 @@ configuration, immediate primary visibility after auth rotation/revocation,
 and an optional privileged replica-role failure using
 `DATABASE_TOPOLOGY_PRIVILEGED_REPLICA_URL`. If the three required topology
 URLs are unset, Vitest skips the file; the optional negative test is skipped
-when its URL is unset. This repository's Docker Compose file provides a
-development PostgreSQL primary but does not provision a read-replica service,
-so a live replica remains an environment prerequisite rather than a claim of
-local test success. Source: `apps/api/test/database-topology.e2e.spec.ts`,
-`infra/docker-compose.yml`.
+when its URL is unset. The local pair is documented in
+[`docs/development.md`](./development.md#database-topology-suite--primary--streaming-replica-pair);
+a suite run without those URLs is still skipped rather than passing, so a green
+`pnpm --filter api test:e2e` is not evidence for the replica boundary. Source:
+`apps/api/test/database-topology.e2e.spec.ts`, `infra/docker-compose.yml`,
+`scripts/topology-e2e.sh`.
 
 The live topology suite is opt-in because it requires a separately reachable
 replica and a restricted test role on both endpoints. Its switch is the presence
@@ -319,7 +329,7 @@ of the three `DATABASE_TOPOLOGY_*` URLs shown above — there is no separate
 enable flag, and invoking the file without them reports it as skipped:
 
 ```sh
-pnpm --filter api exec vitest run test/database-topology.e2e.spec.ts
+pnpm --filter api exec vitest run --config vitest.e2e.config.ts test/database-topology.e2e.spec.ts
 ```
 
 `DATABASE_URL_TEST_READ_REPLICA` is a different knob: it is what

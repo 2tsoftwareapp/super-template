@@ -21,6 +21,76 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql
 
+  # Opt-in primary + streaming replica pair for the database topology e2e suite.
+  #
+  # Behind the `topology` profile so the default dev stack stays a single Postgres:
+  # nothing here starts unless `--profile topology` is passed (see
+  # `scripts/topology-e2e.sh` and docs/development.md). Ports are separate from
+  # POSTGRES_EXPOSED_PORT so the pair never collides with the dev postgres service.
+  topology-primary:
+    image: postgres:18.2
+    container_name: super-template-topology-primary
+    profiles: ["topology"]
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-fullstack_starter}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      TOPOLOGY_REPLICATION_USER: ${TOPOLOGY_REPLICATION_USER:-replicator}
+      TOPOLOGY_REPLICATION_PASSWORD: ${TOPOLOGY_REPLICATION_PASSWORD:-replicator}
+    command:
+      - postgres
+      - -c
+      - wal_level=replica
+      - -c
+      - max_wal_senders=10
+      - -c
+      - max_replication_slots=10
+      - -c
+      - hot_standby=on
+    ports:
+      - "${TOPOLOGY_PRIMARY_PORT:-65434}:5432"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-fullstack_starter}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
+    volumes:
+      - topology-primary-data:/var/lib/postgresql
+      - ./postgres/topology-primary-init.sh:/docker-entrypoint-initdb.d/10-topology-replication.sh:ro
+
+  topology-replica:
+    image: postgres:18.2
+    container_name: super-template-topology-replica
+    profiles: ["topology"]
+    depends_on:
+      topology-primary:
+        condition: service_healthy
+    environment:
+      PGDATA: /var/lib/postgresql/18/docker
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      TOPOLOGY_PRIMARY_HOST: topology-primary
+      TOPOLOGY_PRIMARY_PORT: "5432"
+      TOPOLOGY_REPLICATION_USER: ${TOPOLOGY_REPLICATION_USER:-replicator}
+      TOPOLOGY_REPLICATION_PASSWORD: ${TOPOLOGY_REPLICATION_PASSWORD:-replicator}
+    entrypoint: ["/bin/sh", "/usr/local/bin/topology-replica-entrypoint.sh"]
+    ports:
+      - "${TOPOLOGY_REPLICA_PORT:-65435}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -h 127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+      - topology-replica-data:/var/lib/postgresql
+      - ./postgres/topology-replica-entrypoint.sh:/usr/local/bin/topology-replica-entrypoint.sh:ro
+
   redis:
     image: redis:7.4
     container_name: super-template-redis
@@ -80,3 +150,5 @@ services:
 volumes:
   postgres-data:
   minio-data:
+  topology-primary-data:
+  topology-replica-data:
