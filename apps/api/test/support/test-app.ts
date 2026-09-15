@@ -13,7 +13,6 @@ import request from "supertest";
 import { AppModule } from "../../src/app.module";
 import { applySqlMigrations } from "../../src/cli/migrations";
 import { seedDatabase } from "../../src/cli/seeds/seed-data";
-import { acquireTestDatabaseLock } from "./test-database-lock";
 import {
   ensureTestDatabaseExists,
   loadTestDatabaseEnv,
@@ -22,6 +21,7 @@ import {
   TEST_APP_ROLE_NAME,
   TEST_APP_ROLE_PASSWORD,
 } from "./test-database-env";
+import { acquireTestDatabaseLock } from "./test-database-lock";
 
 loadTestDatabaseEnv();
 
