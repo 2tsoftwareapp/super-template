@@ -49,7 +49,7 @@ export interface NotificationsRepositoryPort {
    */
   createManyIdempotent(
     sourceJobId: string,
-    recipients: Array<Omit<CreateNotificationInput, "sourceJobId">>,
+    recipients: Omit<CreateNotificationInput, "sourceJobId">[],
     executor?: TransactionExecutor,
   ): Promise<NotificationRecord[]>;
   findBySourceJobAndUsers(

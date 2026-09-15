@@ -4,15 +4,15 @@ See [onboarding.md](./onboarding.md) for a first-day walkthrough.
 
 ## Common Commands
 
-| Goal | macOS / Linux | Cross-platform |
-| --- | --- | --- |
-| First-time setup | `make bootstrap` | `pnpm bootstrap` |
-| Validate toolchain + env | — | `pnpm run env:doctor` |
-| Start API + Web + Admin | `make dev` | `pnpm dev` |
-| Regenerate contracts | `make generate` | `pnpm run generate:contracts` |
-| CI-style verify | `make verify` | `pnpm verify` |
-| Mobile doctor | `pnpm run mobile:doctor` | same |
-| Install git hooks | automatic after bootstrap | `pnpm hooks:install` |
+| Goal                     | macOS / Linux             | Cross-platform                |
+| ------------------------ | ------------------------- | ----------------------------- |
+| First-time setup         | `make bootstrap`          | `pnpm bootstrap`              |
+| Validate toolchain + env | —                         | `pnpm run env:doctor`         |
+| Start API + Web + Admin  | `make dev`                | `pnpm dev`                    |
+| Regenerate contracts     | `make generate`           | `pnpm run generate:contracts` |
+| CI-style verify          | `make verify`             | `pnpm verify`                 |
+| Mobile doctor            | `pnpm run mobile:doctor`  | same                          |
+| Install git hooks        | automatic after bootstrap | `pnpm hooks:install`          |
 
 ## Git Hooks (pre-push gate)
 
@@ -28,6 +28,23 @@ A failing check blocks the push, so import-sort or formatting drift can never
 reach CI. Re-run `pnpm hooks:install` after cloning or after adding hooks under
 `scripts/hooks/`. To bypass in an emergency: `git push --no-verify` (required
 CI checks still run server-side).
+
+### `pnpm typecheck` also compiles test files
+
+A package's `tsconfig.json` excludes `*.spec.ts` so tests never land in build
+output — which meant `pnpm typecheck` used to skip them entirely, and a spec
+with a real type error could pass every gate. Each package that has specs under
+`src/` now ships a sibling `tsconfig.spec.json` that includes those specs, sets
+`noEmit`, and adds `types: ["node", "vitest/globals"]`. Its `typecheck` script
+runs both programs:
+
+```bash
+tsc -p tsconfig.json --noEmit && tsc -p tsconfig.spec.json --noEmit
+```
+
+A spec that does not compile therefore fails `pnpm typecheck`. Fix the spec; do
+not widen the config. `build` stays test-free. Convention and the two
+documented deviations: [`packages/tsconfig/README.md`](../packages/tsconfig/README.md).
 
 ## Running Individual Apps
 
@@ -55,11 +72,11 @@ Full bootstrap: `powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1`
 
 ## Local infrastructure (Docker Compose)
 
-| Service | Default port | Required? |
-| --- | --- | --- |
-| PostgreSQL | 5432 (`POSTGRES_EXPOSED_PORT`) | Yes |
-| Redis | 6379 (`REDIS_PORT`) | Optional — improves throttling/SSE fan-out when `REDIS_URL` is set |
-| Mailpit | 8025 UI / 1025 SMTP | Yes for email flows in dev |
+| Service    | Default port                   | Required?                                                          |
+| ---------- | ------------------------------ | ------------------------------------------------------------------ |
+| PostgreSQL | 5432 (`POSTGRES_EXPOSED_PORT`) | Yes                                                                |
+| Redis      | 6379 (`REDIS_PORT`)            | Optional — improves throttling/SSE fan-out when `REDIS_URL` is set |
+| Mailpit    | 8025 UI / 1025 SMTP            | Yes for email flows in dev                                         |
 
 Override conflicting ports in `.env.local`.
 

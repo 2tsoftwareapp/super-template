@@ -1,7 +1,6 @@
 import type { TransactionExecutor } from "@repo/api-kernel";
 
 import type { OrganizationMemberRole } from "./organization-membership.port";
-export type { OrganizationMemberRole } from "./organization-membership.port";
 
 export interface OrganizationLookup {
   findPrimaryOrganizationId(userId: string, executor?: TransactionExecutor): Promise<string | null>;
@@ -25,3 +24,4 @@ export interface OrganizationLookup {
 }
 
 export { ORGANIZATION_LOOKUP } from "./organization-lookup.token";
+export type { OrganizationMemberRole } from "./organization-membership.port";

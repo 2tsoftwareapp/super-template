@@ -13,7 +13,9 @@ function createService(content: string) {
   };
   const adapter = {
     parseCsvRecord: vi.fn((record: CsvRecord) => record),
-    validateRow: vi.fn(() => null),
+    // Typed to the port (`validateRow(row) => string | null`) so a per-row
+    // override can return a message instead of the default "valid".
+    validateRow: vi.fn<(row: CsvRecord) => string | null>(() => null),
   };
   const registry = { resolve: vi.fn(() => adapter) };
   const service = new ImportFileParserService(objectStorage as never, registry as never);

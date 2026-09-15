@@ -1,11 +1,19 @@
 import { describe, expect, it, vi } from "vitest";
 
+import type { TransactionExecutor } from "@repo/api-kernel";
+
 import { listSettingDefaults } from "../../setting-definitions";
 import { EnsureSettingsSeedDataUseCase } from "../ensure-settings-seed-data.use-case";
 
+/** Mirrors the repository port, so `mock.calls` keeps the real arity and types. */
+type EnsureDefaults = (
+  defaults: ReturnType<typeof listSettingDefaults>,
+  executor?: TransactionExecutor,
+) => Promise<void>;
+
 describe("EnsureSettingsSeedDataUseCase", () => {
   it("seeds exactly the registry defaults", async () => {
-    const ensureDefaults = vi.fn(async () => undefined);
+    const ensureDefaults = vi.fn<EnsureDefaults>(async () => undefined);
     const useCase = new EnsureSettingsSeedDataUseCase({ ensureDefaults } as never);
     const executor = { id: "tx" };
 
@@ -17,7 +25,7 @@ describe("EnsureSettingsSeedDataUseCase", () => {
   });
 
   it("writes the documented baseline rows", async () => {
-    const ensureDefaults = vi.fn(async () => undefined);
+    const ensureDefaults = vi.fn<EnsureDefaults>(async () => undefined);
     const useCase = new EnsureSettingsSeedDataUseCase({ ensureDefaults } as never);
 
     await useCase.execute();

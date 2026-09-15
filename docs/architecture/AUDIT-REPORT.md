@@ -37,17 +37,18 @@
 
 **Monorepo Turborepo + pnpm, 4 apps (web, admin, api, mobile), ~20 shared packages.**
 
-| Area | Grade | Notes |
-|------|-------|-------|
-| **BE Architecture** | 🟢 A | Clean Architecture, proper bounded contexts, good DI |
-| **FE Layer Boundaries** | 🟢 A | Strict, well-enforced via ESLint + conventions |
-| **FE Feature Structure** | 🟢 A- | Vertical-slice consistent, but naming drift |
-| **Shared Packages** | 🟡 B | web-ui good, but lots of reusable code trapped in admin app |
-| **Code Reuse** | 🟡 B- | Significant duplication across controllers and HTTP setup |
-| **Documentation** | 🟡 B- | 8+ locations with potentially conflicting instructions |
-| **Naming Conventions** | 🟡 C+ | New conventions defined but not adopted anywhere |
+| Area                     | Grade | Notes                                                       |
+| ------------------------ | ----- | ----------------------------------------------------------- |
+| **BE Architecture**      | 🟢 A  | Clean Architecture, proper bounded contexts, good DI        |
+| **FE Layer Boundaries**  | 🟢 A  | Strict, well-enforced via ESLint + conventions              |
+| **FE Feature Structure** | 🟢 A- | Vertical-slice consistent, but naming drift                 |
+| **Shared Packages**      | 🟡 B  | web-ui good, but lots of reusable code trapped in admin app |
+| **Code Reuse**           | 🟡 B- | Significant duplication across controllers and HTTP setup   |
+| **Documentation**        | 🟡 B- | 8+ locations with potentially conflicting instructions      |
+| **Naming Conventions**   | 🟡 C+ | New conventions defined but not adopted anywhere            |
 
 **Core finding:** The architecture foundation is strong. The main problems are:
+
 1. **Trapped reuse** — shared components/hooks stuck inside admin app
 2. **Duplicated patterns** — 6+ controllers copy-paste the same debounce+URL sync code
 3. **Ghost references** — `@repo/web-core` referenced everywhere but has no code
@@ -59,18 +60,18 @@
 
 These strengths should be **preserved and protected** in any redesign:
 
-| # | Strength | Evidence |
-|---|----------|----------|
-| 1 | **BE Clean Architecture** | Controller → UseCase → Domain → Port → Infrastructure, strictly followed in api-identity and api-platform |
-| 2 | **Bounded Contexts** | api-identity (auth, users, orgs, RBAC, MFA, SSO) and api-platform (settings, mail, files, jobs, etc.) are well-separated |
-| 3 | **FE Layer Boundaries** | UI components never import `useQuery`/`useMutation`/`webFetch`/`useRouter`/`useSearchParams` — verified via code search |
-| 4 | **Feature-Sliced Structure** | Every admin feature follows: `api/` → `model/` → `controllers/` → `screens/` → `ui/` |
-| 5 | **36 UI Primitives** | `@repo/web-ui` has comprehensive design system (button, table, dialog, sheet, combobox, etc.) |
-| 6 | **Query Key Factories** | Every feature uses `xxxKeys.all()` / `xxxKeys.list(params)` pattern |
-| 7 | **Pure Permission Selectors** | `selectXxxPermissions()` functions in model layer — no hooks, no side effects |
-| 8 | **Search Param Typing** | `parseXxxSearchParams()` / `serializeXxxSearchParams()` pattern with type safety |
-| 9 | **Generated API Contract** | OpenAPI → TypeScript + Dart clients via `pnpm generate` |
-| 10 | **Route Pages as Thin Wrappers** | `page.tsx` only renders `<Suspense><XxxView /></Suspense>` — no business logic |
+| #   | Strength                         | Evidence                                                                                                                 |
+| --- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| 1   | **BE Clean Architecture**        | Controller → UseCase → Domain → Port → Infrastructure, strictly followed in api-identity and api-platform                |
+| 2   | **Bounded Contexts**             | api-identity (auth, users, orgs, RBAC, MFA, SSO) and api-platform (settings, mail, files, jobs, etc.) are well-separated |
+| 3   | **FE Layer Boundaries**          | UI components never import `useQuery`/`useMutation`/`webFetch`/`useRouter`/`useSearchParams` — verified via code search  |
+| 4   | **Feature-Sliced Structure**     | Every admin feature follows: `api/` → `model/` → `controllers/` → `screens/` → `ui/`                                     |
+| 5   | **36 UI Primitives**             | `@repo/web-ui` has comprehensive design system (button, table, dialog, sheet, combobox, etc.)                            |
+| 6   | **Query Key Factories**          | Every feature uses `xxxKeys.all()` / `xxxKeys.list(params)` pattern                                                      |
+| 7   | **Pure Permission Selectors**    | `selectXxxPermissions()` functions in model layer — no hooks, no side effects                                            |
+| 8   | **Search Param Typing**          | `parseXxxSearchParams()` / `serializeXxxSearchParams()` pattern with type safety                                         |
+| 9   | **Generated API Contract**       | OpenAPI → TypeScript + Dart clients via `pnpm generate`                                                                  |
+| 10  | **Route Pages as Thin Wrappers** | `page.tsx` only renders `<Suspense><XxxView /></Suspense>` — no business logic                                           |
 
 ---
 
@@ -80,16 +81,16 @@ These strengths should be **preserved and protected** in any redesign:
 
 Verified by searching across all admin features:
 
-| Violation Type | Matches Found |
-|----------------|---------------|
-| `useQuery`/`useMutation` in `ui/` | **0** ✅ |
-| `webFetch` in `ui/` | **0** ✅ |
-| `useRouter`/`useSearchParams` in `ui/` | **0** ✅ |
-| `useSession`/`useAdminSession` in `ui/` | **0** ✅ |
-| `toast` in `api/` | **0** ✅ |
-| `@repo/web-ui` imports in `controllers/` | **0** ✅ |
-| `../ui/` deep imports in `controllers/` | **0** ✅ |
-| `@tanstack/react-query` or `@/lib/http` in `ui/` | **0** ✅ |
+| Violation Type                                   | Matches Found |
+| ------------------------------------------------ | ------------- |
+| `useQuery`/`useMutation` in `ui/`                | **0** ✅      |
+| `webFetch` in `ui/`                              | **0** ✅      |
+| `useRouter`/`useSearchParams` in `ui/`           | **0** ✅      |
+| `useSession`/`useAdminSession` in `ui/`          | **0** ✅      |
+| `toast` in `api/`                                | **0** ✅      |
+| `@repo/web-ui` imports in `controllers/`         | **0** ✅      |
+| `../ui/` deep imports in `controllers/`          | **0** ✅      |
+| `@tanstack/react-query` or `@/lib/http` in `ui/` | **0** ✅      |
 
 **This is genuinely impressive — the boundary enforcement is working perfectly.**
 
@@ -97,30 +98,30 @@ Verified by searching across all admin features:
 
 CODING_RULES defines new conventions, but **zero features** have adopted them:
 
-| Item | CODING_RULES Says | Actual Codebase |
-|------|-------------------|-----------------|
-| Controller file name | `use<Feature>Handlers.ts` | All 14 features use `use-*-controller.ts` |
-| Controller export name | `use<Feature>Handlers` | All export `useXxxController` |
-| Handler function naming | `handle<Action>` | Mixed: `handleXxx`, `onXxx`, direct callbacks |
+| Item                    | CODING_RULES Says         | Actual Codebase                               |
+| ----------------------- | ------------------------- | --------------------------------------------- |
+| Controller file name    | `use<Feature>Handlers.ts` | All 14 features use `use-*-controller.ts`     |
+| Controller export name  | `use<Feature>Handlers`    | All export `useXxxController`                 |
+| Handler function naming | `handle<Action>`          | Mixed: `handleXxx`, `onXxx`, direct callbacks |
 
 **All 14 features with controllers:**
 
-| Feature | Controller File | Lines |
-|---------|----------------|-------|
-| users | `use-users-list-controller.ts` | ~230 ⚠️ |
-| users (detail) | `use-user-detail-controller.ts` | ~150 |
-| roles | `use-roles-controller.ts` | ~80 |
-| organizations | `use-organizations-controller.ts` | ~70 |
-| settings | `use-settings-controller.ts` | ~115 |
-| audit-logs | `use-audit-logs-controller.ts` | ~130 |
-| notifications | `use-notifications-controller.ts` | ~120 |
-| jobs | `use-jobs-controller.ts` | ~130 |
-| files | `use-files-controller.ts` | ~120 |
-| mail | `use-mail-controller.ts` | ~130 |
-| imports | `use-imports-controller.ts` | ~70 |
-| dashboard | `use-dashboard-controller.ts` | ~90 |
-| security | `use-security-controller.ts` | ~50 |
-| auth | `use-admin-login-flow.ts` | ~120 |
+| Feature        | Controller File                   | Lines   |
+| -------------- | --------------------------------- | ------- |
+| users          | `use-users-list-controller.ts`    | ~230 ⚠️ |
+| users (detail) | `use-user-detail-controller.ts`   | ~150    |
+| roles          | `use-roles-controller.ts`         | ~80     |
+| organizations  | `use-organizations-controller.ts` | ~70     |
+| settings       | `use-settings-controller.ts`      | ~115    |
+| audit-logs     | `use-audit-logs-controller.ts`    | ~130    |
+| notifications  | `use-notifications-controller.ts` | ~120    |
+| jobs           | `use-jobs-controller.ts`          | ~130    |
+| files          | `use-files-controller.ts`         | ~120    |
+| mail           | `use-mail-controller.ts`          | ~130    |
+| imports        | `use-imports-controller.ts`       | ~70     |
+| dashboard      | `use-dashboard-controller.ts`     | ~90     |
+| security       | `use-security-controller.ts`      | ~50     |
+| auth           | `use-admin-login-flow.ts`         | ~120    |
 
 ### 3.3 Controller Size & Responsibility
 
@@ -157,13 +158,13 @@ use-users-list-controller.ts  (composes sub-hooks, < 60 lines)
 
 Referenced in **14 locations** across docs:
 
-| Document | What it says |
-|----------|-------------|
-| `CLAUDE.md` | "UI primitives come only from `@repo/web-core/components/*`" |
-| `CODING_RULES.md` | "Shared primitive chỉ lấy từ `web-core`" |
-| `README.md` | "`@repo/web-core` shared web UI + logic" |
-| `docs/architecture.md` | "`@repo/web-core/components/*` is the single source of UI" |
-| 4+ architecture specs | Various references |
+| Document               | What it says                                                 |
+| ---------------------- | ------------------------------------------------------------ |
+| `CLAUDE.md`            | "UI primitives come only from `@repo/web-core/components/*`" |
+| `CODING_RULES.md`      | "Shared primitive chỉ lấy từ `web-core`"                     |
+| `README.md`            | "`@repo/web-core` shared web UI + logic"                     |
+| `docs/architecture.md` | "`@repo/web-core/components/*` is the single source of UI"   |
+| 4+ architecture specs  | Various references                                           |
 
 **Reality:** `packages/web-core/` directory contains **only** `node_modules/` and `.turbo/`. Zero source files. Zero `package.json`. It's completely empty.
 
@@ -175,15 +176,15 @@ Referenced in **14 locations** across docs:
 
 These components in `apps/admin/src/components/` are **generic by nature** but cannot be used by the web app or any future app:
 
-| Component | Used By | Why It's Generic |
-|-----------|---------|------------------|
-| `resource-table.tsx` | All admin list features | Generic TanStack Table renderer with skeleton/loading/error/empty states |
-| `resource-page-shell.tsx` | All admin list pages | Page layout with icon, title, description, actions |
-| `resource-toolbar.tsx` | All admin list features | Search input + filter slots + clear button |
-| `resource-drawer.tsx` | All admin drawer features | Slide-over panel with backdrop, header, body, footer |
-| `bulk-action-bar.tsx` | All admin bulk ops | Animated bar showing selection count + actions |
-| `use-resource-table-config.ts` | All admin list features | TanStack Table setup with sort bridge + row selection |
-| `permission-multi-select.tsx` | roles, organizations | Generic permission picker |
+| Component                      | Used By                   | Why It's Generic                                                         |
+| ------------------------------ | ------------------------- | ------------------------------------------------------------------------ |
+| `resource-table.tsx`           | All admin list features   | Generic TanStack Table renderer with skeleton/loading/error/empty states |
+| `resource-page-shell.tsx`      | All admin list pages      | Page layout with icon, title, description, actions                       |
+| `resource-toolbar.tsx`         | All admin list features   | Search input + filter slots + clear button                               |
+| `resource-drawer.tsx`          | All admin drawer features | Slide-over panel with backdrop, header, body, footer                     |
+| `bulk-action-bar.tsx`          | All admin bulk ops        | Animated bar showing selection count + actions                           |
+| `use-resource-table-config.ts` | All admin list features   | TanStack Table setup with sort bridge + row selection                    |
+| `permission-multi-select.tsx`  | roles, organizations      | Generic permission picker                                                |
 
 **Total: ~800 lines of reusable code trapped in admin app.**
 
@@ -264,17 +265,18 @@ export { ApiClientError, webFetch } from "@repo/web-utils/http";
 #### 6.6.4 Utils Re-exports
 
 Both apps have identical `lib/utils.ts`:
+
 ```ts
 export { cn, getCsrfTokenFromDocument } from "@repo/web-utils";
 ```
 
 ### 3.7 Resource Config Inconsistencies
 
-| Feature | Resource Config Source | Issue |
-|---------|----------------------|-------|
-| users, roles, orgs, etc. | `adminResources.find(r => r.id === "users")!` | ✅ Standard |
-| security | Defined inline in `security-view.tsx` | ⚠️ Not in adminResources |
-| dashboard | In adminResources but no sidebar entry | ⚠️ Missing navigation |
+| Feature                  | Resource Config Source                        | Issue                    |
+| ------------------------ | --------------------------------------------- | ------------------------ |
+| users, roles, orgs, etc. | `adminResources.find(r => r.id === "users")!` | ✅ Standard              |
+| security                 | Defined inline in `security-view.tsx`         | ⚠️ Not in adminResources |
+| dashboard                | In adminResources but no sidebar entry        | ⚠️ Missing navigation    |
 
 ---
 
@@ -285,8 +287,8 @@ export { cn, getCsrfTokenFromDocument } from "@repo/web-utils";
 **Backend is in excellent shape.** Every bounded context module follows:
 
 ```
-modules/<domain>/
-├── <domain>.module.ts          # NestJS DI wiring
+packages/feature-<id>/src/
+├── <id>.module.ts               # NestJS DI wiring
 ├── presentation/               # Controllers, DTOs, mappers
 ├── application/
 │   ├── use-cases/              # Business orchestration
@@ -300,12 +302,13 @@ modules/<domain>/
 
 **Verified modules:**
 
-| Bounded Context | Modules | Architecture |
-|----------------|---------|-------------|
-| api-identity | auth, users, organizations, access-control, mfa, sso, preferences | ✅ Clean |
-| api-platform | settings, mail, imports, storage, exports, audit, files, activities, jobs, notifications | ✅ Clean |
+| Bounded Context | Modules                                                                                  | Architecture |
+| --------------- | ---------------------------------------------------------------------------------------- | ------------ |
+| api-identity    | auth, users, organizations, access-control, mfa, sso, preferences                        | ✅ Clean     |
+| api-platform    | settings, mail, imports, storage, exports, audit, files, activities, jobs, notifications | ✅ Clean     |
 
 **Key patterns followed:**
+
 - Controllers inject UseCases directly (no unnecessary facade layers) ✅
 - Ports are TypeScript interfaces with injection tokens ✅
 - Domain has zero framework dependencies ✅
@@ -325,6 +328,7 @@ application/
 ```
 
 Per DESIGN.md, mappers should be:
+
 - **Presentation mappers** (application result → response DTO) → `presentation/mappers/`
 - **Persistence mappers** (domain model ↔ DB record) → `infrastructure/persistence/`
 
@@ -336,16 +340,16 @@ Per DESIGN.md, mappers should be:
 
 **8+ locations** contain architecture instructions that could conflict:
 
-| # | File | Scope | Authority Level |
-|---|------|-------|-----------------|
-| 1 | `CLAUDE.md` | AI agent guidance | High |
-| 2 | `AGENTS.md` | Agent workflow | High |
-| 3 | `CODING_RULES.md` | Detailed coding rules | **Highest** |
-| 4 | `DESIGN.md` | Architecture design decisions | High |
-| 5 | `apps/admin/AGENTS.md` | Admin-specific conventions | Medium |
-| 6 | `apps/web/AGENTS.md` | Web-specific conventions | Medium |
-| 7 | `docs/architecture/ARCHITECTURE_RULES.md` | Architecture rules | Medium |
-| 8 | `.agents/skills/*/SKILL.md` | Skill-specific instructions | Low |
+| #   | File                                      | Scope                         | Authority Level |
+| --- | ----------------------------------------- | ----------------------------- | --------------- |
+| 1   | `CLAUDE.md`                               | AI agent guidance             | High            |
+| 2   | `AGENTS.md`                               | Agent workflow                | High            |
+| 3   | `CODING_RULES.md`                         | Detailed coding rules         | **Highest**     |
+| 4   | `DESIGN.md`                               | Architecture design decisions | High            |
+| 5   | `apps/admin/AGENTS.md`                    | Admin-specific conventions    | Medium          |
+| 6   | `apps/web/AGENTS.md`                      | Web-specific conventions      | Medium          |
+| 7   | `docs/architecture/ARCHITECTURE_RULES.md` | Architecture rules            | Medium          |
+| 8   | `.agents/skills/*/SKILL.md`               | Skill-specific instructions   | Low             |
 
 **Concrete conflict example:** `CLAUDE.md` says import from `@repo/web-core/components/*`, but actual code uses `@repo/web-ui/button`, `@repo/web-ui/table`, etc.
 
@@ -381,6 +385,7 @@ packages/web-ui/src/
 ```
 
 **New exports in `package.json`:**
+
 ```json
 {
   "./hooks": "./src/hooks/index.ts",
@@ -402,6 +407,7 @@ packages/web-bff/
 ```
 
 Both apps simplify to:
+
 ```ts
 import { webFetch, buildPath, configureCsrf } from "@repo/web-bff";
 ```
@@ -418,8 +424,8 @@ Move `use-resource-table-config.ts` and `table-sort.ts` from admin `lib/` to `@r
 // packages/web-ui/src/hooks/use-animate-presence.ts
 export function useAnimatePresence(
   isOpen: boolean,
-  durationMs?: number
-): { visible: boolean; animate: boolean }
+  durationMs?: number,
+): { visible: boolean; animate: boolean };
 ```
 
 **Replaces:** Identical 15-line blocks in `resource-drawer.tsx` and `bulk-action-bar.tsx`.
@@ -443,7 +449,7 @@ export function useDebouncedUrlSearch<T extends Record<string, string>>({
   debouncedParams: T;
   setSearch: <K extends keyof T>(key: K, value: T[K]) => void;
   setMany: (patch: Partial<T>) => void;
-}
+};
 ```
 
 **Replaces:** ~50-line debounce+URL sync blocks in 6 controllers.
@@ -458,7 +464,7 @@ export function SkeletonTableRows({
 }: {
   columns: { id: string; size?: number }[];
   count?: number;
-})
+});
 ```
 
 **Replaces:** Inline skeleton rendering in `resource-table.tsx`.
@@ -480,6 +486,7 @@ users/controllers/
 ```
 
 The main controller becomes a thin orchestrator:
+
 ```ts
 export function useUsersListController({ createColumns }) {
   const urlState = useUsersListUrlState({ defaults: { search: '', status: 'all', page: 1 } });
@@ -507,6 +514,7 @@ export function useUsersListController({ createColumns }) {
 #### 3b. Naming Convention (New Code Only)
 
 For **new features** created after this audit, use:
+
 - File: `use<Feature>Handlers.ts`
 - Export: `use<Feature>Handlers`
 - Return type: `<Feature>ViewModel`
@@ -599,6 +607,7 @@ export function createUsersTableColumns({
 #### 5a. Single Canonical Source
 
 Create `docs/architecture/CANONICAL.md` containing:
+
 - FE layer rules + dependency matrix
 - BE Clean Architecture rules
 - Naming conventions
@@ -606,8 +615,10 @@ Create `docs/architecture/CANONICAL.md` containing:
 - Anti-patterns
 
 All other docs link to it:
+
 ```markdown
 ## Architecture Rules
+
 See [docs/architecture/CANONICAL.md](./CANONICAL.md) — single source of truth.
 ```
 
@@ -621,18 +632,18 @@ See [docs/architecture/CANONICAL.md](./CANONICAL.md) — single source of truth.
 
 ## 7. Migration Priority
 
-| # | Task | Impact | Effort | Risk |
-|---|------|--------|--------|------|
-| 1 | Extract `useAnimatePresence` hook | Deduplicate animation in 2+ components | 🟢 Low | 🟢 Low |
-| 2 | Extract `useDebouncedUrlSearch` hook | Remove ~300 lines of duplicated controller code | 🟡 Medium | 🟢 Low |
-| 3 | Move shared components to `@repo/web-ui/composables/` | Unlock reuse in web + future apps | 🟡 Medium | 🟡 Medium |
-| 4 | Create `@repo/web-bff` package | Eliminate HTTP setup duplication | 🟢 Low | 🟢 Low |
-| 5 | Decompose users-list-controller | Demonstrate pattern, reduce complexity | 🟡 Medium | 🟡 Medium |
-| 6 | Fix `@repo/web-core` ghost references | Eliminate doc/code mismatch | 🟢 Low | 🟢 Low |
-| 7 | Consolidate architecture docs | Eliminate AI agent confusion | 🟢 Low | 🟢 Low |
-| 8 | Fix SecurityResource + Dashboard config | Feature consistency | 🟢 Low | 🟢 Low |
-| 9 | Naming convention migration (new code) | Gradual adoption, zero breakage | 🟢 Low | 🟢 Low |
-| 10 | Extract `useResourceTableConfig` to shared | Enables reuse beyond admin | 🟡 Medium | 🟡 Medium |
+| #   | Task                                                  | Impact                                          | Effort    | Risk      |
+| --- | ----------------------------------------------------- | ----------------------------------------------- | --------- | --------- |
+| 1   | Extract `useAnimatePresence` hook                     | Deduplicate animation in 2+ components          | 🟢 Low    | 🟢 Low    |
+| 2   | Extract `useDebouncedUrlSearch` hook                  | Remove ~300 lines of duplicated controller code | 🟡 Medium | 🟢 Low    |
+| 3   | Move shared components to `@repo/web-ui/composables/` | Unlock reuse in web + future apps               | 🟡 Medium | 🟡 Medium |
+| 4   | Create `@repo/web-bff` package                        | Eliminate HTTP setup duplication                | 🟢 Low    | 🟢 Low    |
+| 5   | Decompose users-list-controller                       | Demonstrate pattern, reduce complexity          | 🟡 Medium | 🟡 Medium |
+| 6   | Fix `@repo/web-core` ghost references                 | Eliminate doc/code mismatch                     | 🟢 Low    | 🟢 Low    |
+| 7   | Consolidate architecture docs                         | Eliminate AI agent confusion                    | 🟢 Low    | 🟢 Low    |
+| 8   | Fix SecurityResource + Dashboard config               | Feature consistency                             | 🟢 Low    | 🟢 Low    |
+| 9   | Naming convention migration (new code)                | Gradual adoption, zero breakage                 | 🟢 Low    | 🟢 Low    |
+| 10  | Extract `useResourceTableConfig` to shared            | Enables reuse beyond admin                      | 🟡 Medium | 🟡 Medium |
 
 **Recommended order:** 1 → 2 → 4 → 6 → 7 → 8 → 3 → 5 → 10 → 9
 
@@ -725,21 +736,21 @@ UsersListView (presentational)
 
 ## Appendix A: Feature Inventory
 
-| # | Feature | Controllers | UI Files | API Files | Model Files | Screens |
-|---|---------|-------------|----------|-----------|-------------|---------|
-| 1 | users | 7 | 11 | 4 | 5 | 2 |
-| 2 | roles | 1 | 3 | 4 | 5 | 1 |
-| 3 | organizations | 3 | ~6 | 4 | 4 | 2 |
-| 4 | dashboard | 1 | 6 | 3 | 3 | 1 |
-| 5 | settings | 1 | 3 | 3 | 3 | 1 |
-| 6 | audit-logs | 1 | 3 | 4 | 3 | 1 |
-| 7 | notifications | 1 | 3 | 4 | 3 | 1 |
-| 8 | jobs | 1 | ~3 | 4 | 3 | 1 |
-| 9 | files | 1 | ~4 | 4 | 3 | 1 |
-| 10 | mail | 3 | ~3 | 4 | 3 | 1 |
-| 11 | imports | 1 | ~3 | 4 | 3 | 1 |
-| 12 | security | 3 | 7 | 2 | 2 | 1 |
-| 13 | auth | 3 | ~4 | 2 | 6 | ~3 |
+| #   | Feature       | Controllers | UI Files | API Files | Model Files | Screens |
+| --- | ------------- | ----------- | -------- | --------- | ----------- | ------- |
+| 1   | users         | 7           | 11       | 4         | 5           | 2       |
+| 2   | roles         | 1           | 3        | 4         | 5           | 1       |
+| 3   | organizations | 3           | ~6       | 4         | 4           | 2       |
+| 4   | dashboard     | 1           | 6        | 3         | 3           | 1       |
+| 5   | settings      | 1           | 3        | 3         | 3           | 1       |
+| 6   | audit-logs    | 1           | 3        | 4         | 3           | 1       |
+| 7   | notifications | 1           | 3        | 4         | 3           | 1       |
+| 8   | jobs          | 1           | ~3       | 4         | 3           | 1       |
+| 9   | files         | 1           | ~4       | 4         | 3           | 1       |
+| 10  | mail          | 3           | ~3       | 4         | 3           | 1       |
+| 11  | imports       | 1           | ~3       | 4         | 3           | 1       |
+| 12  | security      | 3           | 7        | 2         | 2           | 1       |
+| 13  | auth          | 3           | ~4       | 2         | 6           | ~3      |
 
 ## Appendix B: Shared Package Dependencies
 
@@ -765,4 +776,4 @@ UsersListView (presentational)
 
 ---
 
-*Generated by architecture audit — 2026-08-20*
+_Generated by architecture audit — 2026-08-20_

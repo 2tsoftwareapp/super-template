@@ -40,7 +40,6 @@ import { GetFileUseCase } from "../application/use-cases/get-file.use-case";
 import { ListFileVersionsUseCase } from "../application/use-cases/list-file-versions.use-case";
 import { ListFilesUseCase } from "../application/use-cases/list-files.use-case";
 import { UploadFileUseCase } from "../application/use-cases/upload-file.use-case";
-import { UploadFileInterceptor } from "./files-upload.interceptor";
 import {
   BatchDeleteFilesDto,
   BatchDeleteResultDto,
@@ -50,6 +49,7 @@ import {
   FileUrlDto,
   FileVersionDto,
 } from "./dto/files.dto";
+import { UploadFileInterceptor } from "./files-upload.interceptor";
 
 @ApiTags("files")
 @ApiBearerAuth()

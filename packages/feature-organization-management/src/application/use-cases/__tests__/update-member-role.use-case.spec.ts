@@ -1,8 +1,22 @@
 import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 import { describe, expect, it, vi } from "vitest";
 
 import { LastOwnerGuard } from "../../services/last-owner-guard.service";
 import { UpdateMemberRoleUseCase } from "../update-member-role.use-case";
+
+/** Whole actor, not a fragment: `execute` takes `string | AuthenticatedRequestUser`,
+ *  and only the real shape is assignable to the latter. */
+const actorFor = (userId: string, roles: string[] = []): AuthenticatedRequestUser => ({
+  userId,
+  sessionId: `session-${userId}`,
+  email: `${userId}@example.local`,
+  displayName: userId,
+  status: "ACTIVE",
+  roles,
+  permissions: [],
+  organizationId: "org-1",
+});
 
 function buildMocks() {
   const membership = {
@@ -53,7 +67,7 @@ describe("UpdateMemberRoleUseCase", () => {
     });
 
     const useCase = buildUseCase(m);
-    await useCase.execute("org-1", { userId: "actor", roles: ["USER"] }, "target", "ADMIN");
+    await useCase.execute("org-1", actorFor("actor", ["USER"]), "target", "ADMIN");
 
     expect(m.accessControl.ensureOrganizationAdminRole).toHaveBeenCalledWith(
       "org-1",
@@ -75,7 +89,7 @@ describe("UpdateMemberRoleUseCase", () => {
 
     const useCase = buildUseCase(m);
     await expect(
-      useCase.execute("org-1", { userId: "actor", roles: ["USER"] }, "target", "ADMIN"),
+      useCase.execute("org-1", actorFor("actor", ["USER"]), "target", "ADMIN"),
     ).rejects.toThrow(/owner/i);
     expect(m.membership.updateMemberRole).not.toHaveBeenCalled();
   });
@@ -89,7 +103,7 @@ describe("UpdateMemberRoleUseCase", () => {
 
     const useCase = buildUseCase(m);
     await expect(
-      useCase.execute("org-1", { userId: "actor", roles: ["USER"] }, "target", "OWNER"),
+      useCase.execute("org-1", actorFor("actor", ["USER"]), "target", "OWNER"),
     ).rejects.toThrow(/owner/i);
     expect(m.membership.updateMemberRole).not.toHaveBeenCalled();
   });
@@ -103,7 +117,7 @@ describe("UpdateMemberRoleUseCase", () => {
 
     const useCase = buildUseCase(m);
     await expect(
-      useCase.execute("org-1", { userId: "actor", roles: ["USER"] }, "target", "ADMIN"),
+      useCase.execute("org-1", actorFor("actor", ["USER"]), "target", "ADMIN"),
     ).rejects.toThrow(/role/i);
   });
 
@@ -120,7 +134,7 @@ describe("UpdateMemberRoleUseCase", () => {
     const useCase = buildUseCase(m);
     await useCase.execute(
       "org-1",
-      { userId: "admin", roles: [PLATFORM_ROLE_NAMES.SUPER_ADMIN] },
+      actorFor("admin", [PLATFORM_ROLE_NAMES.SUPER_ADMIN]),
       "target",
       "ADMIN",
     );
@@ -137,7 +151,7 @@ describe("UpdateMemberRoleUseCase", () => {
 
     const useCase = buildUseCase(m);
     await expect(
-      useCase.execute("org-1", { userId: "actor", roles: ["USER"] }, "target", "MEMBER"),
+      useCase.execute("org-1", actorFor("actor", ["USER"]), "target", "MEMBER"),
     ).rejects.toThrow(expect.objectContaining({ code: "ORGANIZATION_LAST_OWNER" }));
 
     // The guard locks the owner rows before it decides.
@@ -162,7 +176,7 @@ describe("UpdateMemberRoleUseCase", () => {
     });
 
     const useCase = buildUseCase(m);
-    await useCase.execute("org-1", { userId: "actor", roles: ["USER"] }, "target", "OWNER");
+    await useCase.execute("org-1", actorFor("actor", ["USER"]), "target", "OWNER");
 
     expect(m.membership.countOwners).not.toHaveBeenCalled();
     expect(m.membership.updateMemberRole).toHaveBeenCalledWith("org-1", "target", "OWNER", "tx");
@@ -181,7 +195,7 @@ describe("UpdateMemberRoleUseCase", () => {
     });
 
     const useCase = buildUseCase(m);
-    await useCase.execute("org-1", { userId: "actor", roles: ["USER"] }, "target", "MEMBER");
+    await useCase.execute("org-1", actorFor("actor", ["USER"]), "target", "MEMBER");
 
     expect(m.accessControl.replaceUserRoles).toHaveBeenCalledWith("target", [], "org-1", "tx");
     expect(m.accessControl.invalidateAccessProfile).toHaveBeenCalledWith("target");
@@ -197,7 +211,7 @@ describe("UpdateMemberRoleUseCase", () => {
 
     const useCase = buildUseCase(m);
     await expect(
-      useCase.execute("org-1", { userId: "actor", roles: ["USER"] }, "target", "ADMIN"),
+      useCase.execute("org-1", actorFor("actor", ["USER"]), "target", "ADMIN"),
     ).rejects.toThrow(expect.objectContaining({ code: "ORGANIZATION_MEMBER_NOT_FOUND" }));
   });
 });

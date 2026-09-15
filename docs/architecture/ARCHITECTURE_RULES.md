@@ -44,6 +44,7 @@ apps/api/src/
   composition/    runtime composition and feature registry
   openapi/        OpenAPI / Swagger configuration
   cli/            migrate / seed / reset entry points (+ seeds/)
+  shell/          process bootstrap wiring (`bootstrap.ts`)
 
 packages/          kernel libraries + compile-time feature packages
   api-kernel/         framework-free ports, errors, types, pure helpers
@@ -155,8 +156,8 @@ Dependencies must always point inward toward business behavior and contracts.
 Use this structure as the maximum standard:
 
 ```text
-modules/<feature>/
-├── <feature>.module.ts
+packages/feature-<id>/src/
+├── <id>.module.ts
 │
 ├── presentation/
 │   ├── <feature>.controller.ts
@@ -644,7 +645,12 @@ A feature plugin's **backend** surface MUST:
   (application/infrastructure/presentation/domain as needed);
 - own its Drizzle tables under `src/infrastructure/persistence/` (SQL migrations
   are composed into `apps/api/migrations` via `@repo/database-runtime` drizzle-kit);
-- carry unit tests under `src/**/__tests__/` and its own lint/typecheck scripts.
+- carry unit tests under `src/**/__tests__/` and its own lint/typecheck scripts;
+- declare a `tsconfig.spec.json` alongside `tsconfig.json` and run **both** from
+  `typecheck`, so specs are compiled by the same gate as the code they cover.
+  `tsconfig.json` excludes `*.spec.ts` (build output stays test-free), which
+  makes the spec program the only thing that type-checks tests. See
+  [`packages/tsconfig/README.md`](../../packages/tsconfig/README.md).
 
 > **Schema composition:** `@repo/database-runtime` exports an empty built-in schema.
 > Feature packages contribute tables via `FeatureManifest.schema`;
@@ -657,8 +663,9 @@ sub-package. They use only kernel design-system packages (`@repo/web-*`,
 `mobile_core`) — never an app's `@/` aliases.
 
 The app decides whether a feature participates by importing its manifest in one
-composition file (`apps/api/src/features.ts` for backend + schema, admin resource
-list for nav, `pubspec.yaml` for mobile) and rendering its thin route entries.
+composition file (`apps/api/src/composition/feature-registry.ts` for backend +
+schema, admin resource list for nav, `pubspec.yaml` for mobile) and rendering its
+thin route entries.
 Removing the workspace dependency + those composition lines removes the capability
 on every surface without touching kernel code. Cross-feature communication goes
 through kernel ports or a peer's public module — never a deep import.

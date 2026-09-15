@@ -10,14 +10,19 @@ function buildMocks() {
   };
 
   const usersRepository = {
-    findByEmail: vi.fn(async () => null),
+    findByEmail: vi.fn(
+      async (_email: string): Promise<{ id: string; email: string } | null> => null,
+    ),
     create: vi.fn(
-      async (input: {
-        email: string;
-        passwordHash: string;
-        displayName: string;
-        status: string;
-      }) => ({
+      async (
+        input: {
+          email: string;
+          passwordHash: string;
+          displayName: string;
+          status: string;
+        },
+        _executor?: unknown,
+      ) => ({
         id: "new-user-id",
         email: input.email,
         displayName: input.displayName,
@@ -28,19 +33,30 @@ function buildMocks() {
 
   const authAccessProfile = {
     getRoleByName: vi.fn(async () => ({ id: "role-user", name: "USER" })),
-    replaceUserRoles: vi.fn(async () => {}),
+    replaceUserRoles: vi.fn(
+      async (_userId: string, _roleIds: string[], _scope: unknown, _executor?: unknown) => {},
+    ),
   };
 
   const auditWriter = {
-    log: vi.fn(async () => {}),
+    log: vi.fn(async (_event: unknown, _executor?: unknown) => {}),
   };
 
   const authSessionRepository = {
-    storeEmailVerificationToken: vi.fn(async () => ({ id: "token-id" })),
+    storeEmailVerificationToken: vi.fn(
+      async (
+        _input: { userId: string; tokenHash: string; expiresAt: Date },
+        _executor?: unknown,
+      ) => ({
+        id: "token-id",
+      }),
+    ),
   };
 
   const outbox = {
-    append: vi.fn(async () => {}),
+    append: vi.fn(
+      async (_event: string, _payload: { email: string; token: string }, _executor?: unknown) => {},
+    ),
   };
 
   const applicationSettingsLookup = {
@@ -49,7 +65,9 @@ function buildMocks() {
   };
 
   const personalOrganizationProvisioner = {
-    ensurePersonalOrganization: vi.fn(async () => {}),
+    ensurePersonalOrganization: vi.fn(
+      async (_userId: string, _displayName: string, _executor?: unknown) => {},
+    ),
   };
 
   const useCase = new RegisterUseCase(
@@ -140,8 +158,8 @@ describe("RegisterUseCase", () => {
       }),
       m.tx,
     );
-    expect(m.usersRepository.create.mock.calls[0][0].passwordHash).toBeTruthy();
-    expect(m.usersRepository.create.mock.calls[0][0].passwordHash).not.toBe("strong-password-123");
+    expect(m.usersRepository.create.mock.calls[0]![0].passwordHash).toBeTruthy();
+    expect(m.usersRepository.create.mock.calls[0]![0].passwordHash).not.toBe("strong-password-123");
 
     // --- USER role assigned ---
     expect(m.authAccessProfile.getRoleByName).toHaveBeenCalledWith("USER", null, m.tx);
@@ -170,7 +188,7 @@ describe("RegisterUseCase", () => {
     );
     // Token hash must differ from the plaintext token sent via outbox.
     const storedTokenHash =
-      m.authSessionRepository.storeEmailVerificationToken.mock.calls[0][0].tokenHash;
+      m.authSessionRepository.storeEmailVerificationToken.mock.calls[0]![0].tokenHash;
     expect(storedTokenHash).toBeTruthy();
 
     // --- Email outbox appended ---
@@ -183,7 +201,7 @@ describe("RegisterUseCase", () => {
       m.tx,
     );
     // The outbox token must match the stored hash (same opaque token).
-    const outboxToken = m.outbox.append.mock.calls[0][1].token;
+    const outboxToken = m.outbox.append.mock.calls[0]![1].token;
     expect(outboxToken).toBeTruthy();
 
     // --- Audit written ---

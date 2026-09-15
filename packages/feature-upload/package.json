@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint .",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.spec.json --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:coverage": "vitest run --coverage --passWithNoTests",
     "test:s3": "RUN_S3_INTEGRATION=1 vitest run test/integration/s3-object-storage.integration.spec.ts",

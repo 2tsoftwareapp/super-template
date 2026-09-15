@@ -12,6 +12,5 @@ export {
   type OutboxTopicHandlerContribution,
 } from "./outbox-handler.port";
 export { OUTBOX_HANDLER_REGISTRY } from "./outbox-handler.token";
-export { type OutboxRecord } from "./outbox.port";
+export { type OutboxRecord, type OutboxRepositoryPort } from "./outbox.port";
 export { OUTBOX_REPOSITORY } from "./outbox.token";
-export type { OutboxRepositoryPort } from "./outbox.port";

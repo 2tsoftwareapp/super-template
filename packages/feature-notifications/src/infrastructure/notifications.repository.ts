@@ -63,7 +63,7 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
 
   async createManyIdempotent(
     sourceJobId: string,
-    recipients: Array<Omit<CreateNotificationInput, "sourceJobId">>,
+    recipients: Omit<CreateNotificationInput, "sourceJobId">[],
     executor: DatabaseExecutor = this.database,
   ) {
     if (recipients.length === 0) {

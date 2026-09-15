@@ -23,7 +23,11 @@ describe("LocalObjectStorage integration", () => {
       },
     } as never);
 
-    await storage.upload({ key: "tenant/file.txt", body: Buffer.from("payload") });
+    await storage.upload({
+      key: "tenant/file.txt",
+      body: Buffer.from("payload"),
+      mimeType: "text/plain",
+    });
 
     await expect(storage.read("tenant/file.txt")).resolves.toEqual(Buffer.from("payload"));
     await expect(storage.getSignedUrl("tenant/file.txt")).resolves.toBe(

@@ -100,7 +100,11 @@ describe("RefreshSessionUseCase — concurrent refreshes of the same rotation", 
     // refresh presents a token the session no longer knows, reuse detection
     // fires, and a legitimate user is logged out.
     const harness = await createHarness();
-    const [tabA, tabB] = Array.from({ length: 2 }, () => harness.openTab(harness.liveRefreshToken));
+    // Two named tabs, so tabA is a Tab rather than a possibly-absent array slot.
+    const [tabA, tabB] = [
+      harness.openTab(harness.liveRefreshToken),
+      harness.openTab(harness.liveRefreshToken),
+    ];
 
     const [first, second] = await Promise.all([tabA.refresh(), tabB.refresh()]);
 
