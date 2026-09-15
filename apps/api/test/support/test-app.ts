@@ -14,6 +14,7 @@ import request from "supertest";
 import { AppModule } from "../../src/app.module";
 import { applySqlMigrations } from "../../src/cli/migrations";
 import { seedDatabase } from "../../src/cli/seeds/seed-data";
+import { acquireTestDatabaseLock } from "./test-database-lock";
 
 loadEnvFiles();
 
@@ -145,6 +146,10 @@ export const resetTestDatabase = async (): Promise<void> => {
   }
 
   await ensureTestDatabaseExists(databaseUrl, adminDatabaseUrl);
+  // Serialise against any other e2e process before touching the shared schema: everything
+  // below drops and rebuilds `public`, which would otherwise tear tables out from under a
+  // concurrently running suite.
+  await acquireTestDatabaseLock(adminDatabaseUrl);
   await ensureRestrictedTestRole(adminDatabaseUrl);
 
   const pool = new Pool({
