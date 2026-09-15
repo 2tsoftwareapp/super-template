@@ -53,26 +53,55 @@ A spec that does not compile therefore fails `pnpm typecheck`. Fix the spec; do
 not widen the config. `build` stays test-free. Convention and the two
 documented deviations: [`packages/tsconfig/README.md`](../packages/tsconfig/README.md).
 
-### `apps/admin/next-env.d.ts` flips after a production build
+### `next-env.d.ts` is ignored, not committed (both Next apps)
 
-`apps/admin/next-env.d.ts` is committed (Next generates it; the file itself says
-it must not be edited). Its third line depends on which Next command ran last:
+Next generates `next-env.d.ts` next to each app's `tsconfig.json`, and its third
+line depends on which Next command ran last:
 
 | Last command | Line Next writes                          |
 | ------------ | ----------------------------------------- |
 | `next dev`   | `import "./.next/dev/types/routes.d.ts";` |
 | `next build` | `import "./.next/types/routes.d.ts";`     |
 
-The committed copy is the `next dev` variant, so `pnpm build` (or
-`pnpm --filter admin build`) leaves exactly that one line modified in
-`git status`. It is generated output, not a real change: keep the file tracked —
-`apps/admin/tsconfig.json` includes it, and tracking it keeps the checked-in
-state equal to what a local `next dev` produces — and discard the line instead of
-committing it. Verified 2026-09-15 on `apps/admin` (Next 16.2.9).
+Because both variants are produced by normal workflows, no committed copy can
+stay in sync: a `pnpm --filter admin build` rewrote the tracked file from the dev
+variant to the build variant, leaving `git status` dirty on a build nobody
+touched. `next-env.d.ts` is therefore listed once in the **root** `.gitignore`
+and untracked in both apps — the same convention `create-next-app` ships with,
+applied to `apps/admin` too. Do not commit it, and do not add a per-app
+`.gitignore` line for it.
 
-`apps/web` carries the same file but ignores it (stock `create-next-app`
-`.gitignore`), so only the admin app shows this churn. Making admin match web is a
-deliberate call for the project owner, not a mechanical cleanup.
+The file is generated output, not an input:
+
+- `pnpm --filter {admin,web} typecheck` passes with the file absent (verified
+  2026-09-16, Next 16.2.9) — `tsc` resolves Next's types from the package itself.
+- both apps' `tsconfig.json` include `.next/types/**/*.ts` **and**
+  `.next/dev/types/**/*.ts`, so typed routes load whichever variant `next dev` or
+  `next build` wrote.
+- `next dev` and `next build` recreate it at startup, so a fresh clone needs no
+  extra step.
+
+If the deleted line of `git status` shows up after a build, the ignore rule is
+missing or the file was re-added — restore the rule instead of committing it.
+
+### `apps/api` and `apps/worker` declare dependencies they never import
+
+Both host apps build with webpack and `webpack-node-externals({ allowlist:
+[/^@repo\//] })`, which bundles workspace packages but leaves **every** npm
+package external. The bundle therefore `require()`s third-party modules at runtime
+out of the host app's own `node_modules`, and pnpm's strict isolation only exposes
+what that app declares.
+
+So `apps/api` and `apps/worker` must keep a declaration for every npm package any
+bundled `@repo/*` code needs at runtime — even when the app's own `src/` never
+imports it:
+
+- `zod` — imported by `@repo/api-runtime` (`src/config/environment/env.schema.ts`)
+- `argon2` — imported by `@repo/api-kernel` (`src/utils/password.ts`)
+
+Do not remove these as "unused": "no import in this package" is not sufficient
+evidence for the two host apps. The same reason is why
+`scripts/check-source-policy.sh` explicitly allows `argon2` in `apps/api`.
 
 ## Running Individual Apps
 

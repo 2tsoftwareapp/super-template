@@ -19,6 +19,11 @@
  * where <name> is the project name folded to lowercase alphanumerics (see
  * `toAppIdentifier`). Both platforms get the same value.
  *
+ * Android also keeps a copy of the identifier as a directory tree
+ * (`src/main/kotlin/com/example/mobile_app/`), so the matching directory is
+ * moved to the new package path — otherwise the folder would disagree with the
+ * `package` declaration it contains.
+ *
  * The generated Dart client under apps/mobile/lib/generated/ is rewritten too so
  * the tree is consistent immediately; `pnpm generate` reproduces it deterministically.
  *
@@ -27,9 +32,18 @@
  *   node scripts/rename.mjs "Acme App" --author acme-co --dry-run
  *   node scripts/rename.mjs            # interactive prompts
  */
-import { readFileSync, writeFileSync, existsSync, statSync, readdirSync } from 'node:fs';
+import {
+  readFileSync,
+  writeFileSync,
+  existsSync,
+  statSync,
+  readdirSync,
+  mkdirSync,
+  renameSync,
+  rmSync,
+} from 'node:fs';
 import { execSync } from 'node:child_process';
-import { resolve, relative, extname } from 'node:path';
+import { resolve, relative, dirname, extname } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
 import { repoRoot } from './merge-env.mjs';
@@ -188,6 +202,83 @@ const toAppIdentifier = (name) => {
 /** Escape a string for use as a literal RegExp. */
 const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+/** Reverse-DNS identifier as a directory tree: `com.acme.app` -> `com/acme/app`. */
+const toPackagePath = (identifier) => identifier.split('.').join('/');
+
+// Android source sets are `<root>/kotlin/<package path>/`. Only those carry a
+// Kotlin package directory that has to follow the namespace.
+const KOTLIN_SOURCE_MARKER = '/kotlin/';
+
+/**
+ * Android package directories that mirror the template's old application id.
+ *
+ * Derived from the file list rather than hard-coded to `src/main/kotlin`, so a
+ * project with extra source sets (debug, flavor, …) is rebranded the same way.
+ * Every source set holding the old package path is returned with the `kotlin`
+ * root it belongs to, which bounds the empty-directory cleanup after a move.
+ */
+const findKotlinPackageDirs = (files, oldPackagePath) => {
+  const needle = `/${oldPackagePath}/`;
+  const sources = new Map();
+
+  for (const rel of files) {
+    const path = rel.split('\\').join('/');
+    const index = path.indexOf(needle);
+    if (index === -1) continue;
+
+    const kotlinIndex = path.lastIndexOf(KOTLIN_SOURCE_MARKER, index);
+    if (kotlinIndex === -1) continue;
+
+    const packageDir = path.slice(0, index + needle.length - 1);
+    sources.set(packageDir, path.slice(0, kotlinIndex + KOTLIN_SOURCE_MARKER.length - 1));
+  }
+
+  return [...sources].map(([packageDir, kotlinRoot]) => ({ packageDir, kotlinRoot })).sort();
+};
+
+/** The old package directory with the old package path swapped for the new one. */
+const toRebrandedPackageDir = (packageDir, oldPackagePath, newPackagePath) =>
+  `${packageDir.slice(0, packageDir.length - oldPackagePath.length)}${newPackagePath}`;
+
+/**
+ * Moves the package directory to `target`.
+ *
+ * Deterministic and re-runnable: a missing source means the move already
+ * happened, and an existing destination is merged entry by entry so a
+ * half-rebranded tree converges instead of being overwritten.
+ */
+const moveKotlinPackageDir = ({ packageDir, kotlinRoot }, target) => {
+  const from = resolve(repoRoot, packageDir);
+  if (!existsSync(from)) return undefined;
+
+  const to = resolve(repoRoot, target);
+  mkdirSync(to, { recursive: true });
+
+  for (const entry of readdirSync(from)) {
+    const destination = resolve(to, entry);
+    if (existsSync(destination)) continue; // never clobber what is already there
+    renameSync(resolve(from, entry), destination);
+  }
+
+  // Leftovers stay behind rather than being deleted; only an emptied tree goes.
+  if (readdirSync(from).length === 0) {
+    rmSync(from, { recursive: true, force: true });
+    pruneEmptyAncestors(dirname(from), resolve(repoRoot, kotlinRoot));
+  }
+
+  return { from: packageDir, to: target };
+};
+
+/** Removes directories emptied by a move, stopping at the `kotlin` root. */
+const pruneEmptyAncestors = (dir, kotlinRoot) => {
+  let current = dir;
+  while (current.startsWith(`${kotlinRoot}/`)) {
+    if (!existsSync(current) || readdirSync(current).length > 0) return;
+    rmSync(current, { recursive: true, force: true });
+    current = dirname(current);
+  }
+};
+
 const main = async () => {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
@@ -303,6 +394,27 @@ const main = async () => {
     `\n${verb} ${totalOccurrences} occurrence(s) across ${changedFiles.length} file(s).\n`,
   );
 
+  // The package directory has to follow the namespace, and the `package` line
+  // inside it was already rewritten above — so the move runs last.
+  const oldPackagePath = toPackagePath(OLD.androidAppId);
+  const newPackagePath = toPackagePath(NEW.appId);
+  const kotlinDirs = findKotlinPackageDirs(tracked, oldPackagePath);
+
+  const movedDirs = [];
+  for (const kotlinDir of kotlinDirs) {
+    const target = toRebrandedPackageDir(kotlinDir.packageDir, oldPackagePath, newPackagePath);
+    if (target === kotlinDir.packageDir) continue;
+
+    const moved = args.dryRun
+      ? { from: kotlinDir.packageDir, to: target }
+      : moveKotlinPackageDir(kotlinDir, target);
+    if (moved) movedDirs.push(moved);
+  }
+
+  for (const { from, to } of movedDirs) {
+    stdout.write(`  move  ${from}/  ->  ${to}/\n`);
+  }
+
   if (!args.dryRun && changedFiles.length > 0) {
     stdout.write(
       `\nNext steps:\n` +
@@ -310,10 +422,7 @@ const main = async () => {
       `  2. Update LICENSE copyright holder and README badge URLs if needed.\n` +
       `  3. Reinstall + regenerate:  pnpm install && pnpm generate\n` +
       `  4. Verify:  pnpm lint && pnpm typecheck && pnpm build\n` +
-      `  5. Optional: move apps/mobile/android/app/src/main/kotlin/${OLD.androidAppId.replace(/\./g, '/')}/\n` +
-      `     to match ${NEW.appId}. The build works either way (Kotlin does not require\n` +
-      `     directory == package); only the folder name is left behind.\n` +
-      `  6. Mobile release signing is project-owner work:\n` +
+      `  5. Mobile release signing is project-owner work:\n` +
       `     apps/mobile/README.md -> "Release signing".\n`,
     );
   }

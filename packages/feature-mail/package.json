@@ -30,8 +30,7 @@
     "class-transformer": "0.5.1",
     "class-validator": "0.15.1",
     "drizzle-orm": "0.45.2",
-    "nodemailer": "9.0.0",
-    "zod": "4.4.3"
+    "nodemailer": "9.0.0"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",
