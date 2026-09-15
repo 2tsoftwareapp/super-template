@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { type AuditLogsParams, fetchAuditLogs } from "./audit-logs.api";
+import { auditLogsApi, type AuditLogsParams } from "./audit-logs.api";
 import { auditLogsKeys } from "./audit-logs.query-keys";
 
 export function useAuditLogsQuery(params: AuditLogsParams) {
@@ -14,7 +14,7 @@ export function useAuditLogsQuery(params: AuditLogsParams) {
       page: params.page,
       sortOrder: params.sortOrder,
     }),
-    queryFn: () => fetchAuditLogs(params),
+    queryFn: () => auditLogsApi.list(params),
     placeholderData: (previous) => previous,
   });
 }

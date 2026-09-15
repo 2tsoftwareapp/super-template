@@ -9,7 +9,7 @@ import {
   type BackgroundJobEnqueuerWithResult,
 } from "@repo/feature-jobs/contracts";
 
-import { isMandatoryMailTemplate } from "../../constants/mandatory-mail-templates";
+import { isMandatoryMailTemplate } from "../../domain/mandatory-mail-templates";
 import {
   TEMPLATE_RENDERER_SERVICE,
   type TemplateRendererServicePort,

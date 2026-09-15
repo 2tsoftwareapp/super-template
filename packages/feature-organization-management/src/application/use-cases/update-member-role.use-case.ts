@@ -2,12 +2,11 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-kernel"
 import type { TransactionPort } from "@repo/api-kernel";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-kernel";
+import { AppError, PLATFORM_ROLE_NAMES, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-kernel";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import {
   assertCanManageTargetRole,
-  assertNotLastOwner,
   assertOrganizationRole,
   ORGANIZATION_ACCESS_CONTROL,
   ORGANIZATION_ERROR_CODES,
@@ -17,8 +16,7 @@ import {
   type OrganizationMembership,
 } from "@repo/feature-organizations/contracts";
 
-/** Platform super-role literal; importing access-control here would create a package cycle. */
-const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";
+import { LastOwnerGuard } from "../services/last-owner-guard.service";
 
 @Injectable()
 export class UpdateMemberRoleUseCase {
@@ -30,6 +28,7 @@ export class UpdateMemberRoleUseCase {
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     @Inject(ORGANIZATION_ACCESS_CONTROL)
     private readonly accessControl: OrganizationAccessControlPort,
+    private readonly lastOwnerGuard: LastOwnerGuard,
   ) {}
 
   async execute(
@@ -44,7 +43,7 @@ export class UpdateMemberRoleUseCase {
         ? { userId: actor, isSuperAdmin: false }
         : {
             userId: actor.userId,
-            isSuperAdmin: actor.roles?.includes(PLATFORM_SUPER_ADMIN) ?? false,
+            isSuperAdmin: actor.roles?.includes(PLATFORM_ROLE_NAMES.SUPER_ADMIN) ?? false,
           };
 
     const tenantContext = {
@@ -103,20 +102,16 @@ export class UpdateMemberRoleUseCase {
         );
       }
 
-      if (targetMembership.role === "OWNER" && role !== "OWNER") {
-        const remainingOwners = await this.membership.countOwners(organizationId, {
-          excludingUserId: targetUserId,
-          executor: transaction,
-          lock: true,
-        });
-        assertNotLastOwner({ userId: targetUserId, role: targetMembership.role }, remainingOwners);
-      }
-
-      const updated = await this.membership.updateMemberRole(
+      const updated = await this.lastOwnerGuard.run(
         organizationId,
-        targetUserId,
-        role,
+        {
+          userId: targetUserId,
+          currentRole: targetMembership.role,
+          // OWNER → OWNER keeps the owner count, so the last-owner guard does not apply.
+          keepsOwnership: role === "OWNER",
+        },
         transaction,
+        () => this.membership.updateMemberRole(organizationId, targetUserId, role, transaction),
       );
 
       if (!updated) {

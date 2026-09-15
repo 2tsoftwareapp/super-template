@@ -6,7 +6,7 @@ This package owns the `settings` feature and its application, domain, infrastruc
 
 ## Public API
 
-The package declares these public entrypoints: `.`, `./contracts`, `./testing`, `./schema`, `./guard`. Consumers must use these entrypoints instead of importing internal files.
+The package declares these public entrypoints: `.`, `./contracts`, `./schema`, `./guard`. Consumers must use these entrypoints instead of importing internal files.
 
 ## Feature dependencies
 

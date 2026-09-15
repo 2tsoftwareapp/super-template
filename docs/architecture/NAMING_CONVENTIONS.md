@@ -177,12 +177,17 @@ RLS follows the table, so two rules hold:
   physical table — policies, indexes, and foreign keys bind by OID and were
   deliberately left alone. Do not "fix" these names to match the prefix; a
   rename would silently drop and recreate the policy.
-- **Coverage is a deliberate subset, not all tables.** 14 of the 38 tables are
-  `ENABLE`d **and** `FORCE`d with exactly one `<base>_tenant_isolation` policy.
-  Four tables carry `organization_id` but are intentionally outside RLS because
-  they are read *before* a tenant context exists — a tenant predicate would hide
-  the very rows used to establish that context (`r_organization_members`,
-  `t_sso_session_exchanges`, `m_roles`, `r_user_roles`). See
+- **Coverage is a deliberate subset, not all tables.** 16 of the 38 tables are
+  `ENABLE`d **and** `FORCE`d with exactly one `<base>_tenant_isolation` policy
+  (`l_activities`, `l_audit_logs`, `m_files`, `r_attachments`,
+  `r_job_dependencies`, `t_export_jobs`, `t_file_batch_operations`,
+  `t_file_versions`, `t_import_jobs`, `t_mail_deliveries`, `t_notifications`,
+  `w_job_attempts`, `w_job_events`, `w_jobs`, `w_notification_jobs`,
+  `w_outbox_messages`). Four tables carry `organization_id` but are intentionally
+  outside RLS because they are read *before* a tenant context exists — a tenant
+  predicate would hide the very rows used to establish that context
+  (`r_organization_members`, `t_sso_session_exchanges`, `m_roles`,
+  `r_user_roles`). See
   [`docs/database.md`](../database.md) → "Tables deliberately outside RLS"
   for the rationale and the compensating controls.
 - **Organization-optional deployments add a user-scoped branch** to every
@@ -211,12 +216,14 @@ and symbols follow each language's idiom.
 | TypeScript class/type           | `PascalCase`                        | `CreateUserUseCase`, `UserResponseDto`              | backend + web/admin         |
 | TypeScript function/variable    | `camelCase`                         | `normalizeEmail`, `usersApi`                        | backend + web/admin         |
 | TypeScript constant             | `UPPER_SNAKE_CASE`                  | `USER_STATUS`, `DEFAULT_USERS_LIST_PARAMS`          | backend + web/admin         |
-| DI token (Symbol)               | `UPPER_SNAKE_CASE`                  | `USER_REPOSITORY = Symbol("UserRepositoryPort")`    | backend                     |
+| DI token (Symbol)               | `UPPER_SNAKE_CASE`, `Symbol("<TOKEN>")` | `USER_LOOKUP = Symbol("USER_LOOKUP")`               | backend                     |
 | Nest use case                   | `*.use-case.ts` / `<Action>UseCase` | `block-user.use-case.ts` → `BlockUserUseCase`       | backend                     |
 | Nest controller                 | `*.controller.ts` / `<Domain>Controller` | `auth.controller.ts` → `AuthController`        | backend                     |
 | Nest module                     | `*.module.ts` / `<Domain>Module`    | `users.module.ts` → `UsersModule`                   | backend                     |
 | Application service             | `*.service.ts` / `<Domain>Service`  | `mfa.service.ts` → `MfaService`                     | backend                     |
-| Port (interface + token)        | `*.repository.port.ts` / `<Resource>RepositoryPort` | `user.repository.port.ts` → `UserRepositoryPort` | backend                |
+| Internal port (interface + token) | `*.repository.port.ts` / `<Resource>RepositoryPort` | `users.repository.port.ts` → `USERS_REPOSITORY` | backend `application/ports/` |
+| Cross-feature port (interface)  | `<name>.port.ts` / `<Resource>Port` | `user-lookup.port.ts` → `UserLookup`                | feature `src/public/`       |
+| Cross-feature token (DI)        | `<name>.token.ts`, `UPPER_SNAKE_CASE` | `user-lookup.token.ts` → `USER_LOOKUP`             | feature `src/public/`       |
 | Repository (impl)               | `*.repository.ts` / `<Resource>Repository` | `users.repository.ts` → `UsersRepository`    | backend (no `drizzle-` prefix) |
 | Adapter                         | `*.adapter.ts` / `<Service>Adapter` | `resend-email.adapter.ts` → `ResendEmailAdapter`    | backend                     |
 | Entity / policy                 | `<domain>.entity.ts` / `<Domain>Entity` | `user.entity.ts` → `UserEntity`                 | backend domain              |
@@ -233,8 +240,25 @@ and symbols follow each language's idiom.
 | FE UI component                 | `<feature>-*.tsx` (kebab) / `<X>View` etc. | `users-table.tsx` → `UsersTable`             | web/admin `ui/`             |
 | Dart file                       | `snake_case.dart`                   | `auth_repository.dart`, `login_screen.dart`         | mobile                      |
 | Dart class                      | `PascalCase`                        | `AuthRepository`, `LoginScreen`, `AuthSession`      | mobile                      |
-| Feature plugin package          | `@repo/feature-<id>`                | `@repo/feature-audit`                               | `packages/features/<id>/`   |
+| Feature plugin package          | `@repo/feature-<id>`                | `@repo/feature-audit`                               | `packages/feature-<id>/`    |
 | API route path                  | kebab-case, plural resources        | `/api/v1/admin/users`, `/api/v1/files/{id}/url`     | Nest controllers            |
+
+**Port and token placement.** Two layouts exist, and the file name tells you
+which one you are reading:
+
+- **Internal port** (`src/application/ports/<resource>.repository.port.ts`): the
+  interface and its DI token live in the same file, e.g.
+  `users.repository.port.ts` declares `UsersRepositoryPort` and
+  `export const USERS_REPOSITORY = Symbol("USERS_REPOSITORY")`.
+- **Cross-feature port** (`src/public/`): the interface lives in
+  `<name>.port.ts` and the token is declared **once** in the sibling
+  `<name>.token.ts` (`export const USER_LOOKUP = Symbol("USER_LOOKUP");`). The
+  port module re-exports it (`export { ACTIVITY_EMITTER } from
+  "./activity-emitter.token";`) and `src/public/contracts.ts` re-exports both,
+  so consumers import the port and the token from one entrypoint. A token may
+  also be published on its own when the interface lives elsewhere (e.g.
+  `public/access-control-repository.token.ts`, re-exported by
+  `application/ports/access-control.repository.port.ts`).
 
 ### 3.2 TypeScript file vs symbol split
 
@@ -280,12 +304,17 @@ Files are `snake_case.dart`; classes are `PascalCase`. Generated Dart under
 ### 3.5 Feature plugin package naming
 
 Each extracted feature is a package `@repo/feature-<id>` at
-`packages/features/<id>/`, where `<id>` is **kebab-case** and **equals the
+`packages/feature-<id>/`, where `<id>` is **kebab-case** and **equals the
 `FeatureManifest.id`** exported from the package's `index.ts`
 (`{ id, nestModule, schema?, permissions? }`). See
 [ADR 0002](../adr/0002-feature-plugin-architecture.md) and
-`ARCHITECTURE_RULES.md` §15.1. Frontend surfaces are exposed through per-surface
-entrypoints (`./admin`, `./web`) and a Dart sub-package under the same package.
+`ARCHITECTURE_RULES.md` §15.1. A package exposes subpath entrypoints for the
+cross-package surfaces it actually has — currently `.`, `./contracts`,
+`./schema`, `./module`, `./guard`, `./interceptor`, `./dispatcher`, `./registry`
+(never a `"./*"` wildcard; `scripts/check-source-policy.sh` rejects it, and
+`scripts/generate-feature-indexes.mjs --check` verifies every target exists).
+Frontend and mobile code stays in `apps/admin`, `apps/web` and `apps/mobile`;
+feature packages ship no Dart or React surface.
 
 ### 3.6 API routes
 
@@ -302,11 +331,21 @@ admin build URLs with `bffPath("/api/v1/…")` rather than hand-written strings.
 Naming is enforced by a mix of tooling and review:
 
 - **`scripts/check-source-policy.sh`** — repo source-policy guard (run via
-  `pnpm lint`). It rejects `@boundaries-ignore`, explicit `any`, `unknown`
-  outside allowed boundaries, package `index.ts` files that export repositories,
-  presentation importing `drizzle-orm`/infrastructure, application importing
-  `drizzle-orm`/`express`/infrastructure/`@repo/database-runtime`, domain importing
-  any framework, and non-route files under `app/**`.
+  `pnpm lint`). It rejects `@boundaries-ignore`, explicit `any`, business feature
+  folders under `apps/api/src`, umbrella `packages/features/{identity,platform}`,
+  wildcard `"./*"` feature exports, `pgTable(...)` in
+  `packages/database-runtime/src`, Nest/Express/Drizzle/Redis/Sentry imports in
+  `packages/api-kernel/src`, feature imports of `apps/*`, and feature-provider
+  SDKs in `apps/api/package.json`. It then chains the structural guards:
+  `scripts/check-cross-feature-fks.mjs`, `scripts/check-error-codes.mjs`, and
+  `scripts/check-domain-purity.mjs` — the last one enforces “domain importing any
+  framework” over `packages/feature-<id>/src/**/domain/**` (ADR 0001 rule 1:
+  value imports of `@nestjs/*`, `drizzle-orm`, `express` and
+  `@repo/database-runtime` are rejected, type-only imports are allowed).
+  Deep imports into a feature's `src/infrastructure`, `src/presentation` or
+  `src/testing` and missing subpath export targets are rejected by
+  `scripts/check-feature-manifest-deps.mjs` and
+  `scripts/generate-feature-indexes.mjs --check`.
 - **Turborepo boundaries** — `layer:*` tags (`core`, `env`, `database`, `sort`,
   `contract`, and `feature` per ADR 0002) constrain which packages may depend on
   which, keeping `@repo/feature-<id>` packages off `apps/*` internals.

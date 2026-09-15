@@ -13,7 +13,7 @@ import {
 
 import { GetAuditLogUseCase } from "../application/use-cases/get-audit-log.use-case";
 import { ListAuditLogsUseCase } from "../application/use-cases/list-audit-logs.use-case";
-import { AuditLogDto, AuditLogsQueryDto } from "./audit.dto";
+import { AuditLogDto, AuditLogsQueryDto } from "./dto/audit.dto";
 
 @ApiTags("admin-audit")
 @ApiBearerAuth()

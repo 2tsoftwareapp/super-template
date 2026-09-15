@@ -16,7 +16,7 @@ import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 import { UsersMapper } from "@repo/feature-users/module";
 
-import { assertUserBelongsToOrganization } from "../../user-org-scope.policy";
+import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 
 @Injectable()
 export class GetUserUseCase {

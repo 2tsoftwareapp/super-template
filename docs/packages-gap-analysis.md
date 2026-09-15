@@ -1,5 +1,24 @@
 # Deep Packages Gap Analysis
 
+> **Status (updated 2026-09-15):** This is a record **as of 2026-09-10**
+> (`aed93237`). The original findings are kept verbatim; the following were
+> addressed during the 2026-09 remediation:
+>
+> - **Highest-priority finding** — "no quality gate proving every package's public
+>   entrypoint / feature manifest / integration boundary remains covered":
+>   **addressed** in `8bb0f68c` by an export-guard spec that reads every workspace
+>   package's `exports` map, imports each subpath and asserts a non-empty namespace
+>   (103 subpaths across 44 packages; the 70 exclusions are browser-only packages
+>   with their own policy list).
+> - **Test depth of `feature-upload`**: **addressed** — the S3 integration suite
+>   now runs for real behind a flag nobody had set (`8bb0f68c`), and the package has
+>   a `test:integration` script plus a README stating its prerequisites; 152 tests
+>   in the package.
+> - **Coverage governance**: now documented in `docs/coverage-governance.md`
+>   (gate `pnpm run test:coverage`, baseline in `scripts/run-coverage.mjs`).
+> - **Remaining**: package documentation for packages other than `feature-upload`,
+>   and the placement convention for integration tests — untouched by this round.
+
 ## Executive conclusion
 
 The monorepo has a coherent package-oriented architecture, and its primary boundary checks now pass. The source policy, package-cycle check, feature-manifest dependency guard, and cross-feature foreign-key guard all pass after restoring the missing `organizationsFeature` export from `feature-organizations/src/index.ts`.

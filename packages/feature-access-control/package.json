@@ -6,7 +6,6 @@
   "exports": {
     ".": "./src/index.ts",
     "./contracts": "./src/public/contracts.ts",
-    "./testing": "./src/testing/index.ts",
     "./schema": "./src/infrastructure/persistence/index.ts",
     "./module": "./src/access-control.module.ts",
     "./interceptor": "./src/tenant-context.interceptor.ts"
@@ -14,7 +13,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint .",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.spec.json --noEmit",
     "test": "vitest run --passWithNoTests",
     "format": "prettier --write ."
   },

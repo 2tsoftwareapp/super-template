@@ -9,9 +9,7 @@ const buildEnvironmentService = (retentionDays: number) => ({
 describe("PurgeExpiredAuditLogsUseCase", () => {
   it("no-ops when retention is disabled", async () => {
     const auditRepository = {
-      tryAdvisoryLock: vi.fn(),
       deleteOlderThanBatched: vi.fn(),
-      unlockAdvisoryLock: vi.fn(),
     };
     const recordAuditLogUseCase = { execute: vi.fn() };
 
@@ -49,6 +47,9 @@ describe("PurgeExpiredAuditLogsUseCase", () => {
     const result = await useCase.execute();
 
     expect(result).toMatchObject({ deletedCount: 3 });
+    // The purge runs inside the kernel advisory lock, so a second replica that
+    // cannot take the lock never issues a delete.
+    expect(advisoryLockPort.withAdvisoryLock).toHaveBeenCalledWith(42_001, expect.any(Function));
     expect(auditRepository.deleteOlderThanBatched).toHaveBeenCalledWith(
       expect.any(Date),
       5000,

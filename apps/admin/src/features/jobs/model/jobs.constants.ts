@@ -1,3 +1,6 @@
+// Values must cover every status the API accepts on `GET /jobs?status=`
+// (see JobsQueryDto/AdminJobsQueryDto in feature-jobs). `BLOCKED` is terminal:
+// PropagationService parks a job here when a dependency failed or was cancelled.
 export const STATUS_OPTIONS = [
   { value: "", label: "All statuses" },
   { value: "PENDING", label: "Pending" },
@@ -5,6 +8,7 @@ export const STATUS_OPTIONS = [
   { value: "COMPLETED", label: "Completed" },
   { value: "FAILED", label: "Failed" },
   { value: "CANCELLED", label: "Cancelled" },
+  { value: "BLOCKED", label: "Blocked" },
 ] as const;
 
 export const EVENT_STYLES: Record<string, { label: string; dot: string; text: string }> = {
@@ -19,6 +23,14 @@ export const EVENT_STYLES: Record<string, { label: string; dot: string; text: st
     dot: "bg-destructive",
     text: "text-destructive",
   },
+  // Not a terminal job status: the worker hit an error before recording one, so
+  // the job is still PROCESSING and stale-lease recovery will re-claim it. Same
+  // error tone as `failed`, but the label says what actually happened.
+  processing_error: {
+    label: "Processing error",
+    dot: "bg-destructive",
+    text: "text-destructive",
+  },
   retry_scheduled: {
     label: "Retry scheduled",
     dot: "bg-chart-2",
@@ -28,6 +40,21 @@ export const EVENT_STYLES: Record<string, { label: string; dot: string; text: st
     label: "Cancelled",
     dot: "bg-muted-foreground",
     text: "text-muted-foreground",
+  },
+  // Recorded on the *dependent* job when PropagationService parks it as BLOCKED
+  // because a job it depends on reached a blocking status. Same failure tone as
+  // `failed`; the event message names the dependency that failed.
+  dependency_failed: {
+    label: "Dependency failed",
+    dot: "bg-destructive",
+    text: "text-destructive",
+  },
+  // Recorded when the worker found no handler for the job type and marked the
+  // job FAILED; same failure tone as `failed`.
+  no_handler: {
+    label: "No handler",
+    dot: "bg-destructive",
+    text: "text-destructive",
   },
 };
 
@@ -51,6 +78,13 @@ export function jobStatusProps(status: string): {
     return {
       variant: "outline",
       className: "text-muted-foreground border-muted-foreground/30",
+    };
+  // BLOCKED shares the failure tone with FAILED (see the `dependency_failed`
+  // event style above); the badge label is what tells the two apart.
+  if (status === "BLOCKED")
+    return {
+      variant: "outline",
+      className: "text-destructive border-destructive/40",
     };
   return { variant: "outline" };
 }

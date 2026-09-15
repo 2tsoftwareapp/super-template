@@ -47,14 +47,14 @@ describe("VerifyMfaChallengeUseCase", () => {
     ).rejects.toMatchObject({ code: MFA_ERROR_CODES.MFA_TOO_MANY_ATTEMPTS });
   });
 
-  it("increments attempts and rejects an invalid code", async () => {
+  it("counts the attempt through the atomic gate and rejects an invalid code", async () => {
     const mfaRepository = {
       findValidChallengeByTokenHash: vi.fn(async () => ({
         id: "c1",
         userId: "u1",
         attempts: 0,
       })),
-      incrementChallengeAttempts: vi.fn(async () => undefined),
+      tryIncrementChallengeAttempts: vi.fn(async () => ({ id: "c1", attempts: 1 })),
     };
     const auditWriter = { log: vi.fn(async () => undefined) };
     const useCase = new VerifyMfaChallengeUseCase(
@@ -71,10 +71,88 @@ describe("VerifyMfaChallengeUseCase", () => {
       }),
     ).rejects.toMatchObject({ code: MFA_ERROR_CODES.MFA_INVALID_CODE });
 
-    expect(mfaRepository.incrementChallengeAttempts).toHaveBeenCalledWith("c1");
+    // The threshold travels with the increment: the data layer enforces it.
+    expect(mfaRepository.tryIncrementChallengeAttempts).toHaveBeenCalledWith("c1", 5);
     expect(auditWriter.log).toHaveBeenCalledWith(
       expect.objectContaining({ action: "mfa.challenge.failed" }),
     );
+  });
+
+  it("throttles instead of counting when the atomic gate refuses the attempt", async () => {
+    // The gate refused because the counter already reached the limit — e.g. a
+    // concurrent request won the last allowed attempt. Nothing was written, so
+    // this request must not be reported as a counted failure.
+    const mfaRepository = {
+      findValidChallengeByTokenHash: vi.fn(async () => ({
+        id: "c1",
+        userId: "u1",
+        attempts: 4,
+      })),
+      tryIncrementChallengeAttempts: vi.fn(async () => null),
+    };
+    const auditWriter = { log: vi.fn(async () => undefined) };
+    const useCase = new VerifyMfaChallengeUseCase(
+      mfaRepository as never,
+      { verifyCode: vi.fn(async () => false) } as never,
+      auditWriter as never,
+    );
+
+    await expect(
+      useCase.execute({
+        mfaToken: "token",
+        code: "000000",
+        metadata: { ipAddress: null, userAgent: null },
+      }),
+    ).rejects.toMatchObject({ code: MFA_ERROR_CODES.MFA_TOO_MANY_ATTEMPTS });
+
+    expect(mfaRepository.tryIncrementChallengeAttempts).toHaveBeenCalledWith("c1", 5);
+    expect(auditWriter.log).not.toHaveBeenCalled();
+  });
+
+  it("never lets the attempt counter exceed the limit when N requests race", async () => {
+    // Emulates the atomic UPDATE ... WHERE attempts < max RETURNING gate over a
+    // single stored counter: 8 concurrent wrong codes must count at most 5
+    // attempts, and the 3 losers must be throttled rather than counted.
+    let attempts = 0;
+    const mfaRepository = {
+      findValidChallengeByTokenHash: vi.fn(async () => ({
+        id: "c1",
+        userId: "u1",
+        // Read-through snapshot, as PostgreSQL would return it per request.
+        attempts,
+      })),
+      tryIncrementChallengeAttempts: vi.fn(async (_id: string, maxAttempts: number) => {
+        if (attempts >= maxAttempts) {
+          return null;
+        }
+        attempts += 1;
+        return { id: "c1", attempts };
+      }),
+    };
+    const auditWriter = { log: vi.fn(async () => undefined) };
+    const useCase = new VerifyMfaChallengeUseCase(
+      mfaRepository as never,
+      { verifyCode: vi.fn(async () => false) } as never,
+      auditWriter as never,
+    );
+
+    const outcomes = await Promise.allSettled(
+      Array.from({ length: 8 }, () =>
+        useCase.execute({
+          mfaToken: "token",
+          code: "000000",
+          metadata: { ipAddress: null, userAgent: null },
+        }),
+      ),
+    );
+
+    const codes = outcomes.map((outcome) =>
+      outcome.status === "rejected" ? (outcome.reason as { code?: string }).code : "resolved",
+    );
+
+    expect(attempts).toBe(5);
+    expect(codes.filter((code) => code === MFA_ERROR_CODES.MFA_INVALID_CODE)).toHaveLength(5);
+    expect(codes.filter((code) => code === MFA_ERROR_CODES.MFA_TOO_MANY_ATTEMPTS)).toHaveLength(3);
   });
 
   it("consumes the challenge and returns the user id on success", async () => {

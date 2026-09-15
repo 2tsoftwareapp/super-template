@@ -42,6 +42,15 @@ export const optionalSecretMin = (min: number) =>
     z.string().min(min).optional(),
   );
 
+/** Empty / missing → undefined; otherwise must be a 32-byte hex key (AES-256). */
+export const optionalHexKey = z.preprocess(
+  (value) => (value === "" || value === undefined || value === null ? undefined : value),
+  z
+    .string()
+    .regex(/^[0-9a-fA-F]{64}$/, "must be a 64-character hex string (32 bytes)")
+    .optional(),
+);
+
 export const isHttpUrl = (value: string): boolean => {
   try {
     new URL(value);

@@ -54,9 +54,9 @@ describe("ApplicationSettingsLookupService (redis path)", () => {
     getMock.mockResolvedValue("true");
     const service = makeService();
 
-    await expect(service.isMaintenanceMode()).resolves.toBe(true);
+    await expect(service.isRegistrationEnabled()).resolves.toBe(true);
 
-    expect(getMock).toHaveBeenCalledWith("settings-flag:maintenance_mode");
+    expect(getMock).toHaveBeenCalledWith("settings-flag:registration_enabled");
   });
 
   it("writes the fetched flag to redis with the TTL on a miss", async () => {
@@ -64,11 +64,22 @@ describe("ApplicationSettingsLookupService (redis path)", () => {
     getMock.mockResolvedValue(null);
     const service = makeService();
 
-    await expect(service.isMaintenanceMode()).resolves.toBe(true);
+    await expect(service.isRegistrationEnabled()).resolves.toBe(true);
 
-    expect(setMock).toHaveBeenCalledWith("settings-flag:maintenance_mode", "true", {
+    expect(setMock).toHaveBeenCalledWith("settings-flag:registration_enabled", "true", {
       EX: 5,
     });
+  });
+
+  it("keeps maintenance mode out of the shared cache so a toggle is immediate", async () => {
+    connectMock.mockResolvedValue(undefined);
+    getMock.mockResolvedValue("false");
+    const service = makeService();
+
+    await expect(service.isMaintenanceMode()).resolves.toBe(true);
+
+    expect(getMock).not.toHaveBeenCalled();
+    expect(setMock).not.toHaveBeenCalled();
   });
 
   it("invalidates the key in redis so other instances refetch", async () => {
@@ -76,9 +87,9 @@ describe("ApplicationSettingsLookupService (redis path)", () => {
     delMock.mockResolvedValue(1);
     const service = makeService();
 
-    await service.invalidate("maintenance_mode");
+    await service.invalidate("registration_enabled");
 
-    expect(delMock).toHaveBeenCalledWith("settings-flag:maintenance_mode");
+    expect(delMock).toHaveBeenCalledWith("settings-flag:registration_enabled");
   });
 
   it("treats a transient redis get error as a cache miss instead of throwing", async () => {
@@ -86,7 +97,7 @@ describe("ApplicationSettingsLookupService (redis path)", () => {
     getMock.mockRejectedValue(new Error("connection lost"));
     const service = makeService();
 
-    await expect(service.isMaintenanceMode()).resolves.toBe(true);
+    await expect(service.isRegistrationEnabled()).resolves.toBe(true);
   });
 
   it("falls back to the in-process cache when the redis connection fails", async () => {
@@ -94,12 +105,12 @@ describe("ApplicationSettingsLookupService (redis path)", () => {
     const service = makeService();
 
     // First read: connect fails → local fallback, value cached locally.
-    await expect(service.isMaintenanceMode()).resolves.toBe(true);
+    await expect(service.isRegistrationEnabled()).resolves.toBe(true);
     // Second read: connect is retried, succeeds this time.
     connectMock.mockResolvedValueOnce(undefined);
     getMock.mockResolvedValue("false");
 
-    await expect(service.isMaintenanceMode()).resolves.toBe(false);
+    await expect(service.isRegistrationEnabled()).resolves.toBe(false);
 
     expect(connectMock).toHaveBeenCalledTimes(2);
   });

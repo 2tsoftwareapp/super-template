@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { AccessControlModule } from "@repo/feature-access-control/module";
 import { OrganizationsModule } from "@repo/feature-organizations/module";
 
+import { LastOwnerGuard } from "./application/services/last-owner-guard.service";
 import { CreateOrganizationUseCase } from "./application/use-cases/create-organization.use-case";
 import { DeleteOrganizationUseCase } from "./application/use-cases/delete-organization.use-case";
 import { EnsurePersonalOrganizationUseCase } from "./application/use-cases/ensure-personal-organization.use-case";
@@ -15,6 +16,7 @@ import { PERSONAL_ORGANIZATION_PROVISIONER } from "./public/contracts";
   imports: [OrganizationsModule, AccessControlModule],
   controllers: [OrganizationManagementController],
   providers: [
+    LastOwnerGuard,
     CreateOrganizationUseCase,
     DeleteOrganizationUseCase,
     EnsurePersonalOrganizationUseCase,

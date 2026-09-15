@@ -45,9 +45,3 @@ export interface ExportResponse {
   fileId: string;
   truncated: boolean;
 }
-
-/** @deprecated Prefer `auditLogsApi` */
-export const fetchAuditLogs = (params: AuditLogsParams) => auditLogsApi.list(params);
-export const exportAuditLogs = (body: Parameters<typeof auditLogsApi.export>[0]) =>
-  auditLogsApi.export(body);
-export const downloadAuditLogExport = (fileId: string) => auditLogsApi.downloadExport(fileId);

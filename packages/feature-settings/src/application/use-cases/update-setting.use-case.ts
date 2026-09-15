@@ -2,7 +2,7 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-kernel"
 import type { PlatformTransactionPort } from "@repo/api-kernel";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, SYSTEM_SCOPE } from "@repo/api-kernel";
+import { AppError, PLATFORM_ROLE_NAMES, SYSTEM_SCOPE } from "@repo/api-kernel";
 import { PLATFORM_TRANSACTION_PORT } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
@@ -15,6 +15,7 @@ import {
   SETTINGS_REPOSITORY,
   type SettingsRepositoryPort,
 } from "../ports/settings.repository.port";
+import { getSettingDefinition } from "../setting-definitions";
 import { SettingsMapper } from "../settings.mapper";
 
 @Injectable()
@@ -34,13 +35,19 @@ export class UpdateSettingUseCase {
     input: UpdateSettingCommand,
     requestContext?: RequestContext,
   ) {
-    if (!actor.roles.includes("SUPER_ADMIN")) {
+    if (!actor.roles.includes(PLATFORM_ROLE_NAMES.SUPER_ADMIN)) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
         "Only SUPER_ADMIN can update application settings",
         HttpStatus.FORBIDDEN,
       );
     }
+
+    // Registry validation is the single write gate for known keys: an invalid
+    // value must never reach the store, otherwise lookups would fall back to
+    // their safe default and silently ignore the operator's intent. Unknown
+    // keys stay free-form (template extension point) and are not validated.
+    getSettingDefinition(key)?.validate(input.value);
 
     const updated = await this.platformTransactionPort.run(async (tx) => {
       const setting = await this.settingsRepository.upsert(key, input.value, actor.userId, tx);
@@ -68,12 +75,21 @@ export class UpdateSettingUseCase {
         tx,
       );
 
+      // Drop the cached flag before the commit, so the window in which a reader
+      // can still hold the previous value is as short as possible. Invalidating
+      // is idempotent and only ever removes data: if this transaction rolls
+      // back, the cache is simply empty and readers fall back to the unchanged
+      // row — a wasted read, never a wrong answer. (Writing the new value into
+      // the cache here would be wrong for exactly that reason.)
+      await this.settingsLookup.invalidate(key);
+
       return setting;
     });
 
-    // The lookup service caches flags for a few seconds; invalidate the updated
-    // key so guards (maintenance/registration) pick up the change immediately.
-    // With Redis this also clears the entry on every other instance.
+    // Clear again after the commit: a reader that started before the commit may
+    // have re-filled the cache from the pre-commit row between the invalidate
+    // above and the commit itself. With Redis this also clears the entry on
+    // every other instance.
     await this.settingsLookup.invalidate(key);
 
     return SettingsMapper.toDto(updated);

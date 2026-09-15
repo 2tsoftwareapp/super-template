@@ -10,4 +10,4 @@ export interface OutboxAppenderPort {
   append(topic: string, payload: JsonObject, executor?: TransactionExecutor): Promise<void>;
 }
 
-export const OUTBOX_APPENDER = Symbol("OUTBOX_APPENDER");
+export { OUTBOX_APPENDER } from "./outbox-appender.token";

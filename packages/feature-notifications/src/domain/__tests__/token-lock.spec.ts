@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { tokenLockId } from "../token-lock";
+import { tokenLockId, normalizeDeviceToken } from "../token-lock";
 
 // Resolve the module dir relative to this test file so the suite works no
 // matter which cwd runs it (package root directly, or apps/api via turbo).
@@ -63,5 +63,37 @@ describe("tokenLockId", () => {
     expect(repository).toMatch(/from ['"].*domain\/token-lock['"]/);
     expect(processor).not.toContain("function tokenLockId");
     expect(repository).not.toContain("function tokenLockId");
+    expect(processor).not.toContain("function normalizeDeviceToken");
+    expect(repository).not.toContain("function normalizeDeviceToken");
+  });
+
+  describe("producer/consumer convergence (token-lock invariant)", () => {
+    it("producer (registerOrTransfer) and consumer (delivery processor) derive the same lock id for the same token", () => {
+      // Producer side: the raw token payload of a register/transfer request,
+      // which registerOrTransfer persists verbatim and locks on.
+      const registerInput = { token: "APA91bExampleFCMToken1234567890abcdef" };
+      // Consumer side: the value the delivery processor reads back from the
+      // device-token row the producer wrote and locks on before sending FCM.
+      const claimedDeliveryToken = registerInput.token;
+
+      const producerLockId = tokenLockId(registerInput.token);
+      const consumerLockId = tokenLockId(claimedDeliveryToken);
+
+      expect(producerLockId).toBe(consumerLockId);
+      expect(producerLockId).toBe(520743880); // golden FNV-1a value
+    });
+
+    it("hashes the canonical form so formatting differences cannot fork the lock", () => {
+      expect(normalizeDeviceToken("  token-a \n")).toBe("token-a");
+      expect(tokenLockId("  token-a \n")).toBe(tokenLockId("token-a"));
+      expect(tokenLockId(" token-a ")).toBe(1288804548); // same golden value as the canonical form
+    });
+
+    it("yields different lock ids for different tokens", () => {
+      expect(tokenLockId("token-a")).not.toBe(tokenLockId("token-b"));
+      expect(tokenLockId(normalizeDeviceToken("token-a"))).not.toBe(
+        tokenLockId(normalizeDeviceToken("token-b")),
+      );
+    });
   });
 });

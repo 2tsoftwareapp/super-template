@@ -6,11 +6,11 @@ This package owns the `mail` feature and its application, domain, infrastructure
 
 ## Public API
 
-The package declares these public entrypoints: `.`, `./contracts`, `./testing`, `./schema`. Consumers must use these entrypoints instead of importing internal files.
+The package declares these public entrypoints: `.`, `./contracts`, `./schema`. Consumers must use these entrypoints instead of importing internal files.
 
 ## Feature dependencies
 
-The package declares these feature dependencies: `feature-audit`, `feature-jobs`, `feature-user-preferences`.
+The package declares these feature dependencies: `feature-audit`, `feature-jobs`, `feature-organizations`, `feature-user-preferences`.
 
 ## Database and runtime
 

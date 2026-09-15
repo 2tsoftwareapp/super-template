@@ -6,11 +6,10 @@ import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
-import { FILE_ERROR_CODES } from "@repo/feature-upload/contracts";
 
 import type { AttachEntityCommand } from "../attachments.types";
 
-import { FILES_REPOSITORY, type FilesRepositoryPort } from "../../../files";
+import { FileAccessService } from "../../../files";
 import { AttachmentsMapper } from "../attachments.mapper";
 import {
   ATTACHMENTS_REPOSITORY,
@@ -22,7 +21,7 @@ export class AttachFileUseCase {
   constructor(
     @Inject(ATTACHMENTS_REPOSITORY)
     private readonly attachmentsRepository: AttachmentsRepositoryPort,
-    @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
+    private readonly fileAccessService: FileAccessService,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
@@ -33,12 +32,15 @@ export class AttachFileUseCase {
     input: AttachEntityCommand,
     requestContext?: RequestContext,
   ) {
-    const file = await this.filesRepository.findById(input.fileId);
+    // Attaching is a read of the file plus a new attachment row, so it enforces
+    // the same rules as get/download (FileAccessService) instead of only
+    // checking that the id exists. Note `findAccessibleFile` already answers
+    // FILE_NOT_FOUND for a missing row.
+    const file = await this.fileAccessService.findAccessibleFile(actor, input.fileId);
 
-    if (!file) {
-      throw new AppError(FILE_ERROR_CODES.FILE_NOT_FOUND, "File not found", HttpStatus.NOT_FOUND);
-    }
-
+    // Explicit rule, kept as-is: attachments are organization-scoped, so a
+    // platform-scoped (global) file stays unattachable even for an actor the
+    // access policy would otherwise allow to read it.
     if (!file.organizationId) {
       throw new AppError(
         ERROR_CODES.VALIDATION_FAILED,

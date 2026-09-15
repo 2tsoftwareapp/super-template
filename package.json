@@ -10,7 +10,8 @@
     "bootstrap": "node scripts/bootstrap.mjs",
     "env:doctor": "node scripts/env-doctor.mjs",
     "lint:web-architecture": "node scripts/check-web-architecture-boundaries.mjs",
-    "lint:policy": "sh scripts/check-source-policy.sh && node scripts/check-web-architecture-boundaries.mjs && sh scripts/check-package-cycles.sh && node scripts/check-cross-feature-fks.mjs && node scripts/__tests__/check-cross-feature-fks.regression.mjs && node scripts/check-feature-manifest-deps.mjs && sh scripts/clean-policy-artifacts.sh && pnpm exec turbo boundaries",
+    "lint:policy": "sh scripts/check-source-policy.sh && node scripts/check-web-architecture-boundaries.mjs && sh scripts/check-package-cycles.sh && node scripts/check-cross-feature-fks.mjs && node scripts/__tests__/check-cross-feature-fks.regression.mjs && node scripts/check-error-codes.mjs && node --test scripts/__tests__/error-code-policy.spec.mjs && node --test scripts/__tests__/domain-purity-policy.spec.mjs && node scripts/check-feature-manifest-deps.mjs && sh scripts/clean-policy-artifacts.sh && pnpm exec turbo boundaries",
+    "lint:error-codes": "node scripts/check-error-codes.mjs",
     "build": "turbo run build",
     "dev": "./scripts/dev.sh",
     "dev:turbo": "turbo run dev",
@@ -42,11 +43,8 @@
     "test:e2e:preflight": "node scripts/test-e2e-preflight.mjs",
     "verify": "sh ./scripts/verify.sh",
     "verify:offline": "node scripts/verify-offline.mjs",
-    "extension:plan": "node .agents/skills/playwright-extension-live-browser/scripts/run-plan.mjs",
-    "extension:session:reset": "node .agents/skills/playwright-extension-live-browser/scripts/reset-session.mjs",
-    "browser-control:plan": "node .agents/skills/playwright-extension-live-browser/scripts/run-plan.mjs",
-    "browser-control:session:reset": "node .agents/skills/playwright-extension-live-browser/scripts/reset-session.mjs",
-    "format:check": "prettier --ignore-unknown --check \"packages/**\" \"apps/api\" \"apps/admin\" \"apps/web\""
+    "format:check": "prettier --ignore-unknown --check \"packages/**\" \"apps/api\" \"apps/admin\" \"apps/web\"",
+    "hooks:install": "node scripts/hooks/install.mjs"
   },
   "devDependencies": {
     "@eslint/js": "9.39.1",

@@ -1,12 +1,16 @@
-import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-kernel";
+import type { AppLogger, AuthenticatedRequestUser, RequestContext } from "@repo/api-kernel";
 import type { TransactionPort } from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { SYSTEM_SCOPE } from "@repo/api-kernel";
+import { APP_LOGGER, SYSTEM_SCOPE } from "@repo/api-kernel";
 import { TRANSACTION_PORT } from "@repo/api-kernel";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 
 import { OBJECT_STORAGE, type ObjectStorage } from "../../../storage";
+import {
+  STORAGE_TRACKING_PORT,
+  type StorageTrackingPort,
+} from "../../../storage/application/ports/storage-tracking.port";
 import { FILES_REPOSITORY, type FilesRepositoryPort } from "../ports/files.repository.port";
 import { FileAccessService } from "../services/file-access.service";
 
@@ -16,6 +20,8 @@ export class DeleteFileUseCase {
     private readonly fileAccessService: FileAccessService,
     @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
+    @Inject(STORAGE_TRACKING_PORT) private readonly storageTracking: StorageTrackingPort,
+    @Inject(APP_LOGGER) private readonly logger: AppLogger,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
   ) {}
@@ -44,12 +50,23 @@ export class DeleteFileUseCase {
     try {
       await this.objectStorage.delete(file.storageKey);
     } catch (err) {
-      console.error(
-        `Failed to cleanup storage object ${file.storageKey} for deleted file ${file.id}:`,
-        err,
-      );
-      // NOTE: Failure to delete storage object is ignored for now.
-      // An outbox/cleanup worker should ideally sweep orphaned objects later.
+      // Compensation failure must be visible and recoverable: log it, then
+      // record a retry in the storage-delete outbox so StorageCleanupService
+      // retries the delete instead of the object being orphaned silently.
+      this.logger.error(`Failed to delete storage object ${file.storageKey} for file ${file.id}`, {
+        error: err instanceof Error ? err.message : String(err),
+      });
+
+      try {
+        await this.storageTracking.enqueueDelete(file.storageKey);
+      } catch (enqueueError) {
+        this.logger.error(
+          `Failed to enqueue delete retry for storage object ${file.storageKey} (file ${file.id})`,
+          {
+            error: enqueueError instanceof Error ? enqueueError.message : String(enqueueError),
+          },
+        );
+      }
     }
   }
 }

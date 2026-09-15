@@ -6,11 +6,11 @@ This package owns the `auth` feature and its application, domain, infrastructure
 
 ## Public API
 
-The package declares these public entrypoints: `.`, `./contracts`, `./testing`, `./schema`, `./module`, `./guard`. Consumers must use these entrypoints instead of importing internal files.
+The package declares these public entrypoints: `.`, `./contracts`, `./schema`, `./module`, `./guard`. Consumers must use these entrypoints instead of importing internal files.
 
 ## Feature dependencies
 
-The package declares these feature dependencies: `feature-access-control`, `feature-audit`, `feature-jobs`, `feature-mail`, `feature-mfa`, `feature-organization-management`, `feature-organizations`, `feature-outbox`, `feature-settings`, `feature-user-management`, `feature-users`.
+The package declares these feature dependencies: `feature-access-control`, `feature-audit`, `feature-mfa`, `feature-organization-management`, `feature-organizations`, `feature-outbox`, `feature-settings`, `feature-users`.
 
 ## Database and runtime
 

@@ -3,6 +3,7 @@ import { ACTION, ERROR_CODES } from "@repo/api-runtime";
 import { ROLE_NAMES } from "../../../public/role.constants";
 
 import { AccessControlMapper } from "../../access-control.mapper";
+import { CatalogPermissionResolver } from "../../services/catalog-permission-resolver.service";
 import { CreateCustomRoleUseCase } from "../create-custom-role.use-case";
 import { DeleteCustomRoleUseCase } from "../delete-custom-role.use-case";
 import { EnsureOrganizationAdminRoleUseCase } from "../ensure-organization-admin-role.use-case";
@@ -83,10 +84,12 @@ describe("RoleManagementUseCase", () => {
       invalidateAccessProfile: vi.fn(),
     };
     const mapper = new AccessControlMapper();
+    const catalogPermissionResolver = new CatalogPermissionResolver(repo as never, mapper);
     const createUc = new CreateCustomRoleUseCase(
       repo as never,
       txPort as never,
       audit as never,
+      catalogPermissionResolver,
       mapper,
     );
     const updateUc = new UpdateCustomRoleUseCase(
@@ -94,6 +97,7 @@ describe("RoleManagementUseCase", () => {
       txPort as never,
       audit as never,
       profile as never,
+      catalogPermissionResolver,
       mapper,
     );
     const deleteUc = new DeleteCustomRoleUseCase(repo as never, txPort as never, audit as never);

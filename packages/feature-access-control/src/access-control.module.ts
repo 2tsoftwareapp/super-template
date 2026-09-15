@@ -9,6 +9,7 @@ import {
 
 import { AccessControlMapper } from "./application/access-control.mapper";
 import { AccessControlService } from "./application/access-control.service";
+import { CatalogPermissionResolver } from "./application/services/catalog-permission-resolver.service";
 import { AccessProfileUseCase } from "./application/use-cases/access-profile.use-case";
 import { CreateCustomRoleUseCase } from "./application/use-cases/create-custom-role.use-case";
 import { DeleteCustomRoleUseCase } from "./application/use-cases/delete-custom-role.use-case";
@@ -40,6 +41,7 @@ import { USER_ROLE_ASSIGNMENTS } from "./public/user-role-assignments.token";
     UserRoleAssignmentsPersistence,
     AccessControlRepository,
     AccessControlMapper,
+    CatalogPermissionResolver,
     AccessProfileUseCase,
     SeedAccessControlUseCase,
     RoleQueryUseCase,

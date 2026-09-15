@@ -4,20 +4,20 @@ import type { TransactionExecutor, TransactionPort } from "@repo/api-kernel";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
-import { ACCESS_CONTROL_ERROR_CODES } from "@repo/feature-access-control/contracts";
 import { AuditWriter } from "@repo/feature-audit/contracts";
 import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
 
 import type { PermissionView, RoleView, UpdateRoleCommand } from "../access-control.types";
 
 import { isFixedRoleName } from "../../access-control.constants";
-import { ROLE_NAMES } from "../../access-control.constants";
 import { assertCanModifyCustomRole } from "../../domain/role-assignment.policy";
+import { ACCESS_CONTROL_ERROR_CODES } from "../../public/error-codes";
 import { AccessControlMapper } from "../access-control.mapper";
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
 } from "../ports/access-control.repository.port";
+import { CatalogPermissionResolver } from "../services/catalog-permission-resolver.service";
 import { AccessProfileUseCase } from "./access-profile.use-case";
 
 function normalizeRoleName(name: string): string {
@@ -32,6 +32,7 @@ export class UpdateCustomRoleUseCase {
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly accessProfileUseCase: AccessProfileUseCase,
+    private readonly catalogPermissionResolver: CatalogPermissionResolver,
     private readonly accessControlMapper: AccessControlMapper,
   ) {}
 
@@ -104,12 +105,12 @@ export class UpdateCustomRoleUseCase {
           );
         let permissions: PermissionView[] = [];
         if (command.permissionIds) {
-          permissions = await this.resolveCatalogPermissions(
+          permissions = await this.catalogPermissionResolver.resolve({
             actor,
-            command.permissionIds,
-            role.organizationId,
-            tx,
-          );
+            permissionIds: command.permissionIds,
+            targetOrganizationId: role.organizationId,
+            executor: tx,
+          });
           await this.accessControlRepository.replaceRolePermissions(
             roleId,
             permissions.map((p) => p.id),
@@ -149,50 +150,6 @@ export class UpdateCustomRoleUseCase {
         );
       throw error;
     }
-  }
-
-  private async resolveCatalogPermissions(
-    actor: AuthenticatedRequestUser,
-    permissionIds: string[],
-    targetOrganizationId: string | null,
-    executor?: TransactionExecutor,
-  ): Promise<PermissionView[]> {
-    const permissions = await this.accessControlRepository.findPermissionsByIds(
-      permissionIds,
-      executor,
-    );
-    if (permissions.length !== permissionIds.length)
-      throw new AppError(
-        ERROR_CODES.VALIDATION_FAILED,
-        "One or more permissions do not exist",
-        HttpStatus.BAD_REQUEST,
-      );
-    const invalidPermission = permissions.find((p) => !p.isSystem);
-    if (invalidPermission)
-      throw new AppError(
-        ERROR_CODES.VALIDATION_FAILED,
-        "Custom roles can only use system catalog permissions",
-        HttpStatus.BAD_REQUEST,
-      );
-    const isOrgScoped = targetOrganizationId !== null;
-    for (const permission of permissions)
-      if (isOrgScoped && permission.scope === "platform")
-        throw new AppError(
-          ERROR_CODES.AUTH_FORBIDDEN,
-          `Permission "${permission.name}" is platform-scoped and cannot be assigned to organization roles`,
-          HttpStatus.FORBIDDEN,
-        );
-    if (!actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
-      const actorPermissionSet = new Set(actor.permissions ?? []);
-      for (const permission of permissions)
-        if (!actorPermissionSet.has(permission.name))
-          throw new AppError(
-            ERROR_CODES.AUTH_FORBIDDEN,
-            `You do not have the "${permission.name}" permission to delegate it`,
-            HttpStatus.FORBIDDEN,
-          );
-    }
-    return permissions.map((p) => this.accessControlMapper.toPermissionView(p as PermissionView));
   }
 
   private async loadPermissionsForRole(

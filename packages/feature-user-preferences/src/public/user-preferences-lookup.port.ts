@@ -8,4 +8,4 @@ export interface UserPreferencesLookup {
   findNotificationPreferencesByEmail(email: string): Promise<NotificationChannelPreferences | null>;
 }
 
-export const USER_PREFERENCES_LOOKUP = Symbol("USER_PREFERENCES_LOOKUP");
+export { USER_PREFERENCES_LOOKUP } from "./user-preferences-lookup.token";

@@ -18,7 +18,7 @@ import {
   SsoCallbackQueryDto,
   StartSsoLoginQueryDto,
   StartSsoLoginResponseDto,
-} from "./sso.dto";
+} from "./dto/sso.dto";
 
 @ApiTags("sso")
 @Controller("auth/sso")

@@ -6,10 +6,6 @@ export type {
   CreateAuditLogInput,
   ListAuditLogsParams,
 } from "../application/ports/audit.repository.port";
-export {
-  AUDIT_WRITER,
-  type AuditLogBaseInput,
-  type AuditLogInput,
-  type AuditWriter,
-} from "./audit-writer.port";
+export { type AuditLogBaseInput, type AuditLogInput, type AuditWriter } from "./audit-writer.port";
+export { AUDIT_WRITER } from "./audit-writer.token";
 export { AUDIT_ERROR_CODES } from "./error-codes";

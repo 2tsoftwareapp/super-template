@@ -31,7 +31,7 @@ import {
   JobLogsQueryDto,
   JobMetricsDto,
   JobMetricsQueryDto,
-} from "./jobs.dto";
+} from "./dto/jobs.dto";
 
 function scopeFromUser(user: AuthenticatedRequestUser): JobScope {
   return user.organizationId

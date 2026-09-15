@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
+import { CsvFormatError } from "../../../domain/csv";
 import { ConfirmImportUseCase } from "../confirm-import.use-case";
 
 const actor = {
@@ -13,35 +14,43 @@ const actor = {
   organizationId: "org-1",
 };
 
+const VALIDATED_HASH = "sha256-recorded-at-validation";
+
+function createImportJob(overrides: Record<string, unknown> = {}) {
+  return {
+    id: "job-1",
+    createdById: "user-1",
+    type: "users",
+    fileId: "file-1",
+    organizationId: "org-1",
+    status: "PENDING",
+    confirmedAt: null,
+    completedAt: null,
+    rowCount: null,
+    successCount: null,
+    errorCount: null,
+    errors: null,
+    // SHA-256 recorded when the file was validated at create time.
+    contentHash: VALIDATED_HASH,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...overrides,
+  };
+}
+
+const parsedData = {
+  rows: [{ name: "Row 1" }, { name: "Row 2 Error" }, { name: "Row 3" }],
+  contentHash: VALIDATED_HASH,
+};
+
 describe("ConfirmImportUseCase", () => {
   it("imports rows using savepoints and continues on row failure", async () => {
-    const importJob = {
-      id: "job-1",
-      createdById: "user-1",
-      type: "users",
-      fileId: "file-1",
-      organizationId: "org-1",
-      status: "PENDING",
-      confirmedAt: null,
-      completedAt: null,
-      rowCount: null,
-      successCount: null,
-      errorCount: null,
-      errors: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const importJob = createImportJob();
 
     const file = {
       id: "file-1",
       organizationId: "org-1",
       storageKey: "imports/file.csv",
-    };
-
-    const parsedData = {
-      headers: ["name"],
-      rows: [{ name: "Row 1" }, { name: "Row 2 Error" }, { name: "Row 3" }],
-      totalRows: 3,
     };
 
     const importJobsRepository = {
@@ -161,23 +170,96 @@ describe("ConfirmImportUseCase", () => {
     expect(result.errorCount).toBe(1);
   });
 
+  describe("content integrity between validate and confirm", () => {
+    function createIntegrityUseCase(overrides: {
+      job?: Record<string, unknown>;
+      parseImportFile?: ReturnType<typeof vi.fn>;
+    }) {
+      const importJob = createImportJob(overrides.job);
+      const adapter = { importRow: vi.fn() };
+      const importJobsRepository = {
+        findById: vi.fn(async () => importJob),
+        confirm: vi.fn(async () => importJob),
+        update: vi.fn(),
+      };
+      const transactionPort = {
+        run: vi.fn(async (cb: (tx: unknown) => Promise<unknown>) => cb({})),
+        withSavepoint: vi.fn(async (_tx: unknown, _name: string, cb: () => Promise<unknown>) =>
+          cb(),
+        ),
+      };
+      const importFileParser = {
+        parseImportFile:
+          overrides.parseImportFile ?? vi.fn(async () => ({ rows: [], contentHash: "matches" })),
+      };
+      const importsMapper = {
+        toImportJobView: vi.fn((job: Record<string, unknown>) => ({ id: String(job.id) })),
+      };
+
+      const useCase = new ConfirmImportUseCase(
+        importJobsRepository as never,
+        {
+          findAccessibleFile: vi.fn(async () => ({
+            id: "file-1",
+            organizationId: "org-1",
+            storageKey: "imports/file.csv",
+          })),
+        } as never,
+        { resolve: vi.fn(() => adapter), getImportPermissions: vi.fn(() => []) } as never,
+        importFileParser as never,
+        { log: vi.fn() } as never,
+        importsMapper as never,
+        transactionPort as never,
+        { emit: vi.fn() } as never,
+      );
+
+      return { adapter, importJobsRepository, useCase };
+    }
+
+    it("imports nothing when the stored file no longer matches the validated fingerprint", async () => {
+      const { adapter, importJobsRepository, useCase } = createIntegrityUseCase({
+        parseImportFile: vi.fn(async () => ({ rows: [{ name: "Row 1" }], contentHash: "swapped" })),
+      });
+
+      await expect(useCase.execute(actor, "job-1")).rejects.toMatchObject({
+        code: "IMPORT_FILE_MODIFIED",
+        statusCode: 409,
+      });
+
+      expect(adapter.importRow).not.toHaveBeenCalled();
+      expect(importJobsRepository.confirm).not.toHaveBeenCalled();
+      expect(importJobsRepository.update).not.toHaveBeenCalled();
+    });
+
+    it("refuses to import when the job recorded no fingerprint", async () => {
+      const { adapter, useCase } = createIntegrityUseCase({
+        job: { contentHash: null },
+        parseImportFile: vi.fn(async () => ({ rows: [{ name: "Row 1" }], contentHash: "any" })),
+      });
+
+      await expect(useCase.execute(actor, "job-1")).rejects.toMatchObject({
+        code: "IMPORT_FILE_MODIFIED",
+      });
+      expect(adapter.importRow).not.toHaveBeenCalled();
+    });
+
+    it("refuses to import when the stored file is no longer parseable CSV", async () => {
+      const { adapter, importJobsRepository, useCase } = createIntegrityUseCase({
+        parseImportFile: vi.fn(async () => {
+          throw new CsvFormatError(2, "CSV record 2 has 4 field(s) but the header has 2");
+        }),
+      });
+
+      await expect(useCase.execute(actor, "job-1")).rejects.toMatchObject({
+        code: "IMPORT_FILE_MODIFIED",
+      });
+      expect(adapter.importRow).not.toHaveBeenCalled();
+      expect(importJobsRepository.confirm).not.toHaveBeenCalled();
+    });
+  });
+
   it("aborts with a conflict when the job is confirmed concurrently", async () => {
-    const importJob = {
-      id: "job-1",
-      createdById: "user-1",
-      type: "users",
-      fileId: "file-1",
-      organizationId: "org-1",
-      status: "PENDING",
-      confirmedAt: null,
-      completedAt: null,
-      rowCount: null,
-      successCount: null,
-      errorCount: null,
-      errors: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const importJob = createImportJob();
 
     const adapter = {
       importRow: vi.fn(),
@@ -209,7 +291,10 @@ describe("ConfirmImportUseCase", () => {
         getImportPermissions: vi.fn(() => []),
       } as never,
       {
-        parseImportFile: vi.fn(async () => ({ rows: [{ name: "Row 1" }] })),
+        parseImportFile: vi.fn(async () => ({
+          rows: [{ name: "Row 1" }],
+          contentHash: VALIDATED_HASH,
+        })),
       } as never,
       { log: vi.fn() } as never,
       {

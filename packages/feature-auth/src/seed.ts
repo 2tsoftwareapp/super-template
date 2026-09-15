@@ -10,11 +10,19 @@ interface SeededUsersBag {
   regularOrganizationId: string;
 }
 
+/**
+ * Seeder id contributed by `@repo/feature-user-management`'s `users.seed.ts`.
+ * Kept a literal on purpose: this package has no package-level dependency on
+ * that feature (the coupling is the `bag.seededUsers` fixture contract written
+ * at seed time), so the ordering edge is declared on the seeder instead.
+ */
+const USERS_SEEDER_ID = "users";
+
 async function runAuthSessionCleanupSeed(ctx: FeatureSeedContext): Promise<void> {
   const seededUsers = ctx.bag.seededUsers as SeededUsersBag | undefined;
   if (!seededUsers) {
     throw new Error(
-      'Auth seeder requires bag.seededUsers from the users seeder. Ensure "users" is composed before "auth".',
+      `Auth seeder requires bag.seededUsers from the "${USERS_SEEDER_ID}" seeder. Ensure it is composed and declares no failed dependency.`,
     );
   }
 
@@ -26,5 +34,5 @@ async function runAuthSessionCleanupSeed(ctx: FeatureSeedContext): Promise<void>
 }
 
 export const authSeeders: readonly FeatureSeeder[] = [
-  { id: "auth-session-cleanup", run: runAuthSessionCleanupSeed },
+  { id: "auth-session-cleanup", dependsOn: [USERS_SEEDER_ID], run: runAuthSessionCleanupSeed },
 ];

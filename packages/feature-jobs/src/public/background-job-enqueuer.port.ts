@@ -13,7 +13,7 @@ export interface BackgroundJobEnqueuer {
   enqueue(input: BackgroundJobEnqueueInput): Promise<void>;
 }
 
-export const BACKGROUND_JOB_ENQUEUER = Symbol("BACKGROUND_JOB_ENQUEUER");
+export { BACKGROUND_JOB_ENQUEUER } from "./background-job-enqueuer.token";
 
 /** Minimal job identity returned by the with-result enqueuer. */
 export interface BackgroundJobRef {
@@ -29,4 +29,4 @@ export interface BackgroundJobEnqueuerWithResult {
   enqueueWithResult(input: BackgroundJobEnqueueInput): Promise<BackgroundJobRef>;
 }
 
-export const BACKGROUND_JOB_ENQUEUER_WITH_RESULT = Symbol("BACKGROUND_JOB_ENQUEUER_WITH_RESULT");
+export { BACKGROUND_JOB_ENQUEUER_WITH_RESULT } from "./background-job-enqueuer.token";

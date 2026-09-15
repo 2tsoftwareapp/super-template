@@ -6,7 +6,7 @@ This package owns the `audit-export` feature and its application, domain, infras
 
 ## Public API
 
-The package declares these public entrypoints: `.`, `./contracts`, `./module`, `./testing`. Consumers must use these entrypoints instead of importing internal files.
+The package declares these public entrypoints: `.`, `./contracts`, `./module`. Consumers must use these entrypoints instead of importing internal files.
 
 ## Feature dependencies
 

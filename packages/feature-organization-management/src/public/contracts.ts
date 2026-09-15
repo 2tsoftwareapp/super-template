@@ -21,4 +21,4 @@ export interface PersonalOrganizationProvisioner {
   ): Promise<string | null>;
 }
 
-export const PERSONAL_ORGANIZATION_PROVISIONER = Symbol("PERSONAL_ORGANIZATION_PROVISIONER");
+export { PERSONAL_ORGANIZATION_PROVISIONER } from "./personal-organization-provisioner.token";

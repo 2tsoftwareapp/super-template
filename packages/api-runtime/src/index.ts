@@ -28,7 +28,7 @@ export { ConsoleAppLogger } from "./logging/console-logger.service";
 export { LoggingModule } from "./logging/logging.module";
 export { RequestContextMiddleware } from "./middleware/request-context.middleware";
 export { RequestLoggerMiddleware } from "./middleware/request-logger.middleware";
-export * from "./pagination/pagination.dto";
+export * from "./pagination/dto/pagination.dto";
 export * from "./rbac";
 
 export { adaptRedisClient, createRedisClient } from "./redis/redis-client.adapter";

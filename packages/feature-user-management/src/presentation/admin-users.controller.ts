@@ -40,7 +40,7 @@ import {
   UpdateAdminUserDto,
   UpdateUserStatusDto,
   UserDto,
-} from "./users.dto";
+} from "./dto/users.dto";
 
 @ApiTags("admin-users")
 @ApiBearerAuth()

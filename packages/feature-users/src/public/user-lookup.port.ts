@@ -14,4 +14,4 @@ export interface UserLookup {
   listDeliverableUserIdsInOrganization(organizationId: string): Promise<string[]>;
 }
 
-export const USER_LOOKUP = Symbol("USER_LOOKUP");
+export { USER_LOOKUP } from "./user-lookup.token";

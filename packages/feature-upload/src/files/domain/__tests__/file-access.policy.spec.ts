@@ -1,6 +1,5 @@
 import { FILE_KIND, FILE_VISIBILITY } from "../../../constants/file.constants";
 import { ACTION, perm } from "@repo/api-runtime";
-import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { describe, expect, it } from "vitest";
 
 import { canAccessFile, listFilesAccessScope } from "../file-access.policy";
@@ -19,7 +18,7 @@ describe("canAccessFile", () => {
         actor: {
           userId: "user-1",
           organizationId: "org-1",
-          roles: [ROLE_NAMES.USER],
+          roles: ["USER"],
           permissions: [perm("files", ACTION.READ)],
         },
         file: orgFile,
@@ -33,7 +32,7 @@ describe("canAccessFile", () => {
         actor: {
           userId: "user-2",
           organizationId: "org-1",
-          roles: [ROLE_NAMES.USER],
+          roles: ["USER"],
           permissions: [perm("files", ACTION.READ)],
         },
         file: orgFile,
@@ -47,7 +46,7 @@ describe("canAccessFile", () => {
         actor: {
           userId: "admin-1",
           organizationId: "org-1",
-          roles: [ROLE_NAMES.ADMIN],
+          roles: ["ADMIN"],
           permissions: [perm("files", ACTION.READ)],
         },
         file: orgFile,
@@ -61,7 +60,7 @@ describe("canAccessFile", () => {
         actor: {
           userId: "admin-1",
           organizationId: "org-1",
-          roles: [ROLE_NAMES.ADMIN],
+          roles: ["ADMIN"],
           permissions: [perm("files", ACTION.READ)],
         },
         file: { ...orgFile, visibility: FILE_VISIBILITY.RESTRICTED },
@@ -73,7 +72,7 @@ describe("canAccessFile", () => {
         actor: {
           userId: "admin-1",
           organizationId: "org-1",
-          roles: [ROLE_NAMES.ADMIN],
+          roles: ["ADMIN"],
           permissions: [perm("files", ACTION.READ), perm("audit", ACTION.READ)],
         },
         file: { ...orgFile, visibility: FILE_VISIBILITY.RESTRICTED },
@@ -88,7 +87,7 @@ describe("listFilesAccessScope", () => {
       listFilesAccessScope({
         userId: "user-1",
         organizationId: "org-1",
-        roles: [ROLE_NAMES.USER],
+        roles: ["USER"],
         permissions: [perm("files", ACTION.READ)],
       }),
     ).toEqual({
@@ -103,7 +102,7 @@ describe("listFilesAccessScope", () => {
       listFilesAccessScope({
         userId: "admin-1",
         organizationId: "org-1",
-        roles: [ROLE_NAMES.ADMIN],
+        roles: ["ADMIN"],
         permissions: [perm("files", ACTION.READ), perm("audit", ACTION.READ)],
       }),
     ).toEqual({

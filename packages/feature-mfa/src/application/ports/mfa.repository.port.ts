@@ -88,8 +88,20 @@ export interface MfaRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<MfaChallengeRecord | null>;
 
-  incrementChallengeAttempts(
+  /**
+   * Atomically reserve one verification attempt. The threshold check and the
+   * increment are one statement
+   * (`set attempts = attempts + 1 where id = $1 and attempts < $2 returning *`),
+   * so two concurrent requests holding the same challenge cannot both read a
+   * stale `attempts < max` and each increment past the limit.
+   *
+   * Returns the updated row when the attempt was counted, or null when the
+   * counter is already at `maxAttempts` (or the row is gone). The caller must
+   * treat null as "challenge exhausted", not as a counted failure.
+   */
+  tryIncrementChallengeAttempts(
     id: string,
+    maxAttempts: number,
     executor?: TransactionExecutor,
   ): Promise<MfaChallengeRecord | null>;
 

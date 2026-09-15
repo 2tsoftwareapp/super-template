@@ -43,4 +43,4 @@ export interface AuthUserStore {
   ): Promise<AuthUserRecord | null>;
 }
 
-export const AUTH_USER_STORE = Symbol("AUTH_USER_STORE");
+export { AUTH_USER_STORE } from "./auth-user-store.token";

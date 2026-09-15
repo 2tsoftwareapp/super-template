@@ -2,7 +2,7 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-kernel"
 import type { TransactionPort } from "@repo/api-kernel";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-kernel";
+import { AppError, PLATFORM_ROLE_NAMES, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-kernel";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 
@@ -14,9 +14,6 @@ import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
 } from "../ports/organizations.repository.port";
-
-/** Platform super-role literal; importing access-control here would create a package cycle. */
-const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";
 
 @Injectable()
 export class UpdateOrganizationUseCase {
@@ -41,7 +38,7 @@ export class UpdateOrganizationUseCase {
         ? { userId: actor, isSuperAdmin: false }
         : {
             userId: actor.userId,
-            isSuperAdmin: actor.roles?.includes(PLATFORM_SUPER_ADMIN) ?? false,
+            isSuperAdmin: actor.roles?.includes(PLATFORM_ROLE_NAMES.SUPER_ADMIN) ?? false,
           };
 
     let membership = null;

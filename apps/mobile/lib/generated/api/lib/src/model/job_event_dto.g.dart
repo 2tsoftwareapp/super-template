@@ -14,12 +14,16 @@ const JobEventDtoTypeEnum _$jobEventDtoTypeEnum_completed =
     const JobEventDtoTypeEnum._('completed');
 const JobEventDtoTypeEnum _$jobEventDtoTypeEnum_failed =
     const JobEventDtoTypeEnum._('failed');
+const JobEventDtoTypeEnum _$jobEventDtoTypeEnum_processingError =
+    const JobEventDtoTypeEnum._('processingError');
 const JobEventDtoTypeEnum _$jobEventDtoTypeEnum_retryScheduled =
     const JobEventDtoTypeEnum._('retryScheduled');
 const JobEventDtoTypeEnum _$jobEventDtoTypeEnum_cancelled =
     const JobEventDtoTypeEnum._('cancelled');
 const JobEventDtoTypeEnum _$jobEventDtoTypeEnum_noHandler =
     const JobEventDtoTypeEnum._('noHandler');
+const JobEventDtoTypeEnum _$jobEventDtoTypeEnum_dependencyFailed =
+    const JobEventDtoTypeEnum._('dependencyFailed');
 
 JobEventDtoTypeEnum _$jobEventDtoTypeEnumValueOf(String name) {
   switch (name) {
@@ -29,12 +33,16 @@ JobEventDtoTypeEnum _$jobEventDtoTypeEnumValueOf(String name) {
       return _$jobEventDtoTypeEnum_completed;
     case 'failed':
       return _$jobEventDtoTypeEnum_failed;
+    case 'processingError':
+      return _$jobEventDtoTypeEnum_processingError;
     case 'retryScheduled':
       return _$jobEventDtoTypeEnum_retryScheduled;
     case 'cancelled':
       return _$jobEventDtoTypeEnum_cancelled;
     case 'noHandler':
       return _$jobEventDtoTypeEnum_noHandler;
+    case 'dependencyFailed':
+      return _$jobEventDtoTypeEnum_dependencyFailed;
     default:
       throw ArgumentError(name);
   }
@@ -45,9 +53,11 @@ final BuiltSet<JobEventDtoTypeEnum> _$jobEventDtoTypeEnumValues =
   _$jobEventDtoTypeEnum_claimed,
   _$jobEventDtoTypeEnum_completed,
   _$jobEventDtoTypeEnum_failed,
+  _$jobEventDtoTypeEnum_processingError,
   _$jobEventDtoTypeEnum_retryScheduled,
   _$jobEventDtoTypeEnum_cancelled,
   _$jobEventDtoTypeEnum_noHandler,
+  _$jobEventDtoTypeEnum_dependencyFailed,
 ]);
 
 Serializer<JobEventDtoTypeEnum> _$jobEventDtoTypeEnumSerializer =
@@ -59,17 +69,21 @@ class _$JobEventDtoTypeEnumSerializer
     'claimed': 'claimed',
     'completed': 'completed',
     'failed': 'failed',
+    'processingError': 'processing_error',
     'retryScheduled': 'retry_scheduled',
     'cancelled': 'cancelled',
     'noHandler': 'no_handler',
+    'dependencyFailed': 'dependency_failed',
   };
   static const Map<Object, String> _fromWire = const <Object, String>{
     'claimed': 'claimed',
     'completed': 'completed',
     'failed': 'failed',
+    'processing_error': 'processingError',
     'retry_scheduled': 'retryScheduled',
     'cancelled': 'cancelled',
     'no_handler': 'noHandler',
+    'dependency_failed': 'dependencyFailed',
   };
 
   @override

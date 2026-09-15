@@ -9,6 +9,7 @@ import {
   DatabaseHealthIndicator,
   RedisHealthIndicator,
 } from "../application/health.indicators";
+import { resolveRedisRequirement, shouldProbeRedis } from "../domain/redis-readiness.policy";
 
 class HealthStatusDto {
   @ApiProperty({ enum: ["ok", "ready"] })
@@ -59,7 +60,12 @@ export class HealthController {
       () => this.databaseHealthIndicator.isHealthy("database"),
     ];
 
-    if (this.environmentService.redisUrl) {
+    // The shared policy decides, not this controller: Redis is probed whenever
+    // it is configured, and in production without REDIS_URL too — there the
+    // probe fails with an explicit reason instead of letting a misconfigured
+    // deployment report itself ready. Non-production without REDIS_URL is the
+    // supported single-instance mode, so the check is skipped.
+    if (shouldProbeRedis(resolveRedisRequirement(this.environmentService))) {
       checks.push(() => this.redisHealthIndicator.isHealthy("redis"));
     }
 

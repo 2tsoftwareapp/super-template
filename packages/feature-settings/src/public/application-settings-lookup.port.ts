@@ -8,4 +8,4 @@ export interface ApplicationSettingsLookup {
   isMaintenanceMode(): Promise<boolean>;
 }
 
-export const APPLICATION_SETTINGS_LOOKUP = Symbol("APPLICATION_SETTINGS_LOOKUP");
+export { APPLICATION_SETTINGS_LOOKUP } from "./application-settings-lookup.token";

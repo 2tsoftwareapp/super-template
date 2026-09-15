@@ -31,6 +31,7 @@ if (-not $env:APP_ENV) {
 Import-MergedEnv
 
 pnpm install
+node scripts/hooks/install.mjs
 
 pnpm run mobile:doctor *> $null
 if ($LASTEXITCODE -eq 0) {

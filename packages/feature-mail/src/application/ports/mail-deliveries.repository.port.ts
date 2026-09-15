@@ -5,6 +5,8 @@ export type MailDeliveryStatus = "PENDING" | "PROCESSING" | "PROVIDER_ACCEPTED" 
 
 export interface DeliveryRecord {
   id: string;
+  /** Tenant that owns the delivery; `null` for platform-scope (auth) mail. */
+  organizationId: string | null;
   templateKey: string;
   recipient: string;
   subject: string;

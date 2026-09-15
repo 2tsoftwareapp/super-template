@@ -1,6 +1,22 @@
 import { describe, expect, it, vi } from "vitest";
 
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
+
+import { LastOwnerGuard } from "../../services/last-owner-guard.service";
 import { LeaveOrganizationUseCase } from "../leave-organization.use-case";
+
+/** Whole actor, not a fragment: `execute` takes `string | AuthenticatedRequestUser`,
+ *  and only the real shape is assignable to the latter. */
+const actorFor = (userId: string, roles: string[] = []): AuthenticatedRequestUser => ({
+  userId,
+  sessionId: `session-${userId}`,
+  email: `${userId}@example.local`,
+  displayName: userId,
+  status: "ACTIVE",
+  roles,
+  permissions: [],
+  organizationId: "org-1",
+});
 
 function buildMocks() {
   const membership = {
@@ -28,6 +44,9 @@ function buildUseCase(mocks: ReturnType<typeof buildMocks>) {
     mocks.membership as never,
     mocks.auditWriter as never,
     mocks.accessControl as never,
+    // Real guard over the mocked membership port: these tests exercise the
+    // leave flow end to end through the shared last-owner sequence.
+    new LastOwnerGuard(mocks.membership as never),
   );
 }
 
@@ -115,7 +134,7 @@ describe("LeaveOrganizationUseCase", () => {
     m.membership.removeMember.mockResolvedValue(true);
 
     const useCase = buildUseCase(m);
-    await useCase.execute("org-1", { userId: "u3", roles: ["USER"] });
+    await useCase.execute("org-1", actorFor("u3", ["USER"]));
 
     expect(m.membership.findMembership).toHaveBeenCalledWith("org-1", "u3", "tx");
   });

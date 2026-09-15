@@ -1,6 +1,8 @@
 import type { JsonObject } from "@repo/api-kernel";
 import type { TransactionExecutor } from "@repo/api-kernel";
 
+import type { JobEventType } from "../../domain/job-event-type";
+
 export interface JobObservabilityRepositoryPort {
   startAttempt(
     values: {
@@ -42,7 +44,7 @@ export interface JobObservabilityRepositoryPort {
       jobId: string;
       organizationId: string | null;
       attemptId?: string | null;
-      type: string;
+      type: JobEventType;
       message?: string | null;
       metadata?: JsonObject | null;
     },
@@ -52,7 +54,7 @@ export interface JobObservabilityRepositoryPort {
     jobId: string;
     organizationId: string | null;
     attemptId: string | null;
-    type: string;
+    type: JobEventType;
     message: string | null;
     metadata: JsonObject | null;
     createdAt: Date;
@@ -67,7 +69,7 @@ export interface JobObservabilityRepositoryPort {
       jobId: string;
       organizationId: string | null;
       attemptId: string | null;
-      type: string;
+      type: JobEventType;
       message: string | null;
       metadata: JsonObject | null;
       createdAt: Date;

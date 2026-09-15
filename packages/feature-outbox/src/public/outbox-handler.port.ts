@@ -37,7 +37,7 @@ export interface OutboxTopicHandlerClass {
   new (...args: never[]): OutboxTopicHandler;
 }
 
-export const OUTBOX_HANDLER_REGISTRY = Symbol("OUTBOX_HANDLER_REGISTRY");
+export { OUTBOX_HANDLER_REGISTRY } from "./outbox-handler.token";
 
 /**
  * Registry port consumed by {@link OutboxDispatcher}. The bridge provider

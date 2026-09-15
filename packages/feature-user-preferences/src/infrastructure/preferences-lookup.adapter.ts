@@ -6,17 +6,9 @@ import type {
   UserPreferencesLookup,
 } from "../public/user-preferences-lookup.port";
 
+import { resolveNotificationChannelPreferences } from "../application/notification-preferences.policy";
 import { DEFAULT_USER_PREFERENCES } from "../application/preferences.constants";
 import { PreferencesRepository } from "./preferences.repository";
-
-function resolveNotificationPreferences(
-  value: Record<string, unknown> | null | undefined,
-): NotificationChannelPreferences {
-  return {
-    email: value?.email !== false,
-    push: value?.push !== false,
-  };
-}
 
 @Injectable()
 export class PreferencesLookupAdapter implements UserPreferencesLookup {
@@ -30,7 +22,7 @@ export class PreferencesLookupAdapter implements UserPreferencesLookup {
   ): Promise<NotificationChannelPreferences> {
     const preferences = await this.preferencesRepository.findByUserId(userId);
 
-    return resolveNotificationPreferences(
+    return resolveNotificationChannelPreferences(
       preferences?.notificationPreferences ?? DEFAULT_USER_PREFERENCES.notificationPreferences,
     );
   }

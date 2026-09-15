@@ -11,13 +11,17 @@ import type { ImportValidationError } from "../../../application/ports/import-ex
 import type { ImportJobView } from "../imports.types";
 
 import { ImportExportAdapterRegistry } from "../../../application/services/import-export-adapter.registry";
+import { CsvFormatError } from "../../domain/csv";
 import { canAccessImportJob } from "../../domain/import-access.policy";
 import { ImportsMapper } from "../imports.mapper";
 import {
   IMPORT_JOBS_REPOSITORY,
   type ImportJobsRepositoryPort,
 } from "../ports/imports.repository.port";
-import { ImportFileParserService } from "../services/import-file-parser.service";
+import {
+  ImportFileParserService,
+  type ParsedImportFile,
+} from "../services/import-file-parser.service";
 
 @Injectable()
 export class ConfirmImportUseCase {
@@ -89,7 +93,24 @@ export class ConfirmImportUseCase {
     }
 
     const organizationId = file.organizationId;
-    const parsed = await this.importFileParser.parseImportFile(job.type, file.storageKey);
+
+    let parsed: ParsedImportFile;
+
+    try {
+      parsed = await this.importFileParser.parseImportFile(job.type, file.storageKey);
+    } catch (error) {
+      if (!(error instanceof CsvFormatError)) {
+        throw error;
+      }
+
+      // A job that reached confirm passed validation when it was created, so the
+      // same bytes must parse here. Failing to parse means the stored object was
+      // replaced with different content, which is the case this gate exists for.
+      throw this.contentChanged();
+    }
+
+    this.assertContentUnchanged(job.contentHash, parsed.contentHash);
+
     const adapter = this.importExportAdapters.resolve(job.type);
 
     const importPermissions = this.importExportAdapters.getImportPermissions(job.type);
@@ -186,6 +207,25 @@ export class ConfirmImportUseCase {
     });
 
     return this.importsMapper.toImportJobView(updatedJob ?? job);
+  }
+
+  /**
+   * Refuse to import a file whose bytes no longer match the SHA-256 recorded at
+   * validation time. A `null` fingerprint (job created before fingerprints were
+   * recorded) also refuses: the file cannot be vouched for.
+   */
+  private assertContentUnchanged(storedHash: string | null, currentHash: string): void {
+    if (!storedHash || storedHash !== currentHash) {
+      throw this.contentChanged();
+    }
+  }
+
+  private contentChanged(): AppError {
+    return new AppError(
+      IMPORT_EXPORT_ERROR_CODES.IMPORT_FILE_MODIFIED,
+      "The import file no longer matches the content that was validated; create the import again",
+      HttpStatus.CONFLICT,
+    );
   }
 }
 

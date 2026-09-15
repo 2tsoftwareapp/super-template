@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "start": "node dist/main",
     "test": "vitest run test src",
+    "test:e2e": "WORKER_E2E=1 vitest run test",
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

@@ -13,7 +13,11 @@ import { HealthController } from "../health.controller";
 
 describe("HealthController", () => {
   function createSetup(
-    options: { redisUrl?: string | undefined; warnings?: string[] | undefined } = {},
+    options: {
+      redisUrl?: string | undefined;
+      isProduction?: boolean;
+      warnings?: string[] | undefined;
+    } = {},
   ) {
     const executedChecks: Array<() => Promise<unknown> | unknown> = [];
     const health = {
@@ -41,6 +45,7 @@ describe("HealthController", () => {
 
     const environmentService = {
       redisUrl: options.redisUrl,
+      isProduction: options.isProduction ?? false,
     } as unknown as EnvironmentService;
 
     const controller = new HealthController(
@@ -134,6 +139,27 @@ describe("HealthController", () => {
           warnings: [],
         },
       });
+    });
+
+    it("still probes redis in production without REDIS_URL so readiness fails loudly", async () => {
+      const { controller, redisHealthIndicator, healthWarningsService } = createSetup({
+        isProduction: true,
+        redisUrl: undefined,
+        warnings: ["Production configuration requires REDIS_URL"],
+      });
+
+      const response = await controller.getReady();
+
+      // The shared policy decides: a misconfigured production must not skip the
+      // redis probe (that would report ready while the warnings say otherwise).
+      expect(redisHealthIndicator.isHealthy).toHaveBeenCalledWith("redis");
+      expect(response).toEqual({
+        data: {
+          status: "ready",
+          warnings: ["Production configuration requires REDIS_URL"],
+        },
+      });
+      expect(healthWarningsService.collect).toHaveBeenCalledTimes(1);
     });
 
     it("propagates error when health check fails", async () => {

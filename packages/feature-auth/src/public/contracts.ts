@@ -12,7 +12,16 @@ export type * from "../application/ports/auth-token.provider.port";
 export { IssueSessionUseCase } from "../application/use-cases/issue-session.use-case";
 export { AuthDataModule } from "../auth-data.module";
 export * from "./access-token-authenticator.port";
+export { ACCESS_TOKEN_AUTHENTICATOR } from "./access-token-authenticator.token";
 
-export { AUTH_TOKEN_MAINTENANCE, type AuthTokenMaintenance } from "./auth-token-maintenance.port";
+export * from "./auth-access-profile.port";
+export { AUTH_ACCESS_PROFILE } from "./auth-access-profile.token";
+export * from "./auth-organization-context.port";
+export { AUTH_ORGANIZATION_CONTEXT } from "./auth-organization-context.token";
+export { type AuthTokenMaintenance } from "./auth-token-maintenance.port";
+export { AUTH_TOKEN_MAINTENANCE } from "./auth-token-maintenance.token";
 export * from "./auth-user-store.port";
+export { AUTH_USER_STORE } from "./auth-user-store.token";
 export { AUTH_ERROR_CODES } from "./error-codes";
+export * from "./session-issuer.port";
+export { SESSION_ISSUER } from "./session-issuer.token";

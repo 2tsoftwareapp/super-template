@@ -1,16 +1,12 @@
 import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
-import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError } from "@repo/api-kernel";
-import { ERROR_CODES } from "@repo/api-runtime";
+import { Inject, Injectable } from "@nestjs/common";
 
 import type { ListAuditLogsQuery } from "../audit.types";
 
+import { resolveAuditReadScope } from "../../domain/audit-read-scope.policy";
 import { AuditMapper } from "../audit.mapper";
 import { AUDIT_REPOSITORY, type AuditRepositoryPort } from "../ports/audit.repository.port";
-
-/** Platform super-role literal; importing access-control here would create a package cycle. */
-const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";
 
 @Injectable()
 export class ListAuditLogsUseCase {
@@ -20,20 +16,11 @@ export class ListAuditLogsUseCase {
   ) {}
 
   async execute(actor: AuthenticatedRequestUser, query: ListAuditLogsQuery) {
-    const isSuperAdmin = actor.roles.includes(PLATFORM_SUPER_ADMIN);
-
-    // SUPER_ADMIN sees the full audit trail (including platform-scoped rows
-    // recorded without an organization); non-super admins stay scoped to
-    // their organization.
-    const organizationId = isSuperAdmin ? null : actor.organizationId;
-
-    if (!isSuperAdmin && !organizationId) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        "Organization ID is required for non-super admin",
-        HttpStatus.FORBIDDEN,
-      );
-    }
+    // Single source of truth for the read scope: SUPER_ADMIN sees the full audit
+    // trail (platform-scoped rows included), organization actors stay scoped to
+    // their organization, org-less non-super actors are rejected.
+    const scope = resolveAuditReadScope(actor);
+    const organizationId = scope.kind === "organization" ? scope.organizationId : null;
 
     const result = await this.auditRepository.list({
       page: query.page,

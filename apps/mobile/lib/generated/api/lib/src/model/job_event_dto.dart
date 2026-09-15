@@ -21,7 +21,7 @@ part 'job_event_dto.g.dart';
 /// * [jobId]
 /// * [message]
 /// * [metadata]
-/// * [type]
+/// * [type] - `failed` means the job reached FAILED; `processing_error` means an error escaped the processing cycle before a terminal status was recorded, so the job stays PROCESSING; `dependency_failed` means the job was moved to BLOCKED because this event's dependency (named in `message`) reached a blocking status.
 @BuiltValue()
 abstract class JobEventDto implements Built<JobEventDto, JobEventDtoBuilder> {
   @BuiltValueField(wireName: r'attemptId')
@@ -42,9 +42,10 @@ abstract class JobEventDto implements Built<JobEventDto, JobEventDtoBuilder> {
   @BuiltValueField(wireName: r'metadata')
   BuiltMap<String, JsonObject?>? get metadata;
 
+  /// `failed` means the job reached FAILED; `processing_error` means an error escaped the processing cycle before a terminal status was recorded, so the job stays PROCESSING; `dependency_failed` means the job was moved to BLOCKED because this event's dependency (named in `message`) reached a blocking status.
   @BuiltValueField(wireName: r'type')
   JobEventDtoTypeEnum get type;
-  // enum typeEnum {  claimed,  completed,  failed,  retry_scheduled,  cancelled,  no_handler,  };
+  // enum typeEnum {  claimed,  completed,  failed,  processing_error,  retry_scheduled,  cancelled,  no_handler,  dependency_failed,  };
 
   JobEventDto._();
 
@@ -225,19 +226,40 @@ class _$JobEventDtoSerializer implements PrimitiveSerializer<JobEventDto> {
 }
 
 class JobEventDtoTypeEnum extends EnumClass {
+  /// `failed` means the job reached FAILED; `processing_error` means an error escaped the processing cycle before a terminal status was recorded, so the job stays PROCESSING; `dependency_failed` means the job was moved to BLOCKED because this event's dependency (named in `message`) reached a blocking status.
   @BuiltValueEnumConst(wireName: r'claimed')
   static const JobEventDtoTypeEnum claimed = _$jobEventDtoTypeEnum_claimed;
+
+  /// `failed` means the job reached FAILED; `processing_error` means an error escaped the processing cycle before a terminal status was recorded, so the job stays PROCESSING; `dependency_failed` means the job was moved to BLOCKED because this event's dependency (named in `message`) reached a blocking status.
   @BuiltValueEnumConst(wireName: r'completed')
   static const JobEventDtoTypeEnum completed = _$jobEventDtoTypeEnum_completed;
+
+  /// `failed` means the job reached FAILED; `processing_error` means an error escaped the processing cycle before a terminal status was recorded, so the job stays PROCESSING; `dependency_failed` means the job was moved to BLOCKED because this event's dependency (named in `message`) reached a blocking status.
   @BuiltValueEnumConst(wireName: r'failed')
   static const JobEventDtoTypeEnum failed = _$jobEventDtoTypeEnum_failed;
+
+  /// `failed` means the job reached FAILED; `processing_error` means an error escaped the processing cycle before a terminal status was recorded, so the job stays PROCESSING; `dependency_failed` means the job was moved to BLOCKED because this event's dependency (named in `message`) reached a blocking status.
+  @BuiltValueEnumConst(wireName: r'processing_error')
+  static const JobEventDtoTypeEnum processingError =
+      _$jobEventDtoTypeEnum_processingError;
+
+  /// `failed` means the job reached FAILED; `processing_error` means an error escaped the processing cycle before a terminal status was recorded, so the job stays PROCESSING; `dependency_failed` means the job was moved to BLOCKED because this event's dependency (named in `message`) reached a blocking status.
   @BuiltValueEnumConst(wireName: r'retry_scheduled')
   static const JobEventDtoTypeEnum retryScheduled =
       _$jobEventDtoTypeEnum_retryScheduled;
+
+  /// `failed` means the job reached FAILED; `processing_error` means an error escaped the processing cycle before a terminal status was recorded, so the job stays PROCESSING; `dependency_failed` means the job was moved to BLOCKED because this event's dependency (named in `message`) reached a blocking status.
   @BuiltValueEnumConst(wireName: r'cancelled')
   static const JobEventDtoTypeEnum cancelled = _$jobEventDtoTypeEnum_cancelled;
+
+  /// `failed` means the job reached FAILED; `processing_error` means an error escaped the processing cycle before a terminal status was recorded, so the job stays PROCESSING; `dependency_failed` means the job was moved to BLOCKED because this event's dependency (named in `message`) reached a blocking status.
   @BuiltValueEnumConst(wireName: r'no_handler')
   static const JobEventDtoTypeEnum noHandler = _$jobEventDtoTypeEnum_noHandler;
+
+  /// `failed` means the job reached FAILED; `processing_error` means an error escaped the processing cycle before a terminal status was recorded, so the job stays PROCESSING; `dependency_failed` means the job was moved to BLOCKED because this event's dependency (named in `message`) reached a blocking status.
+  @BuiltValueEnumConst(wireName: r'dependency_failed')
+  static const JobEventDtoTypeEnum dependencyFailed =
+      _$jobEventDtoTypeEnum_dependencyFailed;
 
   static Serializer<JobEventDtoTypeEnum> get serializer =>
       _$jobEventDtoTypeEnumSerializer;

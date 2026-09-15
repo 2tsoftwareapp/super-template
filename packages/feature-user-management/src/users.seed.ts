@@ -25,6 +25,13 @@ export interface SeededUsersBag {
   regularOrganizationId: string | null;
 }
 
+/**
+ * Seeder id contributed by `@repo/feature-access-control`'s `seed.ts`. Roles and
+ * permissions must exist before the seeded users can be granted them; the edge
+ * is declared here because it is a seed-time ordering contract, not an import.
+ */
+const ACCESS_CONTROL_SEEDER_ID = "access-control";
+
 async function runUsersSeed(ctx: FeatureSeedContext): Promise<void> {
   const accessControlService = ctx.app.get(USER_ACCESS_CONTROL) as UserAccessControl;
   const environmentService = ctx.app.get(EnvironmentService) as EnvironmentService;
@@ -132,4 +139,6 @@ async function runUsersSeed(ctx: FeatureSeedContext): Promise<void> {
   } satisfies SeededUsersBag;
 }
 
-export const usersSeeders: readonly FeatureSeeder[] = [{ id: "users", run: runUsersSeed }];
+export const usersSeeders: readonly FeatureSeeder[] = [
+  { id: "users", dependsOn: [ACCESS_CONTROL_SEEDER_ID], run: runUsersSeed },
+];

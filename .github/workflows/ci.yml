@@ -469,6 +469,10 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # The action defaults to `tools platform-tools`, but `tools` was removed
+          # from the SDK repository, so sdkmanager exits 1. Install the subset only.
+          packages: "platform-tools"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4

@@ -33,10 +33,10 @@ function createHarness(sessionRow: ReturnType<typeof session>) {
       mustChangePassword: false,
     }),
   };
-  const accessControlService = {
+  const authAccessProfile = {
     getAccessProfileStrong: vi.fn().mockResolvedValue({ roles: ["USER"], permissions: [] }),
   };
-  const organizationsService = {
+  const authOrganizationContext = {
     resolveOrganizationIdForUser: vi.fn().mockResolvedValue("org-1"),
   };
   const tokenProvider = {
@@ -47,13 +47,13 @@ function createHarness(sessionRow: ReturnType<typeof session>) {
     useCase: new AuthenticateAccessTokenUseCase(
       authSessionRepository as never,
       usersRepository as never,
-      accessControlService as never,
-      organizationsService as never,
+      authAccessProfile as never,
+      authOrganizationContext as never,
       tokenProvider as never,
     ),
     authSessionRepository,
     usersRepository,
-    accessControlService,
+    authAccessProfile,
   };
 }
 
@@ -63,24 +63,24 @@ describe("AuthenticateAccessTokenUseCase strong reads", () => {
   // UsersRepository.findByIdStrong in @repo/feature-users and end to end by
   // apps/api/test/tenant-isolation.e2e.spec.ts.
   it("rejects a revoked session using the repository's strong session read", async () => {
-    const { useCase, authSessionRepository, usersRepository, accessControlService } = createHarness(
+    const { useCase, authSessionRepository, usersRepository, authAccessProfile } = createHarness(
       session({ revokedAt: new Date() }),
     );
 
     await expect(useCase.execute("access-token")).rejects.toThrow("Session has been revoked");
     expect(authSessionRepository.findSessionForUser).toHaveBeenCalledWith("session-1", "user-1");
     expect(usersRepository.findByIdStrong).toHaveBeenCalledWith("user-1");
-    expect(accessControlService.getAccessProfileStrong).not.toHaveBeenCalled();
+    expect(authAccessProfile.getAccessProfileStrong).not.toHaveBeenCalled();
   });
 
   it("uses strong user and permission reads for a valid access token", async () => {
-    const { useCase, usersRepository, accessControlService } = createHarness(session());
+    const { useCase, usersRepository, authAccessProfile } = createHarness(session());
 
     await expect(useCase.execute("rotated-access-token")).resolves.toMatchObject({
       userId: "user-1",
       organizationId: "org-1",
     });
     expect(usersRepository.findByIdStrong).toHaveBeenCalledWith("user-1");
-    expect(accessControlService.getAccessProfileStrong).toHaveBeenCalledWith("user-1", "org-1");
+    expect(authAccessProfile.getAccessProfileStrong).toHaveBeenCalledWith("user-1", "org-1");
   });
 });

@@ -2,7 +2,7 @@ import type { DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE, type DatabaseClient, getPrimaryDatabaseClient } from "@repo/database-runtime";
-import { and, eq, gt, isNull, sql } from "drizzle-orm";
+import { and, eq, gt, isNull, lt, sql } from "drizzle-orm";
 
 import type { MfaRepositoryPort } from "../application/ports/mfa.repository.port";
 
@@ -152,11 +152,26 @@ export class MfaRepository implements MfaRepositoryPort {
     return challenge ?? null;
   }
 
-  async incrementChallengeAttempts(id: string, executor: DatabaseExecutor = this.primaryDatabase) {
+  /**
+   * Atomic check-and-increment: the `attempts < maxAttempts` threshold lives in
+   * the UPDATE predicate, so PostgreSQL evaluates it against the same row
+   * version it writes. The previous read-then-write pair let two concurrent
+   * wrong codes both observe `attempts = 4` and both increment, pushing the
+   * counter past the limit and letting a request slip through.
+   *
+   * No explicit transaction or `SELECT ... FOR UPDATE` is needed: a single
+   * `UPDATE ... WHERE ... RETURNING` is atomic under READ COMMITTED, and it does
+   * not hold a row lock across the surrounding TOTP verification and audit write.
+   */
+  async tryIncrementChallengeAttempts(
+    id: string,
+    maxAttempts: number,
+    executor: DatabaseExecutor = this.primaryDatabase,
+  ) {
     const [challenge] = await executor
       .update(mfaChallenges)
       .set({ attempts: sql`${mfaChallenges.attempts} + 1` })
-      .where(eq(mfaChallenges.id, id))
+      .where(and(eq(mfaChallenges.id, id), lt(mfaChallenges.attempts, maxAttempts)))
       .returning();
 
     return challenge ?? null;

@@ -144,6 +144,7 @@ describe("health indicators", () => {
     };
     const environmentService = {
       redisUrl: undefined,
+      isProduction: false,
     } as unknown as EnvironmentService;
 
     const result = await new RedisHealthIndicator(
@@ -154,6 +155,29 @@ describe("health indicators", () => {
     expect(result).toEqual({
       status: "down",
       details: { reason: "redis url not configured" },
+    });
+  });
+
+  it("explains that REDIS_URL is required when production probes without it", async () => {
+    const indicator = createIndicator();
+    const healthIndicatorService = {
+      check: vi.fn(() => indicator),
+    };
+    const environmentService = {
+      redisUrl: undefined,
+      isProduction: true,
+    } as unknown as EnvironmentService;
+
+    const result = await new RedisHealthIndicator(
+      environmentService,
+      healthIndicatorService as never,
+    ).isHealthy("redis");
+
+    expect(result).toEqual({
+      status: "down",
+      details: {
+        reason: expect.stringContaining("required in production"),
+      },
     });
   });
 });

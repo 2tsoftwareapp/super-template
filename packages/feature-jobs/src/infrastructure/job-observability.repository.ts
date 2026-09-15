@@ -6,17 +6,11 @@ import { DATABASE } from "@repo/database-runtime";
 import { and, count, desc, eq, gte, inArray, isNull, lte, sql } from "drizzle-orm";
 
 import type { JobObservabilityRepositoryPort } from "../application/ports/job-observability.repository.port";
+import type { JobEventType } from "../domain/job-event-type";
 
 import { jobAttempts, jobDependencies, jobEvents, jobs } from "./persistence";
 
 type JobAttemptStatus = "PROCESSING" | "COMPLETED" | "FAILED";
-type JobEventType =
-  | "claimed"
-  | "completed"
-  | "failed"
-  | "retry_scheduled"
-  | "cancelled"
-  | "no_handler";
 
 function scopeWhereClause(
   scope: { type: "organization"; organizationId: string } | { type: "platform" },

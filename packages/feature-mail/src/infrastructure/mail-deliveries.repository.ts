@@ -1,8 +1,9 @@
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
+import { getTenantContext } from "@repo/api-kernel";
 import { DATABASE } from "@repo/database-runtime";
-import { and, count, desc, eq, sql } from "drizzle-orm";
+import { and, count, desc, eq, sql, type SQL } from "drizzle-orm";
 
 import type {
   DeliveryRecord,
@@ -22,13 +23,35 @@ interface ListDeliveriesParams {
 export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
+  /**
+   * Organization of the active tenant context (HTTP request interceptor or job
+   * handler). `null` means the caller runs in platform scope: auth mail
+   * dispatched by the outbox worker, and jobs enqueued without an organization.
+   * Reads and writes stay fenced either way because the table is under RLS.
+   */
+  private resolveTenantOrganizationId(): string | null {
+    const tenantId = getTenantContext()?.tenantId ?? "";
+    if (tenantId.length === 0) {
+      return null;
+    }
+    return tenantId;
+  }
+
   async create(
     values: typeof mailDeliveries.$inferInsert,
     executor: DatabaseExecutor = this.database,
   ) {
     const [delivery] = await executor
       .insert(mailDeliveries)
-      .values(values)
+      .values({
+        ...values,
+        // Tenant attribution is mandatory on every write: an explicit value from
+        // the caller wins, otherwise the ambient tenant context is stamped.
+        organizationId:
+          values.organizationId === undefined
+            ? this.resolveTenantOrganizationId()
+            : values.organizationId,
+      })
       .onConflictDoNothing()
       .returning();
 
@@ -214,7 +237,16 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
   }
 
   async list(params: ListDeliveriesParams, executor: DatabaseExecutor = this.database) {
-    const filters = [];
+    const organizationId = this.resolveTenantOrganizationId();
+    const filters: SQL[] = [
+      // list() is the tenant-facing delivery log (GET /admin/mail/deliveries).
+      // It is scoped to the caller's organization and never exposes
+      // platform-scope rows (`organization_id IS NULL`, auth mail written by the
+      // outbox worker). Without a tenant context the filter matches nothing, so
+      // the read fails closed instead of leaking every tenant's deliveries.
+      // RLS fences the same rows at the database level.
+      organizationId === null ? sql`false` : eq(mailDeliveries.organizationId, organizationId),
+    ];
 
     if (params.templateKey) {
       filters.push(eq(mailDeliveries.templateKey, params.templateKey));
@@ -224,7 +256,7 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
       filters.push(eq(mailDeliveries.status, params.status));
     }
 
-    const whereClause = filters.length > 0 ? and(...filters) : undefined;
+    const whereClause = and(...filters);
     const offset = (params.page - 1) * params.limit;
 
     const [rows, totals] = await Promise.all([

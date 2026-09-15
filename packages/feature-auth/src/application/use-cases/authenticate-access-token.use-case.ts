@@ -3,11 +3,14 @@ import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
-import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";
-import { OrganizationsService } from "@repo/feature-organizations/module";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
+import { AUTH_ACCESS_PROFILE, type AuthAccessProfile } from "../../public/auth-access-profile.port";
+import {
+  AUTH_ORGANIZATION_CONTEXT,
+  type AuthOrganizationContext,
+} from "../../public/auth-organization-context.port";
 import { AUTH_USER_STORE, type AuthUserStore } from "../../public/auth-user-store.port";
 import { assertSessionUsable } from "../auth.helpers";
 import {
@@ -27,8 +30,10 @@ export class AuthenticateAccessTokenUseCase {
     private readonly authSessionRepository: AuthSessionRepositoryPort,
     @Inject(AUTH_USER_STORE)
     private readonly usersRepository: AuthUserStore,
-    private readonly accessControlService: AccessControlService,
-    private readonly organizationsService: OrganizationsService,
+    @Inject(AUTH_ACCESS_PROFILE)
+    private readonly accessProfilePort: AuthAccessProfile,
+    @Inject(AUTH_ORGANIZATION_CONTEXT)
+    private readonly organizationContext: AuthOrganizationContext,
     @Inject(AUTH_TOKEN_PROVIDER)
     private readonly tokenProvider: AuthTokenProviderPort,
   ) {}
@@ -71,11 +76,11 @@ export class AuthenticateAccessTokenUseCase {
       );
     }
 
-    const organizationId = await this.organizationsService.resolveOrganizationIdForUser(
+    const organizationId = await this.organizationContext.resolveOrganizationIdForUser(
       user.id,
       payload.oid,
     );
-    const accessProfile = await this.accessControlService.getAccessProfileStrong(
+    const accessProfile = await this.accessProfilePort.getAccessProfileStrong(
       user.id,
       organizationId,
     );

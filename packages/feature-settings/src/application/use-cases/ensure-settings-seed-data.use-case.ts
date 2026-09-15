@@ -6,6 +6,7 @@ import {
   SETTINGS_REPOSITORY,
   type SettingsRepositoryPort,
 } from "../ports/settings.repository.port";
+import { listSettingDefaults } from "../setting-definitions";
 
 @Injectable()
 export class EnsureSettingsSeedDataUseCase {
@@ -14,18 +15,8 @@ export class EnsureSettingsSeedDataUseCase {
   ) {}
 
   async execute(executor?: TransactionExecutor) {
-    await this.settingsRepository.ensureDefaults(
-      [
-        {
-          key: "registration_enabled",
-          value: { enabled: true },
-        },
-        {
-          key: "maintenance_mode",
-          value: { enabled: false, message: null },
-        },
-      ],
-      executor,
-    );
+    // Defaults come from the settings registry (SETTING_DEFINITIONS), so the
+    // seed, the lookup fallback, and update validation can never drift apart.
+    await this.settingsRepository.ensureDefaults(listSettingDefaults(), executor);
   }
 }

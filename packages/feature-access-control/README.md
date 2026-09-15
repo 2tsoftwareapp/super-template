@@ -6,7 +6,7 @@ This package owns the `access-control` feature and its application, domain, infr
 
 ## Public API
 
-The package declares these public entrypoints: `.`, `./contracts`, `./testing`, `./schema`, `./module`, `./interceptor`. Consumers must use these entrypoints instead of importing internal files.
+The package declares these public entrypoints: `.`, `./contracts`, `./schema`, `./module`, `./interceptor`. Consumers must use these entrypoints instead of importing internal files.
 
 ## Feature dependencies
 

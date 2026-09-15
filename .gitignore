@@ -51,3 +51,6 @@ packages/extension/artifacts/
 
 # WorkBuddy AI — local workspace state (memory, sessions)
 .workbuddy-ai/
+
+# Git hooks installed by `pnpm hooks:install` (mirrors scripts/hooks)
+.githooks/

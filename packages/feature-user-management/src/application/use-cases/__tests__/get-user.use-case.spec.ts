@@ -2,6 +2,7 @@ import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
 import { describe, expect, it, vi } from "vitest";
 
+import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import type { OrganizationMembership } from "@repo/feature-organizations/contracts";
 import { UsersMapper } from "@repo/feature-users/module";
 import { GetUserUseCase } from "../get-user.use-case";
@@ -114,7 +115,7 @@ describe("GetUserUseCase", () => {
       email: "super@example.com",
       displayName: "Super",
       status: "ACTIVE",
-      roles: ["SUPER_ADMIN"],
+      roles: [ROLE_NAMES.SUPER_ADMIN],
       permissions: [],
       organizationId: null,
     } satisfies AuthenticatedRequestUser);

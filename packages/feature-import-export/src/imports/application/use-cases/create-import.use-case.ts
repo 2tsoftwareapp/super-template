@@ -10,12 +10,16 @@ import type { ImportValidationError } from "../../../application/ports/import-ex
 import type { CreateImportCommand, ImportJobView } from "../imports.types";
 
 import { ImportExportAdapterRegistry } from "../../../application/services/import-export-adapter.registry";
+import { CsvFormatError } from "../../domain/csv";
 import { MAX_IMPORT_ROWS } from "../../domain/import-types";
 import {
   IMPORT_JOBS_REPOSITORY,
   type ImportJobsRepositoryPort,
 } from "../ports/imports.repository.port";
-import { ImportFileParserService } from "../services/import-file-parser.service";
+import {
+  ImportFileParserService,
+  type ParsedImportFile,
+} from "../services/import-file-parser.service";
 import { GetImportUseCase } from "./get-import.use-case";
 
 @Injectable()
@@ -118,7 +122,30 @@ export class CreateImportUseCase {
       return this.getImportUseCase.execute(actor, job.id);
     }
 
-    const parsed = await this.importFileParser.parseImportFile(input.type, file.storageKey);
+    let parsed: ParsedImportFile;
+
+    try {
+      parsed = await this.importFileParser.parseImportFile(input.type, file.storageKey);
+    } catch (error) {
+      if (!(error instanceof CsvFormatError)) {
+        throw error;
+      }
+
+      // A structurally broken CSV (ragged field counts, unterminated quotes) is
+      // reported on the job with the parser's own message — the previous naive
+      // `split(",")` imported whatever it happened to produce.
+      const parseError: ImportValidationError = { row: 0, message: error.message };
+
+      await this.importJobsRepository.update(job.id, {
+        status: "FAILED",
+        rowCount: null,
+        successCount: 0,
+        errorCount: 1,
+        errors: [parseError],
+      });
+
+      return this.getImportUseCase.execute(actor, job.id);
+    }
 
     if (parsed.rows.length > MAX_IMPORT_ROWS) {
       const tooManyRowsError: ImportValidationError = {
@@ -143,6 +170,9 @@ export class CreateImportUseCase {
       successCount: errors.length > 0 ? 0 : parsed.rows.length,
       errorCount: errors.length,
       errors: errors.length > 0 ? errors : null,
+      // Fingerprint of exactly the bytes that were validated; confirm refuses
+      // the import when the stored object no longer hashes to this value.
+      contentHash: parsed.contentHash,
     });
 
     return this.getImportUseCase.execute(actor, job.id);

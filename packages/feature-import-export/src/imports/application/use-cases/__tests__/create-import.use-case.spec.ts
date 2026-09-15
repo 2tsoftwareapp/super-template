@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 
+import { CsvFormatError } from "../../../domain/csv";
 import { CreateImportUseCase } from "../create-import.use-case";
+
+const VALIDATED_HASH = "sha256-recorded-at-validation";
 
 const createActor = (permissions: string[] = []) => ({
   userId: "user-1",
@@ -30,6 +33,7 @@ function createUseCase(overrides?: Record<string, unknown>) {
       headers: ["name"],
       rows: [{ name: "Row 1" }, { name: "Row 2" }],
       totalRows: 2,
+      contentHash: VALIDATED_HASH,
     })),
     validateRows: vi.fn(() => []),
     ...((overrides?.importFileParser as Record<string, unknown>) ?? {}),
@@ -39,6 +43,7 @@ function createUseCase(overrides?: Record<string, unknown>) {
     headers: ["name"],
     rows: [{ name: "Row 1" }, { name: "Row 2" }],
     totalRows: 2,
+    contentHash: VALIDATED_HASH,
   };
 
   const importJobsRepository = {
@@ -160,6 +165,9 @@ describe("CreateImportUseCase", () => {
         rowCount: 2,
         successCount: 2,
         errorCount: 0,
+        // The validated content is fingerprinted so confirm can refuse a file
+        // that was swapped in between the two steps.
+        contentHash: VALIDATED_HASH,
       }),
     );
     expect(auditService.log).toHaveBeenCalledWith(
@@ -256,5 +264,32 @@ describe("CreateImportUseCase", () => {
     await expect(
       useCase.execute(createActor(), { type: "users", fileId: "file-1" }),
     ).rejects.toThrow("Cannot import a global file");
+  });
+
+  it("fails the job when the file is not a well-formed CSV", async () => {
+    const { useCase, importJobsRepository, importFileParser, getImportUseCase } = createUseCase({
+      importFileParser: {
+        parseImportFile: vi.fn(async () => {
+          throw new CsvFormatError(2, "CSV record 2 has 3 field(s) but the header has 2");
+        }),
+      },
+    });
+
+    const result = await useCase.execute(createActor(), {
+      type: "users",
+      fileId: "file-1",
+    });
+
+    expect(importJobsRepository.update).toHaveBeenCalledWith("job-1", {
+      status: "FAILED",
+      rowCount: null,
+      successCount: 0,
+      errorCount: 1,
+      errors: [{ row: 0, message: "CSV record 2 has 3 field(s) but the header has 2" }],
+    });
+    // Rows are never validated against a file that could not be read.
+    expect(importFileParser.validateRows).not.toHaveBeenCalled();
+    expect(getImportUseCase.execute).toHaveBeenCalledWith(createActor(), "job-1");
+    expect(result).toMatchObject({ id: "job-1" });
   });
 });

@@ -2,7 +2,7 @@
 
 import { useMutation } from "@tanstack/react-query";
 
-import { downloadAuditLogExport, exportAuditLogs } from "./audit-logs.api";
+import { auditLogsApi } from "./audit-logs.api";
 
 export interface ExportAndDownloadAuditLogsInput {
   from: string | undefined;
@@ -24,8 +24,8 @@ export function useExportAndDownloadAuditLogsMutation() {
     mutationFn: async (
       input: ExportAndDownloadAuditLogsInput,
     ): Promise<ExportAndDownloadAuditLogsResult> => {
-      const { data } = await exportAuditLogs(input);
-      const blob = await downloadAuditLogExport(data.fileId);
+      const { data } = await auditLogsApi.export(input);
+      const blob = await auditLogsApi.downloadExport(data.fileId);
       return { blob, truncated: data.truncated };
     },
   });

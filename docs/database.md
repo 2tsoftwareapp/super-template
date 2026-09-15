@@ -79,14 +79,20 @@ unprefixed camelCase (`m_users` → `users`).
 
 ## Row-level security coverage
 
-14 of the 38 tables are tenant-isolated by PostgreSQL RLS. Each is `ENABLE`d
+16 of the 38 tables are tenant-isolated by PostgreSQL RLS. Each is `ENABLE`d
 **and** `FORCE`d, with exactly one policy named `<base>_tenant_isolation`
 (policy names keep the pre-prefix base name, because policies bind by table OID):
 
 `l_activities`, `l_audit_logs`, `m_files`, `r_attachments`,
 `r_job_dependencies`, `t_export_jobs`, `t_file_batch_operations`,
-`t_file_versions`, `t_import_jobs`, `t_notifications`, `w_job_attempts`,
-`w_job_events`, `w_jobs`, `w_notification_jobs`.
+`t_file_versions`, `t_import_jobs`, `t_mail_deliveries`, `t_notifications`,
+`w_job_attempts`, `w_job_events`, `w_jobs`, `w_notification_jobs`,
+`w_outbox_messages`.
+
+`t_mail_deliveries` (migration `0041`) and `w_outbox_messages` (migration `0042`)
+joined the list during the 2026-09 audit remediation; both keep an explicit
+`organization_id IS NULL` branch for rows produced before a tenant context
+exists (auth mail dispatched by the outbox worker, pre-migration rows).
 
 Policy predicate:
 
@@ -141,6 +147,19 @@ Compensating controls: application-level org scoping
 `m_organizations` and `m_users` are also outside RLS — they are the tenant root
 and the global identity table. Security-sensitive reads of them are pinned to
 the primary connection (see the read-replica section below).
+
+That accounts for 6 of the 22 tables outside RLS: the four exemptions above plus
+the tenant root `m_organizations` and the global identity table `m_users`. The
+remaining 16 carry no `organization_id` at all, so tenant scoping does not apply
+— global reference data (`m_permissions`, `m_application_settings`), user-scoped
+records (`t_auth_sessions`, `m_user_preferences`, `m_user_two_factor_secrets`,
+`t_mfa_challenges`, `t_user_recovery_codes`, `t_email_verification_tokens`,
+`t_password_reset_tokens`, `t_sso_login_states`, `r_external_identities`,
+`t_notification_deliveries`, `m_notification_device_tokens`), storage
+bookkeeping (`t_storage_objects`, `w_storage_delete_outbox`) and the
+role-permission junction (`r_role_permissions`). Where those rows are user-owned,
+isolation comes from explicit `user_id` predicates in the query, not from a
+policy.
 
 ## Migration Workflow
 
@@ -295,15 +314,18 @@ local test success. Source: `apps/api/test/database-topology.e2e.spec.ts`,
 `infra/docker-compose.yml`.
 
 The live topology suite is opt-in because it requires a separately reachable
-replica and a restricted test role on both endpoints. Invoke Vitest directly so
-only that spec runs, and set `DATABASE_URL_TEST_READ_REPLICA` alongside
-`DATABASE_URL_TEST`:
+replica and a restricted test role on both endpoints. Its switch is the presence
+of the three `DATABASE_TOPOLOGY_*` URLs shown above — there is no separate
+enable flag, and invoking the file without them reports it as skipped:
 
 ```sh
-RUN_DATABASE_TOPOLOGY_E2E=1 pnpm --filter api exec vitest run test/database-topology.e2e.spec.ts
+pnpm --filter api exec vitest run test/database-topology.e2e.spec.ts
 ```
 
-Without those external PostgreSQL endpoints, the deterministic provider,
+`DATABASE_URL_TEST_READ_REPLICA` is a different knob: it is what
+`database.provider.ts` needs when the composed application itself composes
+`readReplica: true` in a test environment, and the topology spec does not read
+it. Without the external PostgreSQL endpoints, the deterministic provider,
 environment, and unit tests are the available verification boundary.
 
 ## Transaction Convention

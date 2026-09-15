@@ -7,10 +7,15 @@ import {
   emptyStringToUndefined,
   everyOriginIsHttps,
   optionalEmail,
+  optionalHexKey,
   optionalSecretMin,
   optionalUrl,
 } from "./env-utils";
-import { DEV_PLACEHOLDER_MFA_KEY, DEV_PLACEHOLDER_SECRETS } from "./env.constants";
+import {
+  DEV_PLACEHOLDER_MFA_KEY,
+  DEV_PLACEHOLDER_SECRETS,
+  DEV_PLACEHOLDER_SSO_KEY,
+} from "./env.constants";
 
 export const envSchema = z
   .object({
@@ -87,6 +92,11 @@ export const envSchema = z
     MFA_ENCRYPTION_KEY: z
       .string()
       .regex(/^[0-9a-fA-F]{64}$/, "must be a 64-character hex string (32 bytes)"),
+    // Symmetric key (32 bytes, hex-encoded) encrypting SSO provider secrets (PKCE
+    // verifiers) at rest. Kept separate from MFA_ENCRYPTION_KEY so rotating the MFA
+    // key does not invalidate stored SSO state. Optional: when unset, SSO falls
+    // back to MFA_ENCRYPTION_KEY (legacy v1 data) with a startup warning.
+    SSO_ENCRYPTION_KEY: optionalHexKey,
     // Days to retain audit_logs rows before the daily purge job deletes them. 0 disables purging.
     AUDIT_RETENTION_DAYS: z.coerce.number().int().min(0).default(0),
     // SSO providers (OIDC Authorization Code + PKCE). Leave a provider's client id unset to
@@ -190,6 +200,13 @@ export const envSchema = z
         ctx.addIssue({
           code: "custom",
           path: ["MFA_ENCRYPTION_KEY"],
+          message: "must not reuse the development placeholder key in staging/production",
+        });
+      }
+      if (env.SSO_ENCRYPTION_KEY === DEV_PLACEHOLDER_SSO_KEY) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["SSO_ENCRYPTION_KEY"],
           message: "must not reuse the development placeholder key in staging/production",
         });
       }

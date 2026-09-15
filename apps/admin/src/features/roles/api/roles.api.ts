@@ -53,10 +53,3 @@ export const rolesApi = {
     });
   },
 };
-
-/** @deprecated Prefer `rolesApi` — kept for existing call sites during migration. */
-export const fetchRoles = () => rolesApi.list();
-export const fetchPermissions = () => rolesApi.permissions();
-export const deleteRole = (roleId: string) => rolesApi.delete(roleId);
-export const createRole = (input: RoleForm) => rolesApi.create(input);
-export const updateRole = (roleId: string, input: RoleForm) => rolesApi.update(roleId, input);

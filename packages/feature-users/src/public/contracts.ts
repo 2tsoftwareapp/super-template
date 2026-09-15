@@ -8,3 +8,6 @@ export { userSortsFromQuery } from "../application/user-sort";
 export type * from "../application/users.types";
 export { USER_ERROR_CODES } from "./error-codes";
 export * from "./user-lookup.port";
+export { USER_LOOKUP } from "./user-lookup.token";
+export * from "./user-organization-scope.port";
+export { USER_ORGANIZATION_SCOPE } from "./user-organization-scope.token";

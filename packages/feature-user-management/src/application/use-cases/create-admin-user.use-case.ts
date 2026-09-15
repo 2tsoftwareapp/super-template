@@ -120,7 +120,12 @@ export class CreateAdminUserUseCase {
       assertCanAssignRoleTargets(actor, [
         {
           name: resolvedRole.name,
-          organizationId: assignmentOrganizationId,
+          // The role's own scope, not the assignment scope: a platform role
+          // (organizationId null) must stay recognisable as the platform USER
+          // role for a non-super actor. Passing `assignmentOrganizationId`
+          // made every platform role look like an org-scoped system role and
+          // was rejected with AUTH_FORBIDDEN.
+          organizationId: resolvedRole.organizationId,
           isSystem: resolvedRole.isSystem,
         },
       ]);

@@ -1,4 +1,13 @@
-import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
+import { PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
+
+/**
+ * Organization-admin role name. `SUPER_ADMIN` is a platform role owned by the
+ * kernel (`PLATFORM_ROLE_NAMES`, and re-exported by feature-access-control);
+ * `ADMIN` is owned by feature-access-control, whose contract a `domain/` file
+ * must not depend on (ADR 0001 rule 1), so the literal stays local to the rule
+ * that needs it.
+ */
+const ORGANIZATION_ADMIN_ROLE = "ADMIN";
 
 export interface ImportAccessActor {
   userId: string;
@@ -24,8 +33,8 @@ export function canAccessImportJob(input: {
   job: ImportAccessSubject;
 }): boolean {
   const { actor, job } = input;
-  const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
-  const isAdmin = actor.roles.includes(ROLE_NAMES.ADMIN) || isSuperAdmin;
+  const isSuperAdmin = actor.roles.includes(PLATFORM_ROLE_NAMES.SUPER_ADMIN);
+  const isAdmin = actor.roles.includes(ORGANIZATION_ADMIN_ROLE) || isSuperAdmin;
 
   if (job.organizationId !== actor.organizationId && !isSuperAdmin) {
     return false;

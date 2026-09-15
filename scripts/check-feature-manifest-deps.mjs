@@ -3,19 +3,19 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import ts from "typescript";
 
+import { formatGhostDependencyErrors, findGhostDependencies } from "./lib/ghost-dependencies.mjs";
+
 const root = process.cwd();
 const packageRoot = resolve(root, "packages");
-const featureDirs = readdirSync(packageRoot).filter(
-  (name) => name.startsWith("feature-") && statSync(join(packageRoot, name)).isDirectory(),
-).sort();
+const featureDirs = readdirSync(packageRoot)
+  .filter((name) => name.startsWith("feature-") && statSync(join(packageRoot, name)).isDirectory())
+  .sort();
 const failures = [];
 const fail = (message) => failures.push(`Manifest guard failed: ${message}`);
 
 /** Generated/test/type-declaration files that carry no cross-feature imports worth enforcing. */
 const isIgnoredSourceFile = (file) =>
-  file.endsWith(".d.ts") ||
-  file.includes("/__tests__/") ||
-  file.includes("/node_modules/");
+  file.endsWith(".d.ts") || file.includes("/__tests__/") || file.includes("/node_modules/");
 
 const entryReexports = (entry, target) => {
   const source = ts.createSourceFile(
@@ -26,7 +26,11 @@ const entryReexports = (entry, target) => {
     ts.ScriptKind.TS,
   );
   return source.statements.some((statement) => {
-    if (!ts.isExportDeclaration(statement) || !statement.moduleSpecifier || !ts.isStringLiteral(statement.moduleSpecifier))
+    if (
+      !ts.isExportDeclaration(statement) ||
+      !statement.moduleSpecifier ||
+      !ts.isStringLiteral(statement.moduleSpecifier)
+    )
       return false;
     const candidate = resolve(
       dirname(entry),
@@ -78,13 +82,25 @@ function discoverManifest(file) {
   );
   const result = [];
   for (const statement of source.statements) {
-    if (!ts.isVariableStatement(statement) || !statement.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword))
+    if (
+      !ts.isVariableStatement(statement) ||
+      !statement.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
+    )
       continue;
     for (const declaration of statement.declarationList.declarations) {
       const init = declaration.initializer;
-      if (!init || !ts.isCallExpression(init) || !ts.isIdentifier(init.expression) || init.expression.text !== "defineFeature")
+      if (
+        !init ||
+        !ts.isCallExpression(init) ||
+        !ts.isIdentifier(init.expression) ||
+        init.expression.text !== "defineFeature"
+      )
         continue;
-      if (!ts.isIdentifier(declaration.name) || init.arguments.length !== 1 || !ts.isObjectLiteralExpression(init.arguments[0])) {
+      if (
+        !ts.isIdentifier(declaration.name) ||
+        init.arguments.length !== 1 ||
+        !ts.isObjectLiteralExpression(init.arguments[0])
+      ) {
         fail(`${file}: malformed defineFeature declaration.`);
         continue;
       }
@@ -115,7 +131,8 @@ for (const dir of featureDirs) {
   }
   const manifest = { ...found[0], dir, pkg, packageDir, pkgName: pkg.name };
   const entry = pkg.exports?.["."];
-  if (typeof entry !== "string") fail(`${dir}: missing package.json exports["."] feature entrypoint.`);
+  if (typeof entry !== "string")
+    fail(`${dir}: missing package.json exports["."] feature entrypoint.`);
   else {
     const entryFile = resolve(packageDir, entry);
     if (entryFile !== resolve(manifest.file) && !entryReexports(entryFile, resolve(manifest.file)))
@@ -137,7 +154,11 @@ const ALLOWED_SUBPATHS = ["", "/contracts", "/module", "/schema", "/testing", "/
 /** Parse an import specifier into { packageName, subpath } without assuming node:resolution. */
 function splitImportSpecifier(specifier) {
   const segments = specifier.split("/");
-  if (specifier.startsWith("@")) return { packageName: segments.slice(0, 2).join("/"), subpath: `/${segments.slice(2).join("/")}` };
+  if (specifier.startsWith("@"))
+    return {
+      packageName: segments.slice(0, 2).join("/"),
+      subpath: `/${segments.slice(2).join("/")}`,
+    };
   return { packageName: segments[0], subpath: `/${segments.slice(1).join("/")}` };
 }
 
@@ -147,26 +168,40 @@ function scanPackageSources(packageDir) {
 }
 
 for (const manifest of manifests) {
-  const packageDeps = Object.keys(manifest.pkg.dependencies ?? {}).filter((name) => featurePackage.test(name));
+  const packageDeps = Object.keys(manifest.pkg.dependencies ?? {}).filter((name) =>
+    featurePackage.test(name),
+  );
   for (const depPackage of packageDeps) {
     const dep = byPackage.get(depPackage);
     if (!dep) fail(`${manifest.dir}: package dependency ${depPackage} has no validated manifest.`);
-    else if (!manifest.dependsOn.includes(dep.id)) fail(`${manifest.dir}: package dependency ${depPackage} is missing from dependsOn.`);
+    else if (!manifest.dependsOn.includes(dep.id))
+      fail(`${manifest.dir}: package dependency ${depPackage} is missing from dependsOn.`);
   }
   for (const depId of manifest.dependsOn) {
     const dep = byId.get(depId);
     if (!dep) fail(`${manifest.dir}: dependsOn references unknown feature "${depId}".`);
-    else if (!packageDeps.includes(dep.pkgName)) fail(`${manifest.dir}: dependsOn "${depId}" lacks a matching package dependency.`);
+    else if (!packageDeps.includes(dep.pkgName))
+      fail(`${manifest.dir}: dependsOn "${depId}" lacks a matching package dependency.`);
   }
 
   // --- Scan EVERY source file in the package (not just the manifest file) ---
   for (const file of scanPackageSources(manifest.packageDir)) {
-    const source = ts.createSourceFile(file, readFileSync(file, "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    const source = ts.createSourceFile(
+      file,
+      readFileSync(file, "utf8"),
+      ts.ScriptTarget.Latest,
+      true,
+      ts.ScriptKind.TS,
+    );
     for (const statement of source.statements) {
       if (!ts.isImportDeclaration(statement)) continue;
       const spec = statement.moduleSpecifier;
       if (!ts.isStringLiteral(spec)) continue;
-      if (!featurePackage.test(spec.text) && !featurePackage.test(splitImportSpecifier(spec.text).packageName)) continue;
+      if (
+        !featurePackage.test(spec.text) &&
+        !featurePackage.test(splitImportSpecifier(spec.text).packageName)
+      )
+        continue;
 
       const { packageName, subpath } = splitImportSpecifier(spec.text);
       if (!featurePackage.test(packageName)) continue;
@@ -179,21 +214,28 @@ for (const manifest of manifests) {
             .map((k) => (k.startsWith("./") ? k.slice(1) : k)),
         );
         const normalized = subpath === "/" ? "" : subpath;
-        if (normalized && !declared.has(normalized)) fail(`${file}: deep self-import "${spec.text}" bypasses declared subpath exports.`);
+        if (normalized && !declared.has(normalized))
+          fail(`${file}: deep self-import "${spec.text}" bypasses declared subpath exports.`);
         continue;
       }
 
       const dep = byPackage.get(packageName);
       if (!dep) {
-        fail(`${file}: cross-feature import "${spec.text}" targets a package without a validated manifest.`);
+        fail(
+          `${file}: cross-feature import "${spec.text}" targets a package without a validated manifest.`,
+        );
         continue;
       }
       if (!packageDeps.includes(packageName)) {
-        fail(`${file}: cross-feature import "${spec.text}" is missing from package.json dependencies of ${manifest.dir}.`);
+        fail(
+          `${file}: cross-feature import "${spec.text}" is missing from package.json dependencies of ${manifest.dir}.`,
+        );
         continue;
       }
       if (!manifest.dependsOn.includes(dep.id)) {
-        fail(`${file}: undeclared cross-feature import "${spec.text}" (feature "${dep.id}" not in dependsOn of "${manifest.id}").`);
+        fail(
+          `${file}: undeclared cross-feature import "${spec.text}" (feature "${dep.id}" not in dependsOn of "${manifest.id}").`,
+        );
         continue;
       }
 
@@ -206,11 +248,26 @@ for (const manifest of manifests) {
       );
       const normalizedSubpath = subpath === "/" ? "" : subpath;
       if (normalizedSubpath && !declaredSubpaths.has(normalizedSubpath)) {
-        fail(`${file}: cross-feature import "${spec.text}" is not a declared subpath export of ${dep.pkgName}.`);
+        fail(
+          `${file}: cross-feature import "${spec.text}" is not a declared subpath export of ${dep.pkgName}.`,
+        );
       }
     }
   }
 }
+
+// Ghost dependency check: every dependsOn edge must have at least one
+// cross-feature import in the depending package's own sources.
+const ghostDeps = findGhostDependencies(
+  manifests.map((m) => ({
+    id: m.id,
+    packageName: m.pkgName,
+    packageDir: m.packageDir,
+    dependsOn: m.dependsOn,
+  })),
+  new Map(manifests.map((m) => [m.id, { id: m.id, packageName: m.pkgName }])),
+);
+for (const message of formatGhostDependencyErrors(ghostDeps)) fail(message);
 
 // Dependency cycle check (dependsOn only — capability edges were removed from the manifest model).
 const graph = new Map(manifests.map((m) => [m.id, new Set(m.dependsOn)]));
@@ -233,4 +290,6 @@ if (failures.length) {
   console.error(failures.join("\n"));
   process.exit(1);
 }
-console.log(`Feature manifest dependency guard passed for ${manifests.length} feature packages (all source files scanned).`);
+console.log(
+  `Feature manifest dependency guard passed for ${manifests.length} feature packages (all source files scanned).`,
+);

@@ -6,11 +6,11 @@ This package owns the `sso` feature and its application, domain, infrastructure,
 
 ## Public API
 
-The package declares these public entrypoints: `.`, `./contracts`, `./testing`, `./schema`. Consumers must use these entrypoints instead of importing internal files.
+The package declares these public entrypoints: `.`, `./contracts`, `./schema`. Consumers must use these entrypoints instead of importing internal files.
 
 ## Feature dependencies
 
-The package declares these feature dependencies: `feature-access-control`, `feature-audit`, `feature-auth`, `feature-mfa`, `feature-organization-management`, `feature-organizations`, `feature-users`.
+The package declares these feature dependencies: `feature-access-control`, `feature-audit`, `feature-auth`, `feature-mfa`, `feature-organization-management`, `feature-users`.
 
 ## Database and runtime
 

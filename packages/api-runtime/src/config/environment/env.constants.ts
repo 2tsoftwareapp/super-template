@@ -6,3 +6,7 @@ export const DEV_PLACEHOLDER_SECRETS = new Set([
 ]);
 export const DEV_PLACEHOLDER_MFA_KEY =
   "0861abb090792515d50d973600fced671ad99f2edd463d5da88887d90d594f99";
+// Must differ from DEV_PLACEHOLDER_MFA_KEY: the whole point of SSO_ENCRYPTION_KEY
+// is a key lifecycle independent from the MFA key.
+export const DEV_PLACEHOLDER_SSO_KEY =
+  "6617b8fda13d6885a44e53dc00bfbfd997d0b25b3094cf2063a577eaec268788";

@@ -6,7 +6,7 @@ This package owns the `outbox` feature and its application, domain, infrastructu
 
 ## Public API
 
-The package declares these public entrypoints: `.`, `./contracts`, `./module`, `./schema`, `./testing`, `./dispatcher`, `./registry`. Consumers must use these entrypoints instead of importing internal files.
+The package declares these public entrypoints: `.`, `./contracts`, `./module`, `./schema`, `./dispatcher`, `./registry`. Consumers must use these entrypoints instead of importing internal files.
 
 ## Feature dependencies
 

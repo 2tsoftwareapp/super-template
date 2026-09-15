@@ -1598,8 +1598,11 @@ export interface components {
             metadata?: {
                 [key: string]: unknown;
             } | null;
-            /** @enum {string} */
-            type: "claimed" | "completed" | "failed" | "retry_scheduled" | "cancelled" | "no_handler";
+            /**
+             * @description `failed` means the job reached FAILED; `processing_error` means an error escaped the processing cycle before a terminal status was recorded, so the job stays PROCESSING; `dependency_failed` means the job was moved to BLOCKED because this event's dependency (named in `message`) reached a blocking status.
+             * @enum {string}
+             */
+            type: "claimed" | "completed" | "failed" | "processing_error" | "retry_scheduled" | "cancelled" | "no_handler" | "dependency_failed";
         };
         JobListDto: {
             attempts: number;

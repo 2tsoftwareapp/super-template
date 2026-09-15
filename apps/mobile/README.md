@@ -2,6 +2,82 @@
 
 Flutter client for Super Template.
 
+## Application identifier
+
+Android `namespace` / `applicationId` and the iOS `PRODUCT_BUNDLE_IDENTIFIER`
+ship as `com.example.mobile_app` / `com.example.mobileApp`. Rebranding rewrites
+both:
+
+```bash
+node scripts/rename.mjs "Acme App" --author acme-co   # -> com.acmeapp.app
+```
+
+The rule is `com.<project name folded to lowercase alphanumerics>.app` (spaces
+and punctuation dropped, diacritics folded, an `app` prefix if the name would
+start with a digit). The same value is used for both platforms. It is applied in
+`android/app/build.gradle.kts`, `android/app/src/main/kotlin/`,
+`ios/Runner.xcodeproj/project.pbxproj` (including `.RunnerTests`), `Info.plist`,
+and the `google-services.json` / `GoogleService-Info.plist` templates. Register
+the same identifier in Firebase when you enable push.
+
+## Release signing
+
+Android release builds are signed with the **debug** keystore out of the box so
+`flutter run --release` works. Google Play rejects that, so a real release needs
+a keystore that only the project owner can create — this repository cannot ship
+one. Steps:
+
+1. Create the keystore (keep it and its passwords out of git):
+
+   ```bash
+   keytool -genkey -v -keystore ~/upload-keystore.jks \
+     -storetype JKS -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+   ```
+
+2. Create `apps/mobile/android/key.properties` (gitignored) with:
+
+   ```properties
+   storePassword=<password>
+   keyPassword=<password>
+   keyAlias=upload
+   storeFile=/absolute/path/to/upload-keystore.jks
+   ```
+
+3. In `apps/mobile/android/app/build.gradle.kts`, load it and add a release
+   signing config, then point `buildTypes.release` at it:
+
+   ```kotlin
+   import java.util.Properties
+   import java.io.FileInputStream
+
+   val keystoreProperties = Properties().apply {
+       val file = rootProject.file("key.properties")
+       if (file.exists()) FileInputStream(file).use { load(it) }
+   }
+
+   android {
+       signingConfigs {
+           create("release") {
+               keyAlias = keystoreProperties["keyAlias"] as String
+               keyPassword = keystoreProperties["keyPassword"] as String
+               storeFile = file(keystoreProperties["storeFile"] as String)
+               storePassword = keystoreProperties["storePassword"] as String
+           }
+       }
+       buildTypes {
+           release {
+               signingConfig = signingConfigs.getByName("release")
+           }
+       }
+   }
+   ```
+
+4. Verify: `flutter build appbundle --release`, then check the signer with
+   `keytool -printcert -jarfile build/app/outputs/bundle/release/app-release.aab`.
+
+Keep a copy of the keystore and passwords outside the repository — losing them
+means you cannot ship an update to the same listing.
+
 ## Run
 
 - `make dev-mobile` launches the app with `apps/mobile/env/dev.json`

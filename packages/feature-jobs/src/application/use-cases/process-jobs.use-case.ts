@@ -65,8 +65,14 @@ export class ProcessJobsUseCase {
                   {
                     jobId: job.id,
                     organizationId: job.organizationId ?? null,
-                    type: "failed",
-                    message: `Batch isolation: ${message}`,
+                    // Not "failed": the job itself was never marked FAILED. An
+                    // error escaped `processJob` before a terminal status (or a
+                    // retry) was written, so the job stays PROCESSING and keeps
+                    // its lease until stale-lease recovery re-claims it. The old
+                    // "failed" label claimed a terminal state the job does not
+                    // have, and shared one label with the real FAILED path.
+                    type: "processing_error",
+                    message: `Job left PROCESSING; error before a terminal status was recorded: ${message}`,
                   },
                   tx,
                 );

@@ -4,7 +4,7 @@ import type { UpdateProfileCommand, UserView } from "@repo/feature-users/contrac
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, SYSTEM_SCOPE } from "@repo/api-kernel";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
-import { FILE_LOOKUP, type FileLookup } from "@repo/feature-upload/contracts";
+import { FILE_ERROR_CODES, FILE_LOOKUP, type FileLookup } from "@repo/feature-upload/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 
@@ -35,7 +35,11 @@ export class UpdateProfileUseCase {
       const file = await this.fileLookup.findById(input.avatarFileId);
 
       if (file?.uploadedById !== userId) {
-        throw new AppError("FILE_NOT_FOUND", "Avatar file not found", HttpStatus.NOT_FOUND);
+        throw new AppError(
+          FILE_ERROR_CODES.FILE_NOT_FOUND,
+          "Avatar file not found",
+          HttpStatus.NOT_FOUND,
+        );
       }
     }
 

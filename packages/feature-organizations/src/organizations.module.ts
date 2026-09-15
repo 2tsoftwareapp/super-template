@@ -1,4 +1,5 @@
 import { Global, Module } from "@nestjs/common";
+import { USER_ORGANIZATION_SCOPE } from "@repo/feature-users/contracts";
 
 import { OrganizationsService } from "./application/organizations.service";
 import { ORGANIZATIONS_REPOSITORY } from "./application/ports/organizations.repository.port";
@@ -12,6 +13,7 @@ import { UpdateOrganizationUseCase } from "./application/use-cases/update-organi
 import { OrganizationLookupAdapter } from "./infrastructure/organization-lookup.adapter";
 import { OrganizationMembersRepository } from "./infrastructure/organization-members.repository";
 import { OrganizationsRepository } from "./infrastructure/organizations.repository";
+import { UserOrganizationScopeAdapter } from "./infrastructure/user-organization-scope.adapter";
 import { OrganizationsController } from "./presentation/organizations.controller";
 import { ORGANIZATION_LOOKUP } from "./public/organization-lookup.port";
 import { ORGANIZATION_MEMBERSHIP } from "./public/organization-membership.token";
@@ -43,6 +45,7 @@ export { EnsurePersonalOrganizationUseCase } from "./application/use-cases/ensur
       useExisting: OrganizationMembersRepository,
     },
     OrganizationLookupAdapter,
+    UserOrganizationScopeAdapter,
     OrganizationsService,
     ListOrganizationsForUserUseCase,
     GetOrganizationUseCase,
@@ -55,12 +58,17 @@ export { EnsurePersonalOrganizationUseCase } from "./application/use-cases/ensur
       provide: ORGANIZATION_LOOKUP,
       useExisting: OrganizationLookupAdapter,
     },
+    {
+      provide: USER_ORGANIZATION_SCOPE,
+      useExisting: UserOrganizationScopeAdapter,
+    },
   ],
   exports: [
     OrganizationsService,
     ORGANIZATIONS_REPOSITORY,
     ORGANIZATION_MEMBERSHIP,
     ORGANIZATION_LOOKUP,
+    USER_ORGANIZATION_SCOPE,
     GetOrganizationUseCase,
     ListOrganizationsForUserUseCase,
     ListOrganizationMembersUseCase,

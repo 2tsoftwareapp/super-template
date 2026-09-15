@@ -1,5 +1,7 @@
-/** Domain-owned error codes for @repo/feature-settings. Stable API contract values. */
-export const SETTINGS_ERROR_CODES = {
-  SETTINGS_NOT_FOUND: "SETTINGS_NOT_FOUND",
-  REGISTRATION_DISABLED: "REGISTRATION_DISABLED",
-} as const;
+/**
+ * Settings error codes moved to kernel level (see
+ * `@repo/api-kernel` feature-error-codes) so other features can raise them
+ * without a package dependency on @repo/feature-settings. Re-exported here to
+ * keep the public contract of this package stable.
+ */
+export { SETTINGS_ERROR_CODES } from "@repo/api-kernel";

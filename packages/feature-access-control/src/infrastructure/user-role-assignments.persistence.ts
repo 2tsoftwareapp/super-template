@@ -1,9 +1,10 @@
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
-import type { UserRoleAssignments } from "@repo/feature-access-control/contracts";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE, getPrimaryDatabaseClient } from "@repo/database-runtime";
 import { and, eq, inArray, isNull, or, sql, type SQL } from "drizzle-orm";
+
+import type { UserRoleAssignments } from "../public/user-role-assignments.port";
 
 import { permissions, rolePermissions, roles, userRoles } from "./persistence";
 
@@ -84,16 +85,23 @@ export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
             (role) => role.organizationId === null || role.organizationId === organizationId,
           ),
         );
-      await executor
-        .insert(userRoles)
-        .values(
-          assignedRoles.map((role) => ({
-            userId,
-            roleId: role.id,
-            organizationId: role.organizationId,
-          })),
-        )
-        .onConflictDoNothing();
+      // Every requested role can be filtered out above (ids that do not exist,
+      // or that belong to another tenant). Drizzle renders
+      // `insert into ... values ` with no tuples for an empty array, which
+      // Postgres rejects, so skip the insert instead of emitting invalid SQL.
+      // Same guard as `replaceRolePermissions`.
+      if (assignedRoles.length > 0) {
+        await executor
+          .insert(userRoles)
+          .values(
+            assignedRoles.map((role) => ({
+              userId,
+              roleId: role.id,
+              organizationId: role.organizationId,
+            })),
+          )
+          .onConflictDoNothing();
+      }
     }
   }
 

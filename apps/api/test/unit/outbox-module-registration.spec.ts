@@ -1,6 +1,6 @@
 import { Global, Module } from "@nestjs/common";
 import { Test, type TestingModule } from "@nestjs/testing";
-import { APP_LOGGER } from "@repo/api-kernel";
+import { APP_LOGGER, TenantContextService } from "@repo/api-kernel";
 import { DATABASE } from "@repo/database-runtime";
 import { OutboxDispatcher } from "@repo/feature-outbox/dispatcher";
 import { OutboxHandlerRegistry } from "@repo/feature-outbox/registry";
@@ -112,8 +112,11 @@ class FakeAuthHandlersModule {}
       useValue: { error: () => undefined, warn: () => undefined, info: () => undefined },
     },
     { provide: DATABASE, useValue: {} },
+    // OutboxDispatcher enters each claimed message's tenant context before
+    // invoking its handler; the real provider comes from DatabaseModule.
+    TenantContextService,
   ],
-  exports: [APP_LOGGER, DATABASE],
+  exports: [APP_LOGGER, DATABASE, TenantContextService],
 })
 class FakeCoreModule {}
 
@@ -195,6 +198,7 @@ describe("OutboxModule.register (runtime wiring)", () => {
 
     repository!.messages.push({
       id: "m1",
+      organizationId: null,
       topic: "user.lifecycle.created",
       payload: { userId: "u-1", email: "u@x", displayName: "U" },
       attempts: 0,
@@ -215,6 +219,7 @@ describe("OutboxModule.register (runtime wiring)", () => {
 
     repository!.messages.push({
       id: "m2",
+      organizationId: null,
       topic: "user.lifecycle.deleted",
       payload: { userId: "u-2" },
       attempts: 0,
@@ -235,6 +240,7 @@ describe("OutboxModule.register (runtime wiring)", () => {
 
     repository!.messages.push({
       id: "m3",
+      organizationId: null,
       topic: "user.lifecycle.password-changed",
       payload: { userId: "u-3" },
       attempts: 0,
@@ -255,6 +261,7 @@ describe("OutboxModule.register (runtime wiring)", () => {
 
     repository!.messages.push({
       id: "m4",
+      organizationId: null,
       topic: "user.lifecycle.status-blocked",
       payload: { userId: "u-4" },
       attempts: 0,
@@ -275,6 +282,7 @@ describe("OutboxModule.register (runtime wiring)", () => {
 
     repository!.messages.push({
       id: "m5",
+      organizationId: null,
       topic: "auth.send-verification-email",
       payload: { email: "u@x", token: "tok", displayName: "U" },
       attempts: 0,
@@ -295,6 +303,7 @@ describe("OutboxModule.register (runtime wiring)", () => {
 
     repository!.messages.push({
       id: "m6",
+      organizationId: null,
       topic: "no.such.topic",
       payload: {},
       attempts: 0,
@@ -337,6 +346,7 @@ describe("OutboxModule.register (runtime wiring)", () => {
 
     repository!.messages.push({
       id: "orphan",
+      organizationId: null,
       topic: "user.lifecycle.created",
       payload: { userId: "u-x" },
       attempts: 0,

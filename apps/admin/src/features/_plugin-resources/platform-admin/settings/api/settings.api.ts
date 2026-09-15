@@ -18,8 +18,3 @@ export const settingsApi = {
     );
   },
 };
-
-/** @deprecated Prefer `settingsApi` */
-export const fetchSettings = () => settingsApi.list();
-export const updateSetting = (key: string, value: ApplicationSettingDto["value"]) =>
-  settingsApi.update(key, value);

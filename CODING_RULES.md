@@ -731,7 +731,7 @@ Presentation → Application → Domain
 
 **Trách nhiệm:** Nhận HTTP request, validate DTO, gọi Use Case, trả response.
 
-**File pattern:** `*.controller.ts` trong `modules/<domain>/presentation/`
+**File pattern:** `*.controller.ts` trong `packages/feature-<id>/src/presentation/`
 
 | # | Rule |
 |---|------|
@@ -745,17 +745,17 @@ Presentation → Application → Domain
 
 ✅ **DO**
 ```ts
-// apps/api/src/identity/modules/auth/presentation/auth.controller.ts
+// packages/feature-auth/src/presentation/auth-login.controller.ts
 @Controller("auth")
-export class AuthController {
+export class AuthLoginController {
   constructor(private readonly loginUseCase: LoginUseCase) {}
 
   @Post("login")
-  async login(@Body() dto: LoginDto, @Req() req: Request) {
+  login(@Body() input: LoginDto, @Req() request: Request) {
     // Controller chỉ parse + delegate — không business logic
     return this.loginUseCase.execute(
-      { email: dto.email, password: dto.password },
-      extractRequestContext(req),
+      { email: input.email, password: input.password },
+      request.requestContext,
     );
   }
 }
@@ -779,7 +779,7 @@ async login(@Body() dto: LoginDto) {
 
 **Trách nhiệm:** Orchestration — điều phối Domain và Ports, quản lý transaction boundary, side effects (audit, notification).
 
-**File pattern:** `<action>.use-case.ts` trong `modules/<domain>/application/use-cases/`
+**File pattern:** `<action>.use-case.ts` trong `packages/feature-<id>/src/application/use-cases/`
 
 | # | Rule |
 |---|------|
@@ -794,12 +794,16 @@ async login(@Body() dto: LoginDto) {
 
 ✅ **DO** (từ codebase thực tế)
 ```ts
-// apps/api/src/identity/modules/auth/application/use-cases/login.use-case.ts
+// packages/feature-auth/src/application/use-cases/login.use-case.ts
+import { HttpStatus } from "@nestjs/common";
+import { AppError, normalizeEmail } from "@repo/api-kernel";
+import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";
+
 @Injectable()
 export class LoginUseCase {
   constructor(
-    @Inject(USERS_REPOSITORY)
-    private readonly usersRepository: UsersRepositoryPort, // Inject Port — không phải concrete impl
+    @Inject(AUTH_USER_STORE)
+    private readonly usersRepository: AuthUserStore, // Inject Port — không phải concrete impl
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly mfaService: MfaService,
   ) {}
@@ -808,13 +812,22 @@ export class LoginUseCase {
     // Use Case orchestrate — không có HTTP types, không có raw SQL
     const user = await this.usersRepository.findByEmail(normalizeEmail(input.email));
 
-    if (!user || !(await verifyPassword(user.passwordHash, input.password))) {
-      throw new AppError(ERROR_CODES.AUTH_INVALID_CREDENTIALS, "Invalid credentials", HttpStatus.UNAUTHORIZED);
+    if (!user || !(await verifyPasswordWithTimingPadding(user.passwordHash, input.password))) {
+      throw new AppError(
+        AUTH_ERROR_CODES.AUTH_INVALID_CREDENTIALS,
+        "Invalid email or password",
+        HttpStatus.UNAUTHORIZED,
+      );
     }
     // ...
   }
 }
 ```
+
+> `AUTH_INVALID_CREDENTIALS` thuộc tầng **kernel-shared** (`AUTH_ERROR_CODES`
+> trong `@repo/api-kernel`), không phải `ERROR_CODES` của `@repo/api-runtime`:
+> feature-user-management cũng ném mã này cho `PATCH /users/me/password` nên nó
+> không thể thuộc riêng feature-auth. Xem §11.7.
 
 ❌ **DON'T**
 ```ts
@@ -835,7 +848,7 @@ const repo = new DrizzleUsersRepository(db); // ← vi phạm R3 — dùng @Inje
 
 **Trách nhiệm:** Business rules và invariants thuần — zero framework dependency.
 
-**File pattern:** `*.entity.ts`, `*.policy.ts` trong `modules/<domain>/domain/`
+**File pattern:** `*.policy.ts`, `*.entity.ts`, `*.value-object.ts` trong `packages/feature-<id>/src/domain/`
 
 | # | Rule |
 |---|------|
@@ -844,24 +857,30 @@ const repo = new DrizzleUsersRepository(db); // ← vi phạm R3 — dùng @Inje
 | R3 | **Không** throw HTTP exceptions — throw plain `Error` hoặc domain-specific errors |
 | R4 | Không async (trừ khi business rule thực sự cần) — business logic là synchronous |
 
-**Naming:** `<domain>.entity.ts`, `<domain>.policy.ts` → Class: `<Domain>Entity`, `<Domain>Policy`
+**Naming:** `<domain>.policy.ts` → hàm policy export theo tên (`isActiveUserAccount`,
+`softDeleteUserAccount`, …) hoặc class `<Domain>Policy`; `<domain>.entity.ts` → class
+`<Domain>Entity` khi cần giữ invariant trên một instance.
 
-✅ **DO**
+✅ **DO** (từ codebase thực tế)
 ```ts
-// apps/api/src/identity/modules/users/domain/user.entity.ts
+// packages/feature-users/src/domain/user-account.policy.ts
+import { normalizeEmail } from "@repo/api-kernel"; // kernel thuần — không kéo framework vào domain
 
-// Domain entity — không có import từ NestJS hay Drizzle
-export class UserEntity {
-  constructor(private readonly data: UserRecord) {}
+/** Business invariant — khai báo thuần, không import NestJS/Drizzle. */
+export function isActiveUserAccount(account: { deletedAt: Date | null }): boolean {
+  return account.deletedAt === null;
+}
 
-  // Business invariant — bất biến của domain
-  canLogin(): boolean {
-    return this.data.status === "ACTIVE" && this.data.emailVerifiedAt !== null;
-  }
+/** Soft delete là terminal: đóng dấu marker và park account ở BLOCKED. */
+export function softDeleteUserAccount(deletedAt: Date): {
+  deletedAt: Date;
+  status: UserAccountStatus;
+} {
+  return { deletedAt, status: USER_ACCOUNT_STATUS.BLOCKED };
+}
 
-  isBlocked(): boolean {
-    return this.data.status === "BLOCKED";
-  }
+export function toAccountEmailKey(email: string): string {
+  return normalizeEmail(email);
 }
 ```
 
@@ -886,7 +905,7 @@ export class UserPolicy {
 
 **Trách nhiệm:** Định nghĩa interface contract cho Data Access và External Services.
 
-**File pattern:** `<resource>.repository.port.ts` trong `modules/<domain>/application/ports/`
+**File pattern:** `<resource>.repository.port.ts` trong `packages/feature-<id>/src/application/ports/`
 
 | # | Rule |
 |---|------|
@@ -897,18 +916,18 @@ export class UserPolicy {
 
 ✅ **DO** (từ codebase thực tế)
 ```ts
-// apps/api/src/identity/modules/auth/application/ports/auth-session.repository.port.ts
+// packages/feature-auth/src/application/ports/auth-session.repository.port.ts
 import type { TransactionExecutor } from "@repo/api-kernel";
 import type { AuthSessionModel, CreateSessionInput } from "../models/auth-session";
 
 // Chỉ là interface — không có implementation
 export interface AuthSessionRepositoryPort {
-  createSession(values: CreateSessionInput, tx?: TransactionExecutor): Promise<AuthSessionModel | null>;
-  findSessionById(sessionId: string, tx?: TransactionExecutor): Promise<AuthSessionModel | null>;
-  updateSession(sessionId: string, values: Partial<CreateSessionInput>, tx?: TransactionExecutor): Promise<AuthSessionModel | null>;
+  createSession(values: CreateSessionInput, executor?: TransactionExecutor): Promise<AuthSessionModel | null>;
+  findSessionById(sessionId: string, executor?: TransactionExecutor): Promise<AuthSessionModel | null>;
+  updateSession(sessionId: string, values: Partial<CreateSessionInput>, executor?: TransactionExecutor): Promise<AuthSessionModel | null>;
 }
 
-export const AUTH_SESSION_REPOSITORY = Symbol("AuthSessionRepositoryPort");
+export const AUTH_SESSION_REPOSITORY = Symbol("AUTH_SESSION_REPOSITORY");
 ```
 
 ❌ **DON'T**
@@ -933,9 +952,10 @@ import { db } from "@/db"; // ← vi phạm R2
 
 **File pattern:**
 ```
-modules/<domain>/infrastructure/
+packages/feature-<id>/src/infrastructure/
   ├── <resource>.repository.ts  # Drizzle implementation
-  └── <service>.adapter.ts      # External service adapter
+  ├── <service>.adapter.ts      # External service adapter
+  └── persistence/              # Drizzle table definitions (không export ra ngoài)
 ```
 
 > **Naming (thực tế trong repo):** repository file dùng `<resource>.repository.ts`
@@ -953,7 +973,7 @@ modules/<domain>/infrastructure/
 
 ✅ **DO**
 ```ts
-// apps/api/src/identity/modules/users/infrastructure/users.repository.ts
+// packages/feature-users/src/infrastructure/users.repository.ts
 @Injectable()
 export class UsersRepository implements UsersRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
@@ -989,11 +1009,11 @@ async execute(input: CreateUserCommand) {
 }
 ```
 
-### 11.6 DI Wiring (`<domain>.module.ts`)
+### 11.6 DI Wiring (`packages/feature-<id>/src/<id>.module.ts`)
 
-- Module wiring thuộc về NestJS module của mỗi Bounded Context
-  (VD: `apps/api/src/identity/modules/users/users.module.ts`,
-  `apps/api/src/platform/modules/notifications/notifications.module.ts`) —
+- Module wiring thuộc về NestJS module của mỗi feature package
+  (VD: `packages/feature-users/src/users.module.ts`,
+  `packages/feature-notifications/src/notifications.module.ts`) —
   không hardcode dependency trong Use Case. `apps/api/src/shell/` chỉ chứa
   cross-cutting infra (guard, interceptor), không phải nơi wiring repository.
 - Mỗi Bounded Context có NestJS Module riêng (VD: `AuthModule`, `UsersModule`)
@@ -1008,6 +1028,35 @@ async execute(input: CreateUserCommand) {
 
 ---
 
+### 11.7 Error Codes (`AppError.code`)
+
+`AppError.code` thuộc HTTP contract — client branch theo giá trị này, nên mỗi mã
+chỉ có **một** chủ sở hữu. Có đúng ba tầng, không có tầng thứ tư:
+
+| Tầng | Catalog | Dùng cho |
+|------|---------|----------|
+| **transport** | `ERROR_CODES` (`packages/api-runtime/src/error-codes.ts`) | kết quả HTTP/authorization dùng chung: `AUTH_FORBIDDEN`, `AUTH_UNAUTHORIZED`, `INTERNAL_ERROR`, `RATE_LIMITED`, `RESOURCE_CONFLICT`, `SERVICE_UNAVAILABLE`, `VALIDATION_FAILED` |
+| **kernel-shared** | `packages/api-kernel/src/errors/feature-error-codes.ts` | mã domain mà feature A ném thay cho dữ liệu của feature B; feature sở hữu re-export lại cùng object |
+| **feature-owned** | `packages/feature-<id>/src/public/error-codes.ts` (export qua `./contracts`) | mã nghiệp vụ riêng của feature (`JOB_NOT_FOUND`, `MFA_INVALID_CODE`, …) |
+
+| # | Rule |
+|---|------|
+| R1 | Một giá trị mã chỉ được khai báo bởi **một** catalog — không trùng giữa các tầng/feature |
+| R2 | Ném mã qua hằng số, **không** ném string literal. Literal chỉ được phép với mã thuộc tầng shared (transport/kernel-shared) |
+| R3 | Mã domain của feature khác thì import qua `./contracts` của feature đó — chỉ khi dependency đã tồn tại. Không thêm dependency feature→feature chỉ để dùng lại hằng số; hãy đưa mã lên tầng kernel-shared |
+| R4 | **Không** đổi giá trị mã hay HTTP status đang chạy để "dọn" catalog — client đang phụ thuộc giá trị trên wire |
+
+Enforce: `node scripts/check-error-codes.mjs` (nằm trong chuỗi
+`sh scripts/check-source-policy.sh` và `pnpm run lint:policy`). Danh sách literal
+được phép — kèm lý do — nằm ở `scripts/lib/error-code-policy.mjs` và được in ra
+mỗi lần check xanh.
+
+> Quy tắc đầy đủ + quy ước layout DTO/test:
+> [docs/architecture/ARCHITECTURE_RULES.md](./docs/architecture/ARCHITECTURE_RULES.md)
+> §12.1 (DTO trong `presentation/dto/`), §15.2 (error codes), §5 (test trong `__tests__/`).
+
+---
+
 ## 12. DB & External Service Rules
 
 ### 12.1 Port-First Pattern
@@ -1018,8 +1067,8 @@ async execute(input: CreateUserCommand) {
 
 ✅ **DO**
 ```
-1. Tạo interface: modules/<domain>/application/ports/<resource>.repository.port.ts
-2. Tạo implementation: modules/<domain>/infrastructure/<resource>.repository.ts
+1. Tạo interface: packages/feature-<id>/src/application/ports/<resource>.repository.port.ts
+2. Tạo implementation: packages/feature-<id>/src/infrastructure/<resource>.repository.ts
 3. Đăng ký DI trong Module
 ```
 
@@ -1117,7 +1166,7 @@ async findByEmail(email: string) {
 async execute(input: LoginCommand) {
   const user = await this.usersRepository.findByEmail(input.email);
   // Use Case xử lý business meaning, không expose DB error
-  if (!user) throw new AppError(ERROR_CODES.AUTH_INVALID_CREDENTIALS, "...", 401);
+  if (!user) throw new AppError(AUTH_ERROR_CODES.AUTH_INVALID_CREDENTIALS, "...", 401);
 }
 ```
 

@@ -44,6 +44,7 @@ apps/api/src/
   composition/    runtime composition and feature registry
   openapi/        OpenAPI / Swagger configuration
   cli/            migrate / seed / reset entry points (+ seeds/)
+  shell/          process bootstrap wiring (`bootstrap.ts`)
 
 packages/          kernel libraries + compile-time feature packages
   api-kernel/         framework-free ports, errors, types, pure helpers
@@ -101,6 +102,38 @@ Rules:
   (Base UI vs Radix). Do not add a third primitive library; new composites should
   reuse the stack already used by neighboring components.
 
+### 2.2 Declaration-only packages vs. executing packages
+
+Workspace-wide commands (`turbo run <task>`) must distinguish two kinds of package:
+
+| Kind                 | Packages                                                     | Scripts                                      |
+| -------------------- | ------------------------------------------------------------ | -------------------------------------------- |
+| **Declaration-only** | `@repo/tsconfig`, `@repo/eslint-config`, `@repo/test-config` | `format` only; no `build`/`typecheck`/`test` |
+| **Executing**        | every `apps/*` and the remaining `packages/*`                | real `build`, `typecheck`, `test`, `lint`    |
+
+Declaration-only packages ship config artifacts — tsconfig JSONs, the shareable ESLint
+config, the vitest alias/setup helper — and `@repo/test-config` has no scripts at all.
+Their layers are declared as `layer:tsconfig`, `layer:eslint` and `layer:test` in their
+own `turbo.json`.
+
+Rules:
+
+- **A green workspace-wide run does not prove every package was checked.** Turbo keeps
+  a package in the task graph but runs no command when the script is missing
+  (`turbo run test --dry=json` reports `<NONEXISTENT>` for the three packages above).
+  A green `pnpm test` therefore means "every package that has tests passed".
+- **Never add stub scripts to a declaration-only package.** A `"test": "exit 0"` in
+  `@repo/tsconfig` would make the workspace command report work that never ran; the
+  absence of the script is the correct signal.
+- **Use the turbo tasks, not `--filter` over a package list.** `pnpm test` /
+  `pnpm typecheck` fan out through turbo, which skips declaration-only packages for
+  free; an explicit list of packages has to be kept in sync by hand and will silently
+  drift as packages are added.
+- **`--passWithNoTests` is the sanctioned way for an executing package to own no
+  specs.** It keeps an empty suite green without pretending the package is
+  declaration-only; per-package coverage expectations live in
+  [`docs/coverage-governance.md`](../coverage-governance.md).
+
 ## 3. Composition roots
 
 `apps/api` is a composition root.
@@ -155,8 +188,8 @@ Dependencies must always point inward toward business behavior and contracts.
 Use this structure as the maximum standard:
 
 ```text
-modules/<feature>/
-├── <feature>.module.ts
+packages/feature-<id>/src/
+├── <id>.module.ts
 │
 ├── presentation/
 │   ├── <feature>.controller.ts
@@ -187,7 +220,8 @@ modules/<feature>/
 │   ├── <feature>.entity.ts
 │   ├── <feature>.policy.ts
 │   ├── <feature>.value-object.ts
-│   └── *.spec.ts
+│   └── __tests__/
+│       └── <feature>.policy.spec.ts
 │
 └── infrastructure/
     ├── persistence/
@@ -205,7 +239,13 @@ Rules:
 - thin CRUD may omit `domain/`;
 - complex features may split use cases further;
 - do not collapse unrelated responsibilities into `service.ts`;
-- do not introduce a different structure for a single feature.
+- do not introduce a different structure for a single feature;
+- keep DTOs in `presentation/dto/` — never loose in `presentation/`;
+- keep unit tests in `__tests__/` next to the layer they cover
+  (`src/**/__tests__/*.spec.ts`). A unit test is never parked beside its subject
+  file — the folder boundary is what tells `pnpm --filter <pkg> test` and the
+  reviewer which kind of test it is. Integration and composition tests use the
+  package or app test boundaries instead (`<pkg>/test/`, `apps/api/test/`).
 
 ---
 
@@ -389,7 +429,7 @@ Domain code must:
 
 - be framework-free;
 - not import NestJS, Express, Drizzle, database schema, Redis, S3, SMTP, Firebase, or controller DTOs;
-- have colocated unit tests;
+- have unit tests under `domain/__tests__/`;
 - expose named policies, entities, value objects, or pure functions;
 - never import application, presentation, or infrastructure.
 
@@ -500,6 +540,28 @@ Do not:
 - let response DTOs become domain entities.
 
 Explicit mapping is preferred at boundaries.
+
+### 12.1 Where DTO files live
+
+One layout, everywhere: `*.dto.ts` files sit in a `dto/` folder, and for HTTP
+presentation that folder is `presentation/dto/`.
+
+```text
+<feature>/src/presentation/dto/users.dto.ts       # controllers import ./dto/users.dto
+<feature>/src/exports/presentation/dto/exports.dto.ts
+```
+
+Do not:
+
+- park DTOs loose in `presentation/` (`presentation/users.dto.ts`);
+- keep a second, compatibility DTO path next to the real one — a re-export barrel
+  that nobody imports is a public surface claim, not a compatibility guarantee;
+- nest DTOs under a transport folder (`presentation/http/dto/`) when the feature's
+  controllers already live in `presentation/`.
+
+DTO class names, fields and validators are contract surface: moving a file may
+only change its import specifier, never its shape. No DTO file is re-exported
+through a package `exports` subpath, so a move stays inside the package.
 
 ---
 
@@ -615,7 +677,12 @@ A feature plugin's **backend** surface MUST:
   (application/infrastructure/presentation/domain as needed);
 - own its Drizzle tables under `src/infrastructure/persistence/` (SQL migrations
   are composed into `apps/api/migrations` via `@repo/database-runtime` drizzle-kit);
-- carry colocated unit tests and its own lint/typecheck scripts.
+- carry unit tests under `src/**/__tests__/` and its own lint/typecheck scripts;
+- declare a `tsconfig.spec.json` alongside `tsconfig.json` and run **both** from
+  `typecheck`, so specs are compiled by the same gate as the code they cover.
+  `tsconfig.json` excludes `*.spec.ts` (build output stays test-free), which
+  makes the spec program the only thing that type-checks tests. See
+  [`packages/tsconfig/README.md`](../../packages/tsconfig/README.md).
 
 > **Schema composition:** `@repo/database-runtime` exports an empty built-in schema.
 > Feature packages contribute tables via `FeatureManifest.schema`;
@@ -628,8 +695,9 @@ sub-package. They use only kernel design-system packages (`@repo/web-*`,
 `mobile_core`) — never an app's `@/` aliases.
 
 The app decides whether a feature participates by importing its manifest in one
-composition file (`apps/api/src/features.ts` for backend + schema, admin resource
-list for nav, `pubspec.yaml` for mobile) and rendering its thin route entries.
+composition file (`apps/api/src/composition/feature-registry.ts` for backend +
+schema, admin resource list for nav, `pubspec.yaml` for mobile) and rendering its
+thin route entries.
 Removing the workspace dependency + those composition lines removes the capability
 on every surface without touching kernel code. Cross-feature communication goes
 through kernel ports or a peer's public module — never a deep import.
@@ -640,6 +708,39 @@ deliberate data migration.
 > **Naming across all platforms** (DB table prefixes, feature package ids
 > `@repo/feature-<id>`, file/class/route conventions): see
 > [Naming Conventions](./NAMING_CONVENTIONS.md).
+
+### 15.2 Error codes and catalogs
+
+`AppError.code` is part of the HTTP contract: clients branch on it, so a value
+must have exactly one owner and one meaning. There are three tiers, and nothing
+else.
+
+| Tier              | Catalog                                                                           | Use it for                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ----------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **transport**     | `ERROR_CODES` in `packages/api-runtime/src/error-codes.ts`                        | cross-cutting HTTP/authorization outcomes any feature may raise: `AUTH_FORBIDDEN`, `AUTH_UNAUTHORIZED`, `INTERNAL_ERROR`, `RATE_LIMITED`, `RESOURCE_CONFLICT`, `SERVICE_UNAVAILABLE`, `VALIDATION_FAILED`. A feature never re-declares these.                                                                                                                                                                                                                                        |
+| **kernel-shared** | `packages/api-kernel/src/errors/feature-error-codes.ts`                           | domain codes one feature raises **on behalf of another feature's data** (e.g. auth rejecting registration because `feature-settings` disabled it; user-management answering `AUTH_INVALID_CREDENTIALS` for a wrong current password). The owning feature re-exports the shared value from its `public/error-codes.ts` — the whole catalog when it owns nothing else (`SETTINGS_ERROR_CODES`), or merged into the codes it keeps (`AUTH_ERROR_CODES`) — so its contract stays stable. |
+| **feature-owned** | `packages/feature-<id>/src/public/error-codes.ts`, exported through `./contracts` | everything specific to the feature's own domain (`JOB_NOT_FOUND`, `MFA_INVALID_CODE`, …).                                                                                                                                                                                                                                                                                                                                                                                            |
+
+Rules:
+
+- exactly one catalog declares a given code value — no duplicates across tiers or
+  features;
+- raise a code through its constant, never a bare string literal. A literal is
+  only acceptable for a **shared** tier value (transport or kernel-shared);
+- a domain code of another feature is referenced through that feature's
+  `./contracts` entrypoint, which means the dependency must already exist. Do not
+  add a feature-to-feature dependency just to reuse a constant — promote the code
+  to the kernel-shared tier instead (the owning feature then re-exports it);
+- never change an existing code value or HTTP status to "clean up" a catalog;
+  clients depend on the wire value.
+
+Enforcement: `node scripts/check-error-codes.mjs` (also chained into
+`scripts/check-source-policy.sh` and `pnpm run lint:policy`) walks the three
+tiers, rejects duplicate owners and rejects disallowed literals. The only
+permitted literals are listed with a reason in
+`scripts/lib/error-code-policy.mjs`; the guard prints them on every successful
+run so the debt stays visible. Its own self-check lives in
+`scripts/__tests__/error-code-policy.spec.mjs`.
 
 ---
 

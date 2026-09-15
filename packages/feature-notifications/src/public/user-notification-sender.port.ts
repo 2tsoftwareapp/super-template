@@ -35,4 +35,4 @@ export interface UserNotificationSender {
   dispatch(notification: NotificationMessage, organizationId: string): Promise<void>;
 }
 
-export const USER_NOTIFICATION_SENDER = Symbol("USER_NOTIFICATION_SENDER");
+export { USER_NOTIFICATION_SENDER } from "./user-notification-sender.token";

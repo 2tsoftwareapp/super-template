@@ -1,3 +1,4 @@
+import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { ERROR_CODES } from "@repo/api-runtime";
 import { describe, expect, it, vi } from "vitest";
@@ -10,7 +11,7 @@ const actor = {
   email: "admin@example.local",
   displayName: "Admin",
   status: "ACTIVE" as const,
-  roles: ["SUPER_ADMIN"],
+  roles: [ROLE_NAMES.SUPER_ADMIN],
   organizationId: null,
 };
 

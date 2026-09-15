@@ -6,7 +6,7 @@ This package owns the `users` feature and its application, domain, infrastructur
 
 ## Public API
 
-The package declares these public entrypoints: `.`, `./contracts`, `./testing`, `./schema`, `./module`. Consumers must use these entrypoints instead of importing internal files.
+The package declares these public entrypoints: `.`, `./contracts`, `./schema`, `./module`. Consumers must use these entrypoints instead of importing internal files.
 
 ## Feature dependencies
 

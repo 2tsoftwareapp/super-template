@@ -1,5 +1,7 @@
 import type { TransactionExecutor } from "@repo/api-kernel";
 
+import type { SsoIdentity } from "./sso-provider.port";
+
 export interface SsoLoginStateRecord {
   id: string;
   provider: string;
@@ -30,6 +32,13 @@ export interface ExternalIdentityRecord {
   providerSubject: string;
   email: string;
   createdAt: Date;
+}
+
+/** A provider-resolved identity held for one callback round trip. */
+export interface SsoIdentityExchangeRecord {
+  identity: SsoIdentity;
+  /** Nonce bound to the login state this identity belongs to ("" when unused). */
+  nonce: string;
 }
 
 export interface SsoRepositoryPort {
@@ -92,6 +101,35 @@ export interface SsoRepositoryPort {
     },
     executor?: TransactionExecutor,
   ): Promise<ExternalIdentityRecord | null>;
+
+  /**
+   * Persist a provider-resolved identity for one callback round trip and
+   * return its one-time opaque handle (doubles as the adapter's idToken).
+   *
+   * Backed by the same store as login states so the exchange survives process
+   * boundaries: `exchangeCode` and `verifyIdToken` may land on different
+   * instances. The payload is encrypted at rest with the same versioned key
+   * scheme as login states and expires with the given TTL.
+   */
+  storeIdentityExchange(
+    values: {
+      provider: string;
+      identity: SsoIdentity;
+      nonce: string;
+      expiresAt: Date;
+    },
+    executor?: TransactionExecutor,
+  ): Promise<string>;
+
+  /**
+   * CAS-consume a stored identity exchange by handle. Returns null when the
+   * handle is unknown, expired, or already consumed — callers must reject the
+   * identity instead of replaying it (TOCTOU guard).
+   */
+  consumeIdentityExchange(
+    handle: string,
+    executor?: TransactionExecutor,
+  ): Promise<SsoIdentityExchangeRecord | null>;
 }
 
 export const SSO_REPOSITORY = Symbol("SSO_REPOSITORY");

@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Pre-push git hook** gating every push on `format:check`, `lint` (policy
+  chain + turbo lint), and `typecheck`, so import-sort/format drift is caught
+  locally before CI. Installed automatically by `pnpm bootstrap` (or manually
+  via `pnpm hooks:install`); bypass with `git push --no-verify` in emergencies.
+- **Kernel-owned cross-cutting ports** (`JOB_HANDLER_REGISTRY`,
+  `JOB_HANDLER`, `MailTemplateSender`/`MAIL_TEMPLATE_SENDER`, and
+  `SETTINGS_ERROR_CODES`) moved into `@repo/api-kernel`; features-jobs/mail
+  re-export them for compatibility and bind the implementations. `auth` now
+  integrates with jobs/mail through these optional ports instead of package
+  dependencies, and ghost `dependsOn` edges (`auth → user-management`,
+  `notifications → user-management`) were removed — auth drops from 12 to 8
+  direct dependencies (feature graph: 68 → 64 edges).
+- **Ghost-dependency guard** (`scripts/lib/ghost-dependencies.mjs`):
+  `discoverFeatureCatalog` and the manifest dependency guard now fail when a
+  `dependsOn` edge has no cross-feature import in the depending package's own
+  sources (test-support files excluded). Removed the remaining ghost edges
+  (`jobs → users`, `organization-management → users`,
+  `organization-management → outbox`, `sso → organizations`); every edge in
+  the feature graph is now backed by a real integration (61 edges total).
+- **Session-issuance port (ADR 0004 Phase 1)**: `feature-auth` exposes
+  `SESSION_ISSUER` / `SessionIssuer` (with a structural `SessionIssuanceUser`
+  input — no password hash required for issuance) and binds it via
+  `SessionIssuerAdapter` → `IssueSessionUseCase`, keeping one issuance
+  implementation for password login, MFA, and SSO.
+  `HandleSsoCallbackUseCase` now injects the port instead of the concrete
+  use-case class and imports `hashPassword` from the kernel, so `feature-sso`
+  consumes auth through contracts and module wiring only.
 - **Selectable organization model** (compile-time capability, mirrors tenant
   modes): `feature-org-model-optional` (`org-model-optional`) lets users exist
   and operate **without** any organization — registration/SSO no longer force a
@@ -50,10 +77,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `legacy-journal-map.json` and `migration-integrity.json` made it abort with `data is malformed`.
   Both are now `_`-prefixed, and `check-schema.mjs` fails with an actionable message if another
   non-snapshot file appears there.
-- **`drizzle.config.ts` globbed `persistence/**/*.ts`**, which pulled repositories and DTOs into the
-  drizzle-kit bundle and failed with `Parameter decorators only work when experimental decorators
+- **`drizzle.config.ts` globbed `persistence/**/\*.ts`**, which pulled repositories and DTOs into the
+drizzle-kit bundle and failed with `Parameter decorators only work when experimental decorators
   are enabled`. It now globs only the canonical persistence entry points, matching
-  `check-schema.mjs`.
+`check-schema.mjs`.
 - **A generated migration could collide with an existing `NNNN_*.sql` file** because
   `meta/_journal.json` ended at 36 while the ledger reaches 0037. The journal now records 0037, so
   the next generated migration is 0038.

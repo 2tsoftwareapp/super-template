@@ -43,6 +43,9 @@
     "0037_table_naming_convention_prefixes.sql": "df456f42c644c5867658e4bc9cf050235eb0fb1fdd8c9e1251c6ac96f7e44a49",
     "0038_org_optional_user_scoped_rls.sql": "87b147d2bd324e71de545ffebd20787fb87f6c8aeded0d88e71d559ce3ba1ad8",
     "0039_platform_scope_organization.sql": "0afe16635a6a9b652a4a7622cd42e3ff2903a379db17d9c7dee623e333ccbc6f",
-    "0040_job_child_tables_sentinel_scoping.sql": "8232be41de9b05e762ad8511aa300a4e232a6d8da5ef7038089e5a9ea05d551a"
+    "0040_job_child_tables_sentinel_scoping.sql": "8232be41de9b05e762ad8511aa300a4e232a6d8da5ef7038089e5a9ea05d551a",
+    "0041_mail_deliveries_tenant_isolation.sql": "bb5cb94fe53b0d12baa5c20174c4d8a1d85edef66e9b3dedc5bf72751da45dac",
+    "0042_outbox_messages_tenant_isolation.sql": "e1a813a9dd05df0ef7abfc7172356f845c62e2cfa002ae696a618a31b8e13fa3",
+    "0043_import_jobs_content_hash.sql": "3abdf595571273d23f677ba206abc5b7a6de9e9d02119ebaa904d537ce0ebc1e"
   }
 }

@@ -30,7 +30,11 @@ export class AppleSsoAdapter implements SsoProviderAdapter {
     return APPLE_REDIRECT_URI ?? `${API_INTERNAL_URL}/api/v1/auth/sso/apple/callback`;
   }
 
-  buildAuthorizationUrl(params: { state: string; nonce: string; codeChallenge: string }): string {
+  buildAuthorizationUrl(params: {
+    state: string;
+    nonce: string;
+    codeChallenge: string;
+  }): Promise<string> {
     const url = new URL(AUTHORIZATION_ENDPOINT);
     url.searchParams.set("client_id", this.requireClientId());
     url.searchParams.set("redirect_uri", this.getCallbackRedirectUri());
@@ -43,7 +47,8 @@ export class AppleSsoAdapter implements SsoProviderAdapter {
     url.searchParams.set("nonce", params.nonce);
     url.searchParams.set("code_challenge", params.codeChallenge);
     url.searchParams.set("code_challenge_method", "S256");
-    return url.toString();
+    // Apple (unlike the fake provider) keeps no server-side flow state.
+    return Promise.resolve(url.toString());
   }
 
   async exchangeCode(params: { code: string; codeVerifier: string }): Promise<SsoTokenSet> {

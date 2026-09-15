@@ -36,6 +36,9 @@ export class VerifyMfaChallengeUseCase {
       );
     }
 
+    // Cheap pre-filter only: avoids spending a TOTP verification on an
+    // exhausted challenge. It is NOT the threshold gate — see the atomic
+    // increment below, which is the one that cannot be raced.
     if (challenge.attempts >= MAX_CHALLENGE_ATTEMPTS) {
       throw new AppError(
         MFA_ERROR_CODES.MFA_TOO_MANY_ATTEMPTS,
@@ -47,7 +50,26 @@ export class VerifyMfaChallengeUseCase {
     const codeIsValid = await this.mfaCodeVerifierService.verifyCode(challenge.userId, input.code);
 
     if (!codeIsValid) {
-      await this.mfaRepository.incrementChallengeAttempts(challenge.id);
+      // Atomically check the threshold and count the attempt in one statement
+      // (`attempts = attempts + 1 WHERE attempts < max`). Two concurrent wrong
+      // codes therefore cannot both pass a stale read and push the counter past
+      // the limit; the loser gets null and is throttled without being counted.
+      const counted = await this.mfaRepository.tryIncrementChallengeAttempts(
+        challenge.id,
+        MAX_CHALLENGE_ATTEMPTS,
+      );
+
+      if (!counted) {
+        // The counter is already at the limit — the same outcome the
+        // pre-filter produces, and for the same reason: no attempt was
+        // recorded, so no `mfa.challenge.failed` audit row either.
+        throw new AppError(
+          MFA_ERROR_CODES.MFA_TOO_MANY_ATTEMPTS,
+          "Too many failed attempts, request a new login",
+          HttpStatus.TOO_MANY_REQUESTS,
+        );
+      }
+
       await this.auditWriter.log({
         actorId: challenge.userId,
         action: "mfa.challenge.failed",

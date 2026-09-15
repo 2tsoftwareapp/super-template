@@ -36,4 +36,4 @@ export interface AuditWriter {
   log(input: AuditLogInput, executor?: TransactionExecutor): Promise<void>;
 }
 
-export const AUDIT_WRITER = Symbol("AUDIT_WRITER");
+export { AUDIT_WRITER } from "./audit-writer.token";

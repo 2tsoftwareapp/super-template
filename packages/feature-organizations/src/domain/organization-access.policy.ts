@@ -2,6 +2,12 @@ import { AppError } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
 
 import { ORGANIZATION_ERROR_CODES } from "../public/error-codes";
+
+/**
+ * Role of a user inside an organization. This is the single definition of the
+ * type — `public/organization-membership.port.ts` re-exports it, so the union
+ * cannot drift between the domain rules and the public port.
+ */
 export type OrganizationMemberRole = "OWNER" | "ADMIN" | "MEMBER";
 
 export interface OrganizationMembership {

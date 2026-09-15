@@ -1124,10 +1124,11 @@ Hiện repo có ít nhất các bản sao:
 
 
 * `AGENTS.md`
+* `.codex/AGENTS.md`
 * `apps/admin/AGENTS.md`
-* `.agents/skills/add-api-feature/SKILL.md`
-* `.claude/skills/add-api-feature/SKILL.md`
-* Các rearchitecture specs
+* `apps/web/AGENTS.md`
+* `CLAUDE.md`
+* `.claude/skills/super-template/SKILL.md`
 
 Đây là nguồn gây drift.
 

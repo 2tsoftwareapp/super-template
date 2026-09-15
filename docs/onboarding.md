@@ -16,7 +16,9 @@ Plan for **two terminals** if you want web + mobile together.
 
 ## Prerequisites
 
-- **Node.js 24.14+** — use `.nvmrc` (`nvm use`) or install from nodejs.org
+- **Node.js ≥ 24.14.0** (see `.nvmrc`) — run `nvm use` **before** any `pnpm` command.
+  The root `package.json` pins `engines.node` to `>=24.14.0`, so pnpm on an older
+  runtime prints `Unsupported engine` and local results can diverge from CI.
 - **pnpm 11.7+** — `corepack enable && corepack prepare pnpm@11.7.0 --activate`
 - **Docker Desktop** — Postgres, Redis, and Mailpit run in Compose
 - **Flutter** (mobile only) — optional on day 1; web/API/admin work without it

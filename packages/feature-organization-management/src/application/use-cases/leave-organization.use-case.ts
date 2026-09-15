@@ -11,7 +11,9 @@ import {
   type OrganizationAccessControlPort,
   type OrganizationMembership,
 } from "@repo/feature-organizations/contracts";
-import { assertNotLastOwner } from "@repo/feature-organizations/contracts";
+
+import { LastOwnerGuard } from "../services/last-owner-guard.service";
+
 @Injectable()
 export class LeaveOrganizationUseCase {
   constructor(
@@ -21,6 +23,7 @@ export class LeaveOrganizationUseCase {
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(ORGANIZATION_ACCESS_CONTROL)
     private readonly accessControl: OrganizationAccessControlPort,
+    private readonly lastOwnerGuard: LastOwnerGuard,
   ) {}
 
   async execute(
@@ -47,16 +50,12 @@ export class LeaveOrganizationUseCase {
         );
       }
 
-      if (membership.role === "OWNER") {
-        const remainingOwners = await this.membership.countOwners(organizationId, {
-          excludingUserId: userId,
-          executor: transaction,
-          lock: true,
-        });
-        assertNotLastOwner({ userId, role: membership.role }, remainingOwners);
-      }
-
-      const removed = await this.membership.removeMember(organizationId, userId, transaction);
+      const removed = await this.lastOwnerGuard.run(
+        organizationId,
+        { userId, currentRole: membership.role },
+        transaction,
+        () => this.membership.removeMember(organizationId, userId, transaction),
+      );
 
       if (!removed) {
         throw new AppError(

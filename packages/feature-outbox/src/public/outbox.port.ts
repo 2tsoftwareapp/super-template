@@ -2,6 +2,8 @@ import type { JsonObject, TransactionExecutor } from "@repo/api-kernel";
 
 export interface OutboxRecord {
   id: string;
+  /** Tenant that published the event; `null` for platform-scope events. */
+  organizationId: string | null;
   topic: string;
   payload: JsonObject;
   status: string;
@@ -17,6 +19,6 @@ export interface OutboxRepositoryPort {
   recoverStaleProcessing(): Promise<void>;
 }
 
-export const OUTBOX_REPOSITORY = Symbol("OUTBOX_REPOSITORY");
-
 export { OUTBOX_APPENDER, type OutboxAppenderPort } from "./outbox-appender.port";
+
+export { OUTBOX_REPOSITORY } from "./outbox.token";

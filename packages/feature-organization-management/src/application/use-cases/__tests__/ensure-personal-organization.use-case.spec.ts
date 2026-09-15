@@ -50,8 +50,8 @@ describe("EnsurePersonalOrganizationUseCase (RBAC-aware)", () => {
     );
 
     // Core was called before access control.
-    expect(m.core.execute.mock.invocationCallOrder[0]).toBeLessThan(
-      m.accessControl.ensureOrganizationAdminRole.mock.invocationCallOrder[0],
+    expect(m.core.execute.mock.invocationCallOrder[0]!).toBeLessThan(
+      m.accessControl.ensureOrganizationAdminRole.mock.invocationCallOrder[0]!,
     );
   });
 

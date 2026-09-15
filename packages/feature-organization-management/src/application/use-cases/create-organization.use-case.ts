@@ -1,4 +1,4 @@
-import type { AuthenticatedRequestUser } from "@repo/api-kernel";
+import type { AuthenticatedRequestUser, TenantContext } from "@repo/api-kernel";
 import type { PlatformTransactionPort } from "@repo/api-kernel";
 import type {
   CreateOrganizationCommand,
@@ -8,7 +8,7 @@ import type {
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, PLATFORM_TRANSACTION_PORT } from "@repo/api-kernel";
-import { ERROR_CODES } from "@repo/api-runtime";
+import { ERROR_CODES, TenantContextService } from "@repo/api-runtime";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import {
   ORGANIZATION_ACCESS_CONTROL,
@@ -25,6 +25,25 @@ const slugify = (value: string) =>
     .replace(/^-+|-+$/g, "")
     .slice(0, 64) || "organization";
 
+/**
+ * Platform scope for the activity write.
+ *
+ * The activity belongs to the organization being created, but the request's
+ * ambient tenant context still points at the caller's *current* organization
+ * (set by the tenant-context interceptor). `EmitActivityUseCase` is fail-closed
+ * on that mismatch and would answer `AUTH_FORBIDDEN`, which breaks the
+ * switch-organization → create-organization flow. Emitting under an explicit
+ * platform scope is the same authority the write already runs with:
+ * `PLATFORM_TRANSACTION_PORT` bypasses RLS for this transaction. No ambient
+ * organization exists to check the target against, so the caller's explicit
+ * target is the only source of truth.
+ */
+const PLATFORM_ACTIVITY_CONTEXT: TenantContext = {
+  tenantId: "",
+  userId: "",
+  bypassRls: true,
+};
+
 @Injectable()
 export class CreateOrganizationUseCase {
   constructor(
@@ -37,6 +56,7 @@ export class CreateOrganizationUseCase {
     @Inject(ORGANIZATION_ACCESS_CONTROL)
     private readonly accessControl: OrganizationAccessControlPort,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
+    private readonly tenantContextService: TenantContextService,
   ) {}
 
   async execute(user: AuthenticatedRequestUser, input: CreateOrganizationCommand) {
@@ -92,16 +112,18 @@ export class CreateOrganizationUseCase {
             transaction,
           );
 
-          await this.activityEmitter.emit(
-            {
-              organizationId: created.id,
-              summary: `Organization "${created.name}" created`,
-              entityType: "organization",
-              entityId: created.id,
-              actorId: user.userId,
-              visibility: "INTERNAL",
-            },
-            transaction,
+          await this.tenantContextService.runAsync(PLATFORM_ACTIVITY_CONTEXT, () =>
+            this.activityEmitter.emit(
+              {
+                organizationId: created.id,
+                summary: `Organization "${created.name}" created`,
+                entityType: "organization",
+                entityId: created.id,
+                actorId: user.userId,
+                visibility: "INTERNAL",
+              },
+              transaction,
+            ),
           );
 
           return created;

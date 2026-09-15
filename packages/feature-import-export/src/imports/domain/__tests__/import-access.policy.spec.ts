@@ -1,4 +1,3 @@
-import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { describe, expect, it } from "vitest";
 
 import { canAccessImportJob } from "../import-access.policy";
@@ -15,7 +14,7 @@ describe("canAccessImportJob", () => {
         actor: {
           userId: "user-1",
           organizationId: "org-1",
-          roles: [ROLE_NAMES.USER],
+          roles: ["USER"],
         },
         job,
       }),
@@ -28,7 +27,7 @@ describe("canAccessImportJob", () => {
         actor: {
           userId: "user-2",
           organizationId: "org-1",
-          roles: [ROLE_NAMES.USER],
+          roles: ["USER"],
         },
         job,
       }),
@@ -41,7 +40,7 @@ describe("canAccessImportJob", () => {
         actor: {
           userId: "admin-1",
           organizationId: "org-1",
-          roles: [ROLE_NAMES.ADMIN],
+          roles: ["ADMIN"],
         },
         job,
       }),

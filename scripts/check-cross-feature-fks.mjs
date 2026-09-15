@@ -268,6 +268,20 @@ const checks = [
     nullable: true,
     onDelete: "set null",
   },
+
+  // mail
+  {
+    sourceFile: "packages/feature-mail/src/infrastructure/persistence/mail.ts",
+    propertyName: "organizationId",
+    sourceTableExport: "mailDeliveries",
+    physicalColumnName: "organization_id",
+    targetFile: "packages/feature-organizations/src/infrastructure/persistence/organizations.ts",
+    targetTableExport: "organizations",
+    targetPropertyName: "id",
+    nullable: true,
+    onDelete: "cascade",
+  },
+
   // additional auth tables
   {
     sourceFile: "packages/feature-auth/src/infrastructure/persistence/auth.ts",

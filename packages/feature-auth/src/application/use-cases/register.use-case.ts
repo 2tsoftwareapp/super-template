@@ -9,8 +9,8 @@ import {
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
 } from "@repo/api-kernel";
+import { SETTINGS_ERROR_CODES } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
-import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 import {
@@ -18,7 +18,6 @@ import {
   type PersonalOrganizationProvisioner,
 } from "@repo/feature-organization-management/contracts";
 import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
-import { SETTINGS_ERROR_CODES } from "@repo/feature-settings/contracts";
 import {
   APPLICATION_SETTINGS_LOOKUP,
   type ApplicationSettingsLookup,
@@ -27,6 +26,7 @@ import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
 import type { RegisterCommand } from "../auth.types";
 
+import { AUTH_ACCESS_PROFILE, type AuthAccessProfile } from "../../public/auth-access-profile.port";
 import { generateOpaqueToken, hashOpaqueToken, hashPassword } from "../auth.helpers";
 import {
   AUTH_SESSION_REPOSITORY,
@@ -39,7 +39,8 @@ export class RegisterUseCase {
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(AUTH_USER_STORE)
     private readonly usersRepository: AuthUserStore,
-    private readonly accessControlService: AccessControlService,
+    @Inject(AUTH_ACCESS_PROFILE)
+    private readonly accessProfile: AuthAccessProfile,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(AUTH_SESSION_REPOSITORY)
     private readonly authSessionRepository: AuthSessionRepositoryPort,
@@ -82,7 +83,7 @@ export class RegisterUseCase {
         transaction,
       );
 
-      const userRole = await this.accessControlService.getRoleByName("USER", null, transaction);
+      const userRole = await this.accessProfile.getRoleByName("USER", null, transaction);
 
       if (!userRole) {
         throw new AppError(
@@ -92,7 +93,7 @@ export class RegisterUseCase {
         );
       }
 
-      await this.accessControlService.replaceUserRoles(user.id, [userRole.id], null, transaction);
+      await this.accessProfile.replaceUserRoles(user.id, [userRole.id], null, transaction);
 
       await this.personalOrganizationProvisioner.ensurePersonalOrganization(
         user.id,

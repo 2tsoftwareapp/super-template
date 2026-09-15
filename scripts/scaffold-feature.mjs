@@ -103,7 +103,6 @@ const buildFiles = ({ id, pascal, camel }) => {
   "exports": {
     ".": "./src/index.ts",
     "./contracts": "./src/public/contracts.ts",
-    "./testing": "./src/testing/index.ts",
     "./schema": "./src/infrastructure/persistence/index.ts"
   },
   "scripts": {
@@ -207,10 +206,6 @@ export {};
 export { ${moduleClass} } from "../${moduleBase}";
 `;
 
-  const testingTs = `/** Testing helpers for ${pkgName}. */
-export {};
-`;
-
   const readme = `# ${pkgName}
 
 The \`${id}\` feature as a **compile-time plugin package** (see ADR 0002). It owns a
@@ -241,7 +236,6 @@ Matches the existing feature packages (see \`packages/feature-activities\`):
 | \`src/infrastructure/persistence/\`     | Feature-owned Drizzle tables (\`./schema\` entry point).   |
 | \`src/presentation/\`                   | Controllers and DTOs.                                    |
 | \`src/public/contracts.ts\`             | What other features may import (\`./contracts\`).          |
-| \`src/testing/index.ts\`                | Test helpers (\`./testing\`).                              |
 
 ## How the app composes this feature
 
@@ -282,7 +276,6 @@ node scripts/check-cross-feature-fks.mjs
     [`src/${moduleFile}`]: moduleTs,
     "src/infrastructure/persistence/index.ts": persistenceIndexTs,
     "src/public/contracts.ts": contractsTs,
-    "src/testing/index.ts": testingTs,
   };
 };
 

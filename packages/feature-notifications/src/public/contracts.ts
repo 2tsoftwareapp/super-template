@@ -7,3 +7,4 @@ export { PUSH_NOTIFIER } from "../application/ports/push.interface";
 export type * from "../application/ports/push.interface";
 export { NOTIFICATION_ERROR_CODES } from "./error-codes";
 export * from "./user-notification-sender.port";
+export { USER_NOTIFICATION_SENDER } from "./user-notification-sender.token";
