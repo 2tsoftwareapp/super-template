@@ -25,6 +25,11 @@ import { eq, inArray } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { WorkerModule } from "../src/worker.module";
+// Canonical e2e database lock, shared with the API suite on purpose: both suites reset the
+// same `fullstack_starter_test` database, and the lock only excludes anything while every
+// process takes the same key in that database. Importing the file instead of copying the
+// helper keeps a single source of truth for the key and the wait-for-peer behaviour.
+import { acquireTestDatabaseLock } from "../../api/test/support/test-database-lock";
 
 interface WorkerTenant {
   organizationId: string;
@@ -46,8 +51,14 @@ const buildDatabaseUrl = (role: string, password: string): string => {
 };
 
 /**
- * Reset the dedicated test database through the existing API migration/seed
- * commands, then run the real worker against the seeded restricted role.
+ * Reset the dedicated test database through the existing API migration/seed commands,
+ * then run the real worker against the seeded restricted role.
+ *
+ * The database and role have to exist before the advisory lock can be taken (the lock
+ * lives in the test database itself), so this mirrors `resetTestDatabase` in
+ * `apps/api/test/support/test-app.ts`: ensure the infrastructure, take the lock, then drop
+ * and rebuild `public`. Without the lock a concurrent API e2e run resets the schema this
+ * suite is booting against.
  */
 const resetWorkerDatabase = async (): Promise<void> => {
   process.env.APP_ENV = "test";
@@ -84,6 +95,10 @@ const resetWorkerDatabase = async (): Promise<void> => {
   } finally {
     await rootPool.end();
   }
+
+  // Everything below drops and rebuilds `public`, so wait for any peer e2e process to
+  // release the shared test database before touching it.
+  await acquireTestDatabaseLock(adminUrl);
 
   const adminPool = new Pool({ connectionString: adminUrl });
   try {

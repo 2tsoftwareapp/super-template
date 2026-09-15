@@ -69,6 +69,19 @@ export default defineConfig({
       packageSubpathAlias("api-sort"),
       packageAlias("env-loader"),
       packageSubpathAlias("env-loader"),
+      // Packages the API composition never imports, so pnpm does not link them into
+      // apps/api/node_modules and a bare specifier cannot resolve. The
+      // public-api-exports spec still loads every `exports` subpath of every workspace
+      // package, so point those bare specifiers at their sources here.
+      packageAlias("feature-database-read-replica"),
+      packageAlias("feature-org-model-optional"),
+      packageAlias("feature-org-model-personal-orgs"),
+      packageAlias("feature-tenant-schema"),
+      packageAlias("feature-tenant-shared-schema"),
+      packageAlias("utils"),
+      packageSubpathAlias("utils"),
+      packageAlias("web-utils"),
+      packageSubpathAlias("web-utils"),
       ...buildFeatureAliases(packagesDir),
     ],
   },

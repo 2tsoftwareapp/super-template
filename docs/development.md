@@ -84,8 +84,35 @@ Full bootstrap: `powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1`
 | PostgreSQL | 5432 (`POSTGRES_EXPOSED_PORT`) | Yes                                                                |
 | Redis      | 6379 (`REDIS_PORT`)            | Optional — improves throttling/SSE fan-out when `REDIS_URL` is set |
 | Mailpit    | 8025 UI / 1025 SMTP            | Yes for email flows in dev                                         |
+| MinIO      | 9000 API / 9001 console        | Yes for the S3 integration test                                    |
 
-Override conflicting ports in `.env.local`.
+Override conflicting ports in `.env.local`. The `minio-init` compose service creates the
+`S3_BUCKET` after MinIO is healthy; re-run `docker compose -f infra/docker-compose.yml up
+minio-init` if the bucket was removed.
+
+## Opt-in integration and e2e suites
+
+Most suites run against mocks and are covered by `pnpm test`. Three suites need real
+services and stay behind an explicit switch, so a checkout without Docker still gets a
+green default run:
+
+| Suite                            | Command                                          | Prerequisite                                        |
+| -------------------------------- | ------------------------------------------------ | --------------------------------------------------- |
+| S3/MinIO object storage          | `pnpm --filter @repo/feature-upload test:integration` | MinIO up and `S3_BUCKET` created (`minio-init`) |
+| Standalone worker (PostgreSQL)   | `pnpm --filter worker test:e2e`                  | PostgreSQL reachable at `POSTGRES_HOST`/`POSTGRES_PORT` |
+| API end-to-end                   | `pnpm --filter api test:e2e`                     | same as above                                       |
+
+Each script exports the variable that unhides its suite (`RUN_S3_INTEGRATION=1`,
+`WORKER_E2E=1`). Running the same specs without it reports them as **skipped** rather than
+passing, so a green `pnpm test` is not evidence for those boundaries. Details and
+troubleshooting for the storage boundary:
+[`packages/feature-upload/test/integration/README.md`](../packages/feature-upload/test/integration/README.md).
+
+Both PostgreSQL suites reset the same `fullstack_starter_test` database, and both take the
+same Postgres advisory lock
+([`apps/api/test/support/test-database-lock.ts`](../apps/api/test/support/test-database-lock.ts)
+— the worker suite imports that file directly). They can therefore run at the same time
+without one dropping the schema the other is testing against; the second one waits.
 
 ## Emulator Networking
 
