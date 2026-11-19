@@ -1,19 +1,16 @@
 import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
-import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
 import { AppError, PLATFORM_ROLE_NAMES } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
 
-import {
-  SETTINGS_REPOSITORY,
-  type SettingsRepositoryPort,
-} from "../ports/settings.repository.port";
+import { SettingsRepository } from "../../infrastructure/settings.repository";
 import { SettingsMapper } from "../settings.mapper";
 
 @Injectable()
 export class ListSettingsUseCase {
   constructor(
-    @Inject(SETTINGS_REPOSITORY) private readonly settingsRepository: SettingsRepositoryPort,
+    private readonly settingsRepository: SettingsRepository,
   ) {}
 
   async execute(actor?: AuthenticatedRequestUser) {

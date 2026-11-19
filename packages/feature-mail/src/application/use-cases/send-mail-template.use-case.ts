@@ -9,15 +9,12 @@ import {
 } from "@repo/feature-user-preferences/contracts";
 
 import { isMandatoryMailTemplate } from "../../domain/mandatory-mail-templates";
+import { TemplateRendererService } from "../../infrastructure/template-renderer.service";
 import {
   MAIL_DELIVERIES_REPOSITORY,
   type MailDeliveriesRepositoryPort,
 } from "../ports/mail-deliveries.repository.port";
 import { MAILER, type Mailer } from "../ports/mailer.interface";
-import {
-  TEMPLATE_RENDERER_SERVICE,
-  type TemplateRendererServicePort,
-} from "../ports/template-renderer.service.port";
 
 export interface SendTemplateInput {
   templateKey: string;
@@ -33,8 +30,7 @@ export class SendMailTemplateUseCase {
 
   constructor(
     @Inject(MAILER) private readonly mailer: Mailer,
-    @Inject(TEMPLATE_RENDERER_SERVICE)
-    private readonly templateRenderer: TemplateRendererServicePort,
+    private readonly templateRenderer: TemplateRendererService,
     @Inject(MAIL_DELIVERIES_REPOSITORY)
     private readonly mailDeliveriesRepository: MailDeliveriesRepositoryPort,
     @Inject(USER_PREFERENCES_LOOKUP)

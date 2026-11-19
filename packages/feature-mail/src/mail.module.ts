@@ -6,7 +6,6 @@ import { MailMapper } from "./application/mail.mapper";
 import { MailService } from "./application/mail.service";
 import { MAIL_DELIVERIES_REPOSITORY } from "./application/ports/mail-deliveries.repository.port";
 import { MAILER } from "./application/ports/mailer.interface";
-import { TEMPLATE_RENDERER_SERVICE } from "./application/ports/template-renderer.service.port";
 import { ListMailDeliveriesUseCase } from "./application/use-cases/list-mail-deliveries.use-case";
 import { ListMailTemplatesUseCase } from "./application/use-cases/list-mail-templates.use-case";
 import { PreviewMailTemplateUseCase } from "./application/use-cases/preview-mail-template.use-case";
@@ -32,10 +31,6 @@ import { MAIL_TEMPLATE_SENDER } from "./public/mail-template-sender.port";
       provide: MAIL_DELIVERIES_REPOSITORY,
       useExisting: MailDeliveriesRepository,
     },
-    {
-      provide: TEMPLATE_RENDERER_SERVICE,
-      useExisting: TemplateRendererService,
-    },
     SendMailTemplateUseCase,
     PreviewMailTemplateUseCase,
     ListMailDeliveriesUseCase,
@@ -55,7 +50,6 @@ import { MAIL_TEMPLATE_SENDER } from "./public/mail-template-sender.port";
     MAILER,
     MAIL_TEMPLATE_SENDER,
     MAIL_DELIVERIES_REPOSITORY,
-    TEMPLATE_RENDERER_SERVICE,
     MailService,
   ],
 })

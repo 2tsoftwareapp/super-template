@@ -10,10 +10,7 @@ import {
 } from "@repo/feature-jobs/contracts";
 
 import { isMandatoryMailTemplate } from "../../domain/mandatory-mail-templates";
-import {
-  TEMPLATE_RENDERER_SERVICE,
-  type TemplateRendererServicePort,
-} from "../ports/template-renderer.service.port";
+import { TemplateRendererService } from "../../infrastructure/template-renderer.service";
 
 export interface SendAdminMailCommand {
   templateKey: string;
@@ -25,8 +22,7 @@ export interface SendAdminMailCommand {
 @Injectable()
 export class SendAdminMailUseCase {
   constructor(
-    @Inject(TEMPLATE_RENDERER_SERVICE)
-    private readonly templateRenderer: TemplateRendererServicePort,
+    private readonly templateRenderer: TemplateRendererService,
     @Inject(BACKGROUND_JOB_ENQUEUER_WITH_RESULT)
     private readonly jobEnqueuer: BackgroundJobEnqueuerWithResult,
     @Inject(AUDIT_WRITER)

@@ -10,18 +10,15 @@ import { SETTINGS_ERROR_CODES } from "@repo/feature-settings/contracts";
 
 import type { UpdateSettingCommand } from "../settings.types";
 
+import { SettingsRepository } from "../../infrastructure/settings.repository";
 import { ApplicationSettingsLookupService } from "../application-settings-lookup.service";
-import {
-  SETTINGS_REPOSITORY,
-  type SettingsRepositoryPort,
-} from "../ports/settings.repository.port";
 import { getSettingDefinition } from "../setting-definitions";
 import { SettingsMapper } from "../settings.mapper";
 
 @Injectable()
 export class UpdateSettingUseCase {
   constructor(
-    @Inject(SETTINGS_REPOSITORY) private readonly settingsRepository: SettingsRepositoryPort,
+    private readonly settingsRepository: SettingsRepository,
     @Inject(AUDIT_WRITER)
     private readonly auditWriter: AuditWriter,
     @Inject(PLATFORM_TRANSACTION_PORT)
