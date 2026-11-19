@@ -3,6 +3,9 @@
 The concrete shape of this codebase. Short on purpose: if a rule here cannot be
 checked by `pnpm run check`, a reviewer, or a grep, it does not belong here.
 
+Why these rules exist, with the measured baseline and the six failures they
+prevent: [`docs/CLEAN_CODE.md`](CLEAN_CODE.md).
+
 `ARCHITECTURE_RULES.md` and `CODING_RULES.md` remain as reference material. When
 they disagree with this file, this file wins.
 

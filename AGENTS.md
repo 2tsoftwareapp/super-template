@@ -66,6 +66,7 @@ disable a failing gate to get green.
 | --- | --- | --- |
 | **this file** | authoritative | how to work here, non-negotiables |
 | [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md) | authoritative | concrete shape of a feature, naming, when to add a layer |
+| [`docs/CLEAN_CODE.md`](docs/CLEAN_CODE.md) | authoritative | the measured baseline and the six rules that fix it |
 | [`docs/architecture/ARCHITECTURE_RULES.md`](docs/architecture/ARCHITECTURE_RULES.md) | reference | deep rationale, layer-by-layer |
 | [`CODING_RULES.md`](CODING_RULES.md) | reference | long-form code review checklist |
 | [`docs/architecture/NAMING_CONVENTIONS.md`](docs/architecture/NAMING_CONVENTIONS.md) | reference | naming details |
