@@ -10,7 +10,7 @@ import {
   type Updater,
   useReactTable,
 } from "@tanstack/react-table";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { sortChanged, type TableSortBridge } from "@/lib/table-sort";
 
@@ -25,6 +25,11 @@ interface UseResourceTableConfigOptions<T extends { id: string }, TField extends
   onPageSizeChange?: (pageSize: number) => void;
   enableSelection?: boolean;
   getRowId?: (row: T) => string;
+  /**
+   * Changes whenever the active filter/search changes. Selection is cleared so
+   * a bulk action can never target rows that the operator can no longer see.
+   */
+  filterSignature?: string;
 }
 
 /**
@@ -45,6 +50,7 @@ export function useResourceTableConfig<T extends { id: string }, TField extends 
   onPageSizeChange,
   enableSelection = true,
   getRowId = (row) => row.id,
+  filterSignature,
 }: UseResourceTableConfigOptions<T, TField>) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -56,6 +62,16 @@ export function useResourceTableConfig<T extends { id: string }, TField extends 
   const clearSelection = useCallback(() => {
     setRowSelection({});
   }, []);
+
+  // TanStack keeps selection entries for ids that are no longer in `data`; a
+  // filter change must drop them rather than leave invisible rows selected.
+  useEffect(() => {
+    if (!enableSelection) {
+      return;
+    }
+
+    clearSelection();
+  }, [clearSelection, enableSelection, filterSignature]);
 
   const canSort = Boolean(sortBridge && onSortChange && listParams?.sort);
 

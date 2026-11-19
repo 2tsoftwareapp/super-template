@@ -67,6 +67,7 @@ export function createFilesColumns({
             variant="ghost"
             size="icon"
             className="text-destructive"
+            aria-label={`Delete ${row.original.originalName}`}
             onClick={(e: React.MouseEvent) => {
               e.stopPropagation();
               onDeleteClick(row.original);

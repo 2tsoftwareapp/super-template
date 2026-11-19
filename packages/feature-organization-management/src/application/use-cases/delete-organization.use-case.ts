@@ -114,10 +114,8 @@ export class DeleteOrganizationUseCase {
       await this.userRolesPurge.deleteByOrganizationId(organizationId, transaction);
       await this.customRolesPurge.deleteByOrganizationId(organizationId, transaction);
 
-      // Clean up each member's cache
-      for (const member of members) {
-        await this.accessControl.invalidateAccessProfile(member.userId);
-      }
+      // One cache call for all members instead of a round trip per member.
+      await this.accessControl.invalidateAccessProfiles(members.map((member) => member.userId));
 
       await this.auditWriter.log(
         {

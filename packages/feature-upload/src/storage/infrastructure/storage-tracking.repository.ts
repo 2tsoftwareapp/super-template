@@ -82,6 +82,11 @@ export class StorageTrackingRepository implements StorageTrackingPort {
   /**
    * Atomically claim pending delete retries. Single UPDATE ... SKIP LOCKED so
    * concurrent workers each take distinct rows.
+   *
+   * `updated_at` doubles as the retry clock: a failed attempt bumps `attempts`
+   * and `updated_at`, and the row only becomes claimable again after a growing
+   * delay. Without it a failing key burns its whole attempt budget inside one
+   * cron invocation.
    */
   async claimPendingDeletes(
     limit: number,
@@ -99,6 +104,7 @@ export class StorageTrackingRepository implements StorageTrackingPort {
       WHERE id IN (
         SELECT id FROM w_storage_delete_outbox
         WHERE status = 'PENDING'
+          AND updated_at <= now() - (LEAST(attempts + 1, 10) * interval '1 minute')
         ORDER BY created_at ASC
         LIMIT ${limit}
         FOR UPDATE SKIP LOCKED

@@ -55,6 +55,17 @@ async function createHarness(sessionRow: Awaited<ReturnType<typeof createSession
       updatedAt: new Date(),
       mustChangePassword: false,
     })),
+    findByIdStrong: vi.fn(async () => ({
+      id: "user-1",
+      status: "ACTIVE",
+      email: "user@example.local",
+      displayName: "User One",
+      avatarUrl: null,
+      emailVerifiedAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      mustChangePassword: false,
+    })),
   };
   const authAccessProfile = {
     getAccessProfile: vi.fn(async () => ({

@@ -15,8 +15,12 @@ export class ListAttachmentsUseCase {
     private readonly attachmentsRepository: AttachmentsRepositoryPort,
   ) {}
 
-  async execute(query: ListAttachmentsQuery) {
-    const rows = await this.attachmentsRepository.listByEntity(query.entityType, query.entityId);
+  async execute(query: ListAttachmentsQuery, organizationId: string | null) {
+    const rows = await this.attachmentsRepository.listByEntity(
+      query.entityType,
+      query.entityId,
+      organizationId,
+    );
 
     return rows.map((row) => AttachmentsMapper.toAttachmentDto(row));
   }

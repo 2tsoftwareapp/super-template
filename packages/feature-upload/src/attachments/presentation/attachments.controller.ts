@@ -55,11 +55,14 @@ export class AttachmentsController {
   @Get()
   @Authorize({ permissions: [perm("attachments", ACTION.READ)] })
   @ApiArrayResponse(AttachmentDto)
-  list(@Query() query: AttachmentsQueryDto) {
-    return this.listAttachments.execute({
-      entityType: query.entityType,
-      entityId: query.entityId,
-    });
+  list(@CurrentUser() user: AuthenticatedRequestUser, @Query() query: AttachmentsQueryDto) {
+    return this.listAttachments.execute(
+      {
+        entityType: query.entityType,
+        entityId: query.entityId,
+      },
+      user.organizationId,
+    );
   }
 
   @Delete(":id")

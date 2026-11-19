@@ -54,4 +54,7 @@ export interface OrganizationAccessControlPort {
   ): Promise<unknown>;
 
   invalidateAccessProfile(userId: string): Promise<void>;
+
+  /** Purge several members' cached profiles in one cache call. */
+  invalidateAccessProfiles(userIds: string[]): Promise<void>;
 }

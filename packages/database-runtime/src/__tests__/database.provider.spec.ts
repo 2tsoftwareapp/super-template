@@ -72,7 +72,9 @@ describe("database.provider helpers", () => {
     await vi.waitFor(() => expect(callback).toHaveBeenCalled());
 
     expect(release).toHaveBeenCalledWith(error);
-    expect(callback).toHaveBeenCalledWith(error, client, release);
+    // The client already went back to the pool: the callback must not receive a
+    // handle it could still query on.
+    expect(callback).toHaveBeenCalledWith(error, undefined, release);
   });
 
   it("runs callback-based queries through a tenant-aware client checkout", async () => {

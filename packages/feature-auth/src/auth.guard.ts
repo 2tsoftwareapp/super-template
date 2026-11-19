@@ -9,7 +9,12 @@ import {
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { AppError } from "@repo/api-kernel";
-import { ALLOW_MUST_CHANGE_PASSWORD_KEY, ERROR_CODES, IS_PUBLIC_KEY } from "@repo/api-runtime";
+import {
+  ALLOW_MUST_CHANGE_PASSWORD_KEY,
+  EnvironmentService,
+  ERROR_CODES,
+  IS_PUBLIC_KEY,
+} from "@repo/api-runtime";
 
 import { ACCESS_TOKEN_AUTHENTICATOR, type AccessTokenAuthenticator } from "./public/contracts";
 
@@ -19,6 +24,7 @@ export class AuthGuard implements CanActivate {
     private readonly reflector: Reflector,
     @Inject(ACCESS_TOKEN_AUTHENTICATOR)
     private readonly accessTokenAuthenticator: AccessTokenAuthenticator,
+    private readonly environmentService: EnvironmentService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -45,7 +51,10 @@ export class AuthGuard implements CanActivate {
     const token = authorization.slice("Bearer ".length);
     request.user = await this.accessTokenAuthenticator.authenticateAccessToken(token);
 
-    if (process.env.NODE_ENV === "test" && request.headers["x-organization-id"] === "") {
+    if (
+      this.environmentService.allowsTenantOverrideForTests &&
+      request.headers["x-organization-id"] === ""
+    ) {
       request.user.organizationId = null;
     }
 

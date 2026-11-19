@@ -42,6 +42,17 @@ async function createHarness() {
         updatedAt: new Date(),
         mustChangePassword: false,
       })),
+      findByIdStrong: vi.fn(async () => ({
+        id: USER_ID,
+        status: "ACTIVE",
+        email: "user@example.local",
+        displayName: "User One",
+        avatarUrl: null,
+        emailVerifiedAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        mustChangePassword: false,
+      })),
     } as never,
     {
       getAccessProfile: vi.fn(async () => ({ roles: ["USER"], permissions: [] })),

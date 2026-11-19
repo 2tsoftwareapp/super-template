@@ -43,10 +43,12 @@ export function useVerifyEmailController(): VerifyEmailViewModel {
         if (cancelled) return;
         setStatus("success");
         setMessage(VERIFY_EMAIL_MESSAGES.success);
-        redirectTimer = setTimeout(
-          () => router.push(VERIFY_EMAIL_ADMIN_URL),
-          VERIFY_EMAIL_REDIRECT_DELAY_MS,
-        );
+
+        const adminUrl = VERIFY_EMAIL_ADMIN_URL;
+
+        if (adminUrl) {
+          redirectTimer = setTimeout(() => router.push(adminUrl), VERIFY_EMAIL_REDIRECT_DELAY_MS);
+        }
       })
       .catch((error: unknown) => {
         if (cancelled) return;

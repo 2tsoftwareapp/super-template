@@ -173,4 +173,31 @@ describe("proxyWithRefresh", () => {
     expect(response.status).toBe(200);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it("streams non-JSON responses byte-for-byte (CSV export)", async () => {
+    const { auth, backend } = createHarness();
+    stubCookies(auth, { accessToken: "ok", refreshToken: "unused" });
+
+    const csv = "id,action\n1,login\n";
+    const fetchMock = vi.fn().mockResolvedValueOnce(
+      new Response(csv, {
+        status: 200,
+        headers: {
+          "content-type": "text/csv; charset=utf-8",
+          "content-disposition": 'attachment; filename="audit.csv"',
+        },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await backend.proxyWithRefresh(
+      proxiedRequest(),
+      "admin/audit-logs/exports/file-1/download",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toContain("text/csv");
+    expect(response.headers.get("content-disposition")).toContain("audit.csv");
+    await expect(response.text()).resolves.toBe(csv);
+  });
 });

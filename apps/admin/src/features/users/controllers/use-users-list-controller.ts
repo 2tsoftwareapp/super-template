@@ -135,6 +135,7 @@ export function useUsersListController({
       onSortChange: handleSortChange,
       onPageChange: (page) => patchListParams({ page }),
       onPageSizeChange: (limit) => patchListParams({ limit: limit as UsersPageSize, page: 1 }),
+      filterSignature: serializeUsersListSearchParams(queryParams).toString(),
     });
 
   const hasFilters = Boolean(searchInput || queryParams.status !== "all");
@@ -147,9 +148,18 @@ export function useUsersListController({
 
   const handleConfirmBlock = async () => {
     if (!confirmBlock) return;
-    clearSelection();
+
     try {
-      await blockUsers.mutateAsync(confirmBlock.userIds);
+      const result = await blockUsers.mutateAsync(confirmBlock.userIds);
+
+      if (result.failed > 0) {
+        // Keep the dialog and the selection: the operator needs to see which
+        // accounts were not blocked and retry them.
+        toast.warning(`${result.succeeded} blocked, ${result.failed} failed`);
+        return;
+      }
+
+      clearSelection();
       cancelBlock();
     } catch (error) {
       toast.error(getErrorMessage(error));

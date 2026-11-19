@@ -686,7 +686,7 @@ A feature plugin's **backend** surface MUST:
 
 > **Schema composition:** `@repo/database-runtime` exports an empty built-in schema.
 > Feature packages contribute tables via `FeatureManifest.schema`;
-> `apps/api/src/composition/feature-registry.ts` composes them for
+> `packages/app-composition/src/feature-registry.ts` composes them for
 > `DatabaseModule.forRoot({ schema })`.
 
 A feature plugin's **frontend** surfaces (admin/web slices, Flutter package) live
@@ -695,9 +695,11 @@ sub-package. They use only kernel design-system packages (`@repo/web-*`,
 `mobile_core`) — never an app's `@/` aliases.
 
 The app decides whether a feature participates by importing its manifest in one
-composition file (`apps/api/src/composition/feature-registry.ts` for backend +
-schema, admin resource list for nav, `pubspec.yaml` for mobile) and rendering its
-thin route entries.
+shared composition file (`packages/app-composition/src/feature-registry.ts` for
+backend + schema, admin resource list for nav, `pubspec.yaml` for mobile) and
+rendering its thin route entries. `apps/api/src/composition/feature-registry.ts`
+is only an API-local re-export of that registry, kept for API-local tests and CLI
+tooling.
 Removing the workspace dependency + those composition lines removes the capability
 on every surface without touching kernel code. Cross-feature communication goes
 through kernel ports or a peer's public module — never a deep import.
@@ -1495,25 +1497,18 @@ If a reference conflicts with this document, fix the reference.
 
 Generators should create canonical structure.
 
-Recommended commands:
+Recommended command:
 
 ```bash
-pnpm scaffold:api-feature <name>
-pnpm scaffold:admin-feature <name>
-pnpm scaffold:web-feature <name>
+pnpm scaffold:feature <name>
 ```
 
-Generators create:
-
-- folders;
-- named placeholder files;
-- test stubs;
-- module bindings;
-- query-key factory;
-- API file;
-- controller hook;
-- screen;
-- public exports.
+`pnpm scaffold:feature <name>` (→ `scripts/scaffold-feature.mjs`) generates the
+backend plugin package `packages/feature-<id>/` with its `package.json`,
+`tsconfig.json`, `turbo.json`, `README.md`, the feature module plus its typed
+`FeatureManifest`, and the package `index.ts`, then prints the
+`packages/app-composition` wiring steps — it does not register the feature for
+you.
 
 AI agents should fill business behavior rather than invent file organization.
 

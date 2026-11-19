@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app/core/design/app_colors.dart';
 import 'package:mobile_app/core/design/app_spacing.dart';
+import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
   late final Animation<double> _fade;
@@ -40,6 +42,7 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final restoreFailed = ref.watch(authControllerProvider).hasError;
 
     return Scaffold(
       backgroundColor: isDark
@@ -88,20 +91,43 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'Loading your workspace…',
+                  restoreFailed
+                      ? 'Waiting for a connection…'
+                      : 'Loading your workspace…',
                   style: Theme.of(
                     context,
                   ).textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
                 ),
                 const SizedBox(height: AppSpacing.huge),
-                SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                    color: cs.primary,
+                if (restoreFailed) ...[
+                  Text(
+                    "Couldn't reach the server",
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
-                ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    'Check your connection and try again.',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  FilledButton(
+                    onPressed: () => ref
+                        .read(authControllerProvider.notifier)
+                        .refreshSession(),
+                    child: const Text('Retry'),
+                  ),
+                ] else
+                  SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: cs.primary,
+                    ),
+                  ),
               ],
             ),
           ),

@@ -34,6 +34,7 @@ export class AttachmentsRepository implements AttachmentsRepositoryPort {
   async listByEntity(
     entityType: string,
     entityId: string,
+    organizationId?: string | null,
     executor: DatabaseExecutor = this.database,
   ) {
     return executor
@@ -44,6 +45,9 @@ export class AttachmentsRepository implements AttachmentsRepositoryPort {
           eq(attachments.entityType, entityType),
           eq(attachments.entityId, entityId),
           isNull(attachments.deletedAt),
+          // RLS is the backstop, not the only fence: an org-scoped caller must
+          // not read another organization's metadata for the same entity id.
+          organizationId ? eq(attachments.organizationId, organizationId) : undefined,
         ),
       )
       .orderBy(desc(attachments.createdAt));

@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 
 import { Inject, Injectable, type NestMiddleware } from "@nestjs/common";
-import { APP_LOGGER, type AppLogger } from "@repo/api-kernel";
+import { APP_LOGGER, type AppLogger, redactRequestUrl } from "@repo/api-kernel";
 
 @Injectable()
 export class RequestLoggerMiddleware implements NestMiddleware {
@@ -18,7 +18,7 @@ export class RequestLoggerMiddleware implements NestMiddleware {
       const context = {
         requestId: request.requestId,
         method: request.method,
-        path: request.originalUrl,
+        path: redactRequestUrl(request.originalUrl),
         statusCode: response.statusCode,
         duration: Date.now() - startedAt,
         userId: request.user?.userId ?? null,

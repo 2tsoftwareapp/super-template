@@ -13,7 +13,6 @@ export function useActivateUsers() {
   return useBulkMutation({
     mutationFn: (userId) => usersApi.updateStatus(userId, "ACTIVE"),
     queryKey: usersKeys.all,
-    successMessage: "activated",
   });
 }
 
@@ -21,7 +20,6 @@ export function useBlockUsers() {
   return useBulkMutation({
     mutationFn: (userId) => usersApi.updateStatus(userId, "BLOCKED"),
     queryKey: usersKeys.all,
-    successMessage: "blocked",
   });
 }
 

@@ -35,6 +35,7 @@ jobs:
           filters: |
             backend:
               - 'apps/api/**'
+              - 'apps/worker/**'
               - 'packages/*/**'
               - 'scripts/**'
               - 'package.json'
@@ -337,24 +338,14 @@ jobs:
           echo "DATABASE_URL=postgresql://fullstack_starter_app:fullstack_starter_app@localhost:65432/fullstack_starter" >> "$GITHUB_ENV"
 
       - name: API e2e
-        # Exclude health.e2e: Nest Terminus + node-redis readiness hangs in GHA even with
-        # connectTimeout (tracked separately). The other 12 e2e suites cover tenant/auth/MFA/SSO.
+        # health.e2e is excluded on purpose: Nest Terminus + node-redis readiness
+        # hangs in GHA even with connectTimeout (tracked separately). Everything
+        # else under test/ runs, so a new spec cannot be silently left out.
         run: >
           pnpm --filter api exec vitest run
           --maxWorkers=1
-          test/audit.e2e.spec.ts
-          test/background-jobs-tenant.e2e.spec.ts
-          test/files-catalog.e2e.spec.ts
-          test/job-observability.e2e.spec.ts
-          test/maintenance-mode.e2e.spec.ts
-          test/mfa.e2e.spec.ts
-          test/notifications.e2e.spec.ts
-          test/organization-management.e2e.spec.ts
-          test/permission-migration-and-roles.e2e.spec.ts
-          test/preferences.e2e.spec.ts
-          test/sso.e2e.spec.ts
-          test/throttling.e2e.spec.ts
-          test/tenant-isolation.e2e.spec.ts
+          "test/*.e2e.spec.ts"
+          --exclude "test/health.e2e.spec.ts"
 
   browser-e2e:
     needs: changes

@@ -36,6 +36,11 @@ export interface AuthUserStore {
   /** Strong primary read for authentication and authorization decisions. */
   findByIdStrong(userId: string): Promise<AuthUserRecord | null>;
   findByEmail(email: string, executor?: TransactionExecutor): Promise<AuthUserRecord | null>;
+  /**
+   * Strong primary read for credential checks: a replica lag window must never
+   * let a rotated password or a blocked account authenticate.
+   */
+  findByEmailStrong(email: string): Promise<AuthUserRecord | null>;
   update(
     userId: string,
     values: AuthUserUpdateInput,

@@ -276,6 +276,11 @@ export class ProcessJobsUseCase {
     return organizationId ? { type: "organization", organizationId } : { type: "platform" };
   }
 
+  /**
+   * Bounds how long the caller waits — it cannot cancel `promise`. A timed-out
+   * attempt is retried by the job runner while the original handler may still
+   * be running, so handlers must make their writes idempotent.
+   */
   private async withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const timeout = new Promise<never>((_, reject) => {

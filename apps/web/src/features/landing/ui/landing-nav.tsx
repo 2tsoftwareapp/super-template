@@ -42,9 +42,13 @@ export function LandingNav() {
             </a>
           </Button>
           <Button size="sm" asChild>
-            <a href={ADMIN_URL} target="_blank" rel="noopener noreferrer">
-              Open admin
-            </a>
+            {ADMIN_URL ? (
+              <a href={ADMIN_URL} target="_blank" rel="noopener noreferrer">
+                Open admin
+              </a>
+            ) : (
+              <span>Open admin</span>
+            )}
           </Button>
         </div>
       </div>

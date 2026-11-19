@@ -28,8 +28,12 @@ function createGuard(options: { isPublic: boolean; authenticate?: ReturnType<typ
   const accessTokenAuthenticator = {
     authenticateAccessToken: authenticate,
   } as unknown as AccessTokenAuthenticator;
+  const environmentService = { allowsTenantOverrideForTests: false } as never;
 
-  return { guard: new AuthGuard(reflector, accessTokenAuthenticator), authenticate };
+  return {
+    guard: new AuthGuard(reflector, accessTokenAuthenticator, environmentService),
+    authenticate,
+  };
 }
 
 describe("AuthGuard", () => {

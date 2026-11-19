@@ -206,6 +206,7 @@ super-template/
 │   ├── api/              NestJS REST API — composition root + feature registry
 │   ├── admin/            Next.js operations dashboard
 │   ├── web/              Next.js landing + auth BFF
+│   ├── worker/           Standalone worker host — scheduled jobs, outbox, notifications
 │   └── mobile/           Flutter + design-system/
 ├── packages/
 │   ├── api-kernel/       Framework-free ports, errors, types

@@ -118,6 +118,7 @@ export function createNotificationsColumns({
             size="icon"
             className="size-7 text-muted-foreground hover:text-destructive"
             disabled={isCancelling}
+            aria-label="Cancel scheduled notification"
             onClick={() => onCancel(row.original.id)}
           >
             <Trash2 className="size-3.5" />

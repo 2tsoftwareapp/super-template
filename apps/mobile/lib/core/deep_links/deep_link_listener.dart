@@ -76,11 +76,20 @@ class _DeepLinkListenerState extends ConsumerState<DeepLinkListener> {
 
   String? _mapUriToPath(Uri uri) {
     final segments = uri.pathSegments;
-    if (segments.isEmpty) {
+    // Custom-scheme links carry the route in the host:
+    // myapp://verify-email?token=… has an empty pathSegments list. https links
+    // keep the route in the first path segment.
+    final usesHost =
+        (uri.scheme == 'myapp' || uri.scheme == 'super-template') &&
+        uri.host.isNotEmpty;
+    final route = usesHost
+        ? uri.host
+        : (segments.isEmpty ? null : segments.first);
+    if (route == null || route.isEmpty) {
       return null;
     }
 
-    switch (segments.first) {
+    switch (route) {
       case 'verify-email':
         final token = uri.queryParameters['token'];
         return token == null ? '/verify-email' : '/verify-email?token=$token';
@@ -90,10 +99,9 @@ class _DeepLinkListenerState extends ConsumerState<DeepLinkListener> {
             ? '/reset-password'
             : '/reset-password?token=$token';
       case 'invite':
-        if (segments.length < 2) {
-          return null;
-        }
-        return '/invite/${segments[1]}';
+        // No invite route exists in this app yet; dropping the link is better
+        // than navigating to a route GoRouter would report as not found.
+        return null;
       case 'organizations':
         return '/organizations';
       default:

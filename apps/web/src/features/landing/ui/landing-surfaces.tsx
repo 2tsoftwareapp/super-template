@@ -37,7 +37,7 @@ export function LandingSurfaces() {
             return (
               <Reveal key={surface.label} delayMs={index * 60} className={span}>
                 <a
-                  href={surface.href}
+                  href={surface.href ?? undefined}
                   target={surface.external ? "_blank" : undefined}
                   rel={surface.external ? "noopener noreferrer" : undefined}
                   className={`group flex h-full flex-col justify-between rounded-2xl p-6 transition duration-300 hover:-translate-y-0.5 ${TONE_CLASS[surface.tone]}`}

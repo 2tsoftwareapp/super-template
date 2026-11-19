@@ -42,6 +42,10 @@ export class AccessControlService {
     return this.accessProfileUseCase.invalidateAccessProfile(userId);
   }
 
+  invalidateAccessProfiles(userIds: string[]) {
+    return this.accessProfileUseCase.invalidateAccessProfiles(userIds);
+  }
+
   getRoleNamesForUsers(userIds: string[], organizationId?: string | null) {
     return this.roleQueryUseCase.getRoleNamesForUsers(userIds, organizationId);
   }

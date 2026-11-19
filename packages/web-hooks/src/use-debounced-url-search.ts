@@ -85,10 +85,16 @@ export function useDebouncedUrlSearch({
   // Sync URL → local (e.g. back/forward navigation, external URL change)
   useEffect(() => {
     if (lastUrlValueRef.current === urlValue) return;
+
+    // A debounced write is still in flight (localValue !== debouncedValue), so
+    // this URL value is the older query echoing back, not a navigation. Keep
+    // the newer keystrokes instead of overwriting them.
+    if (localValue !== debouncedValue) return;
+
     lastUrlValueRef.current = urlValue;
     syncingFromUrlRef.current = true;
     setLocalValue(urlValue);
-  }, [urlValue]);
+  }, [urlValue, localValue, debouncedValue]);
 
   // Sync local → URL (debounced)
   useEffect(() => {

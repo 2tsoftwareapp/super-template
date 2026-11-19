@@ -80,7 +80,9 @@ export class RefreshSessionUseCase {
       throw await this.rejectAsReuse(session.id);
     }
 
-    const user = await this.usersRepository.findById(session.userId);
+    // Primary read: the account status gates token minting, so it must not be
+    // read from a lagging replica (a blocked account would keep refreshing).
+    const user = await this.usersRepository.findByIdStrong(session.userId);
 
     if (user?.status !== "ACTIVE") {
       await this.authSessionRepository.revokeSession(session.id);

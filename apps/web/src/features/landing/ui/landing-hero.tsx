@@ -28,9 +28,13 @@ export function LandingHero() {
               <a href="#start">Get started</a>
             </Button>
             <Button variant="outline" size="lg" asChild>
-              <a href={ADMIN_URL} target="_blank" rel="noopener noreferrer">
-                Open admin
-              </a>
+              {ADMIN_URL ? (
+                <a href={ADMIN_URL} target="_blank" rel="noopener noreferrer">
+                  Open admin
+                </a>
+              ) : (
+                <span>Open admin</span>
+              )}
             </Button>
           </div>
         </div>

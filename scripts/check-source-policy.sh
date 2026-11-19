@@ -5,6 +5,12 @@ SCRIPT_DIR=$(dirname "$0")
 ROOT_DIR=$(cd "$SCRIPT_DIR/.." && pwd)
 cd "$ROOT_DIR"
 
+# Fail closed: without rg every rule below would silently report a pass.
+command -v rg >/dev/null 2>&1 || {
+  printf 'check-source-policy: ripgrep (rg) is required; refusing to report a false pass.\n' >&2
+  exit 1
+}
+
 failed=0
 
 POLICY_SEARCH_DIRS="
@@ -25,15 +31,11 @@ search_matches() {
   pattern=$1
   shift
 
-  if command -v rg >/dev/null 2>&1; then
-    rg -n "$pattern" "$@" \
-      --glob '!**/*.tsbuildinfo' \
-      --glob '!**/generated/**' \
-      --glob '!**/*.spec.ts' \
-      --glob '!**/*.test.ts' || true
-    return
-  fi
-  true
+  rg -n "$pattern" "$@" \
+    --glob '!**/*.tsbuildinfo' \
+    --glob '!**/generated/**' \
+    --glob '!**/*.spec.ts' \
+    --glob '!**/*.test.ts' || true
 }
 
 check_policy() {

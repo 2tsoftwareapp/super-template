@@ -9,6 +9,7 @@ import { BatchDeleteFilesUseCase } from "./application/use-cases/batch-delete-fi
 import { CreateFileVersionUseCase } from "./application/use-cases/create-file-version.use-case";
 import { DeleteFileUseCase } from "./application/use-cases/delete-file.use-case";
 import { DownloadFileUseCase } from "./application/use-cases/download-file.use-case";
+import { DownloadLocalFileUseCase } from "./application/use-cases/download-local-file.use-case";
 import { GetFileHistoryUseCase } from "./application/use-cases/get-file-history.use-case";
 import { GetFileSignedUrlUseCase } from "./application/use-cases/get-file-signed-url.use-case";
 import { GetFileUseCase } from "./application/use-cases/get-file.use-case";
@@ -30,6 +31,7 @@ import { FilesController } from "./presentation/files.controller";
     GetFileUseCase,
     GetFileSignedUrlUseCase,
     DownloadFileUseCase,
+    DownloadLocalFileUseCase,
     DeleteFileUseCase,
     ListFilesUseCase,
     CreateFileVersionUseCase,

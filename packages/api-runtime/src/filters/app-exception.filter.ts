@@ -15,6 +15,7 @@ import {
   type AppLogger,
   type JsonObject,
   type JsonValue,
+  redactRequestUrl,
 } from "@repo/api-kernel";
 import { type ErrorReportContext, ErrorReporterService } from "@repo/observability";
 
@@ -63,7 +64,7 @@ function buildExceptionContextBase(input: {
   return {
     requestId: request.requestId,
     method: request.method,
-    path: request.originalUrl,
+    path: redactRequestUrl(request.originalUrl),
     statusCode,
     userId: request.user?.userId ?? null,
     errorCode: code,

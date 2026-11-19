@@ -33,6 +33,10 @@ export class AuthUserStoreAdapter implements AuthUserStore {
     return this.usersRepository.findByEmail(email, executor);
   }
 
+  findByEmailStrong(email: string): Promise<AuthUserRecord | null> {
+    return this.usersRepository.findByEmailStrong(email);
+  }
+
   update(
     userId: string,
     values: AuthUserUpdateInput,

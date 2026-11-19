@@ -59,7 +59,7 @@ describe("LocalFileDownloadUrlService", () => {
       const url = service.createSignedUrl("file-1", "uploads/user-1/abc.png");
       const { token, expiresAt, signature } = tokenOf(url);
 
-      expect(url.startsWith(`${BASE_URL}/api/v1/files/file-1/download?token=`)).toBe(true);
+      expect(url.startsWith(`${BASE_URL}/api/v1/files/file-1/download/local?token=`)).toBe(true);
       expect(expiresAt).toBe(START.getTime() + 3600 * 1000);
       // The signature is a real HMAC over the bound triple, not an opaque blob:
       // this recomputes it independently so a weakening of the input string fails.
@@ -70,7 +70,7 @@ describe("LocalFileDownloadUrlService", () => {
     it("strips a trailing slash from the configured base URL", () => {
       const url = buildService({ API_INTERNAL_URL: `${BASE_URL}/` }).createSignedUrl("f", "k");
 
-      expect(url.startsWith(`${BASE_URL}/api/v1/files/f/download?token=`)).toBe(true);
+      expect(url.startsWith(`${BASE_URL}/api/v1/files/f/download/local?token=`)).toBe(true);
       expect(url).not.toContain("//api/");
     });
   });

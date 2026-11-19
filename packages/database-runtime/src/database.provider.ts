@@ -120,7 +120,9 @@ export function createTenantAwareConnect(
           .then(() => invokeConnectCallback(callback, undefined, client, release))
           .catch((error: Error) => {
             release(error);
-            invokeConnectCallback(callback, error, client, release);
+            // The client is already back in the pool: hand the caller `undefined`
+            // so it cannot issue queries on a released connection.
+            invokeConnectCallback(callback, error, undefined, release);
           });
       });
       return;
