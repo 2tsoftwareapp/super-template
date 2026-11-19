@@ -11,7 +11,9 @@ export default async function HomePage() {
   return (
     <main style={{ maxWidth: 720, margin: "10vh auto", fontFamily: "system-ui", padding: 24 }}>
       <h1 style={{ fontSize: 28 }}>Admin</h1>
-      <p>Signed in. User management arrives in P2.</p>
+      <p>
+        <a href="/users">Manage users →</a>
+      </p>
     </main>
   );
 }
