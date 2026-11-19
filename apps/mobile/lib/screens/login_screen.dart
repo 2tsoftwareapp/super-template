@@ -32,7 +32,8 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final session = await widget.api.login(_email.text.trim(), _password.text);
+      final session =
+          await widget.api.login(_email.text.trim(), _password.text);
 
       if (!mounted) return;
 
@@ -44,9 +45,13 @@ class _LoginScreenState extends State<LoginScreen> {
     } on ApiException catch (error) {
       if (mounted) setState(() => _error = error.message);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Network error. Check the API base URL.');
+      if (mounted) {
+        setState(() => _error = 'Network error. Check the API base URL.');
+      }
     } finally {
-      if (mounted) setState(() => _pending = false);
+      if (mounted) {
+        setState(() => _pending = false);
+      }
     }
   }
 
@@ -63,7 +68,8 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('Sign in', style: Theme.of(context).textTheme.headlineMedium),
+                Text('Sign in',
+                    style: Theme.of(context).textTheme.headlineMedium),
                 const SizedBox(height: 16),
                 TextField(
                   controller: _email,

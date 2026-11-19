@@ -43,7 +43,10 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Home'),
         actions: [
-          IconButton(onPressed: _logout, icon: const Icon(Icons.logout), tooltip: 'Sign out'),
+          IconButton(
+              onPressed: _logout,
+              icon: const Icon(Icons.logout),
+              tooltip: 'Sign out'),
         ],
       ),
       body: Padding(
@@ -51,7 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Welcome, ${widget.session.displayName}', style: Theme.of(context).textTheme.headlineSmall),
+            Text('Welcome, ${widget.session.displayName}',
+                style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 8),
             Text(email),
             const SizedBox(height: 24),

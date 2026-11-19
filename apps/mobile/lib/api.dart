@@ -19,7 +19,10 @@ class ApiException implements Exception {
 }
 
 class Session {
-  Session({required this.accessToken, required this.refreshToken, required this.user});
+  Session(
+      {required this.accessToken,
+      required this.refreshToken,
+      required this.user});
 
   final String accessToken;
   final String refreshToken;
