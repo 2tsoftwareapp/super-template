@@ -6,7 +6,6 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { Providers } from "@/components/providers";
 import { routing } from "@/i18n/routing";
-import { tweakcnFontClassName } from "@/lib/tweakcn-fonts";
 
 import "../globals.css";
 
@@ -34,7 +33,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang={locale} suppressHydrationWarning className={tweakcnFontClassName}>
+    <html lang={locale} suppressHydrationWarning>
       <body>
         <script
           id="theme-init"
