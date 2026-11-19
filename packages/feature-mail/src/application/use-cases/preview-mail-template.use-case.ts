@@ -1,17 +1,13 @@
-import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
 import { AppError } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
 
-import {
-  TEMPLATE_RENDERER_SERVICE,
-  type TemplateRendererServicePort,
-} from "../ports/template-renderer.service.port";
+import { TemplateRendererService } from "../../infrastructure/template-renderer.service";
 
 @Injectable()
 export class PreviewMailTemplateUseCase {
   constructor(
-    @Inject(TEMPLATE_RENDERER_SERVICE)
-    private readonly templateRenderer: TemplateRendererServicePort,
+    private readonly templateRenderer: TemplateRendererService,
   ) {}
 
   async execute(templateKey: string, variables?: Record<string, string>) {

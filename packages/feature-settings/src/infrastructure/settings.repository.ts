@@ -1,24 +1,30 @@
-import type { JsonObject } from "@repo/api-kernel";
+import type { JsonObject, TransactionExecutor } from "@repo/api-kernel";
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE } from "@repo/database-runtime";
 import { eq } from "drizzle-orm";
 
-import type { SettingsRepositoryPort } from "../application/ports/settings.repository.port";
-
 import { applicationSettings } from "./persistence";
 
 @Injectable()
-export class SettingsRepository implements SettingsRepositoryPort {
+export class SettingsRepository {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
-  async findAll(executor: DatabaseExecutor = this.database) {
-    return executor.select().from(applicationSettings);
+  /**
+   * Application code passes an opaque `TransactionExecutor`; this is the one
+   * place that knows it is a Drizzle client or transaction.
+   */
+  private db(executor?: TransactionExecutor): DatabaseExecutor {
+    return (executor ?? this.database) as DatabaseExecutor;
   }
 
-  async findByKey(key: string, executor: DatabaseExecutor = this.database) {
-    const [setting] = await executor
+  async findAll(executor?: TransactionExecutor) {
+    return this.db(executor).select().from(applicationSettings);
+  }
+
+  async findByKey(key: string, executor?: TransactionExecutor) {
+    const [setting] = await this.db(executor)
       .select()
       .from(applicationSettings)
       .where(eq(applicationSettings.key, key))
@@ -31,12 +37,12 @@ export class SettingsRepository implements SettingsRepositoryPort {
     key: string,
     value: JsonObject,
     updatedById: string | null,
-    executor: DatabaseExecutor = this.database,
+    executor?: TransactionExecutor,
   ) {
     const existing = await this.findByKey(key, executor);
 
     if (!existing) {
-      const [created] = await executor
+      const [created] = await this.db(executor)
         .insert(applicationSettings)
         .values({
           key,
@@ -48,7 +54,7 @@ export class SettingsRepository implements SettingsRepositoryPort {
       return created ?? null;
     }
 
-    const [updated] = await executor
+    const [updated] = await this.db(executor)
       .update(applicationSettings)
       .set({
         value,
@@ -63,13 +69,13 @@ export class SettingsRepository implements SettingsRepositoryPort {
 
   async ensureDefaults(
     defaults: { key: string; value: JsonObject }[],
-    executor: DatabaseExecutor = this.database,
+    executor?: TransactionExecutor,
   ) {
     for (const item of defaults) {
       const existing = await this.findByKey(item.key, executor);
 
       if (!existing) {
-        await executor.insert(applicationSettings).values({
+        await this.db(executor).insert(applicationSettings).values({
           key: item.key,
           value: item.value,
         });

@@ -1,4 +1,4 @@
-import type { SettingRecord } from "./ports/settings.repository.port";
+import type { SettingRecord } from "./settings.types";
 
 export class SettingsMapper {
   static toDto(setting: SettingRecord) {

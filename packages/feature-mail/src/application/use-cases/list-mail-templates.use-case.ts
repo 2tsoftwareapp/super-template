@@ -1,10 +1,7 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 
 import { isMandatoryMailTemplate } from "../../domain/mandatory-mail-templates";
-import {
-  TEMPLATE_RENDERER_SERVICE,
-  type TemplateRendererServicePort,
-} from "../ports/template-renderer.service.port";
+import { TemplateRendererService } from "../../infrastructure/template-renderer.service";
 
 export interface MailTemplateSummary {
   key: string;
@@ -16,8 +13,7 @@ export interface MailTemplateSummary {
 @Injectable()
 export class ListMailTemplatesUseCase {
   constructor(
-    @Inject(TEMPLATE_RENDERER_SERVICE)
-    private readonly templateRenderer: TemplateRendererServicePort,
+    private readonly templateRenderer: TemplateRendererService,
   ) {}
 
   async execute(): Promise<MailTemplateSummary[]> {

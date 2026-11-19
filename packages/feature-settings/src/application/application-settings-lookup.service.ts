@@ -1,9 +1,9 @@
-import { Inject, Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { isJsonObject } from "@repo/api-kernel";
 import { adaptRedisClient, createRedisClient, EnvironmentService } from "@repo/api-runtime";
 import { type ApplicationSettingsLookup } from "@repo/feature-settings/contracts";
 
-import { SETTINGS_REPOSITORY, type SettingsRepositoryPort } from "./ports/settings.repository.port";
+import { SettingsRepository } from "../infrastructure/settings.repository";
 import { SETTING_DEFINITIONS, type SettingDefinition } from "./setting-definitions";
 
 const CACHE_KEY_PREFIX = "settings-flag:";
@@ -59,8 +59,7 @@ export class ApplicationSettingsLookupService implements ApplicationSettingsLook
   private redisReady: Promise<void> | null = null;
 
   constructor(
-    @Inject(SETTINGS_REPOSITORY)
-    private readonly settingsRepository: SettingsRepositoryPort,
+    private readonly settingsRepository: SettingsRepository,
     private readonly environmentService: EnvironmentService,
   ) {}
 
