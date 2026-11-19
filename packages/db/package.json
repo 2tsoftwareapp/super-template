@@ -1,0 +1,24 @@
+{
+  "name": "@lean/db",
+  "private": true,
+  "type": "commonjs",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.0",
+    "pg": "^8.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.11.0",
+    "drizzle-kit": "^0.31.0",
+    "typescript": "5.9.3"
+  }
+}
