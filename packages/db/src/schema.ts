@@ -1,4 +1,4 @@
-import { integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { index, integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 /**
  * Users own a session (refresh rotation) and a role. A role is a column, not a
@@ -31,18 +31,23 @@ export const sessions = pgTable("sessions", {
  * Postgres is the queue. The worker claims rows with SKIP LOCKED; no Redis
  * dependency for the basic path.
  */
-export const jobs = pgTable("jobs", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  type: text("type").notNull(),
-  payload: jsonb("payload").notNull().default({}),
-  status: text("status").notNull().default("PENDING"),
-  attempts: integer("attempts").notNull().default(0),
-  maxAttempts: integer("max_attempts").notNull().default(5),
-  runAt: timestamp("run_at", { withTimezone: true }).notNull().defaultNow(),
-  lastError: text("last_error"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});
+export const jobs = pgTable(
+  "jobs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    type: text("type").notNull(),
+    payload: jsonb("payload").notNull().default({}),
+    status: text("status").notNull().default("PENDING"),
+    attempts: integer("attempts").notNull().default(0),
+    maxAttempts: integer("max_attempts").notNull().default(5),
+    runAt: timestamp("run_at", { withTimezone: true }).notNull().defaultNow(),
+    result: jsonb("result"),
+    lastError: text("last_error"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("jobs_claim_idx").on(table.status, table.runAt)],
+);
 
 export type UserRow = typeof users.$inferSelect;
 export type JobRow = typeof jobs.$inferSelect;

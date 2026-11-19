@@ -15,6 +15,13 @@
       "when": 1795106653180,
       "tag": "0001_tearful_sasquatch",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795106794313,
+      "tag": "0002_cuddly_shinko_yamashiro",
+      "breakpoints": true
     }
   ]
 }
