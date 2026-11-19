@@ -1,84 +1,90 @@
-# Agent Rules
+# Working in this repository
 
-This is the **short entrypoint**. Prefer layered reading — do not load every doc.
+This file is the engineering contract. Read it before touching code.
+Everything below is either enforced by lint/tests or checked in review; anything
+that is only "advice" belongs in `docs/CONVENTIONS.md`, not here.
 
-## Must-read order (every task)
+## What this is
 
-1. `.agents/START_HERE.md` (**2 minutes**) — path Quick/Lite/Full + commands
-2. `.agents/settings.yaml` and `.agents/PRJ_REFERENCE.md` (after `init`)
-3. `.agents/SKILL_PREAMBLE.md` when invoking a first-party skill
-4. The skill’s `SKILL.md` Contract (+ steps when present)
-5. `.agents/WHAT_NEXT.md` when unsure which skill to run
-6. `.agents/AGENT_POLICY.md` / `AGENT_WORK.md` / `MIGRATION.md` **only when needed**
+A pnpm + Turborepo monorepo: one PostgreSQL schema, one OpenAPI contract, four
+clients (web, admin, mobile, API).
 
-Re-read settings at the start of every task and every skill invocation. Never
-cache `language` across turns. Default language: `en`. Thread/report prose
-follows `language`; **source-code comments** follow
-`rules.code.comments.prose_language` (default `repo-default`). **Headings and
-template keys stay English** (shared form). Do not mix VI/EN in one artifact
-body. Blocking unknowns → **Confirm-first** + **Ask method** in
-`SKILL_PREAMBLE.md` (STOP, then ask — never quiz-as-document).
+```
+apps/api      NestJS REST API — composition root only, no business logic (:3001)
+apps/web      Next.js — public landing (:3000)
+apps/admin    Next.js — operations console + auth BFF (:3002)
+apps/mobile   Flutter (iOS/Android)
+packages/     kernel, runtime, database, contract, web-*, feature-*
+```
 
-## Architecture (map)
+Backend business logic lives in `packages/feature-*`; a feature is a compile-time
+plugin listed in `packages/app-composition/src/feature-registry.ts`. The API host
+composes what that registry returns — do not add feature code to `apps/api`.
 
-| Path | Role |
-| --- | --- |
-| `AGENTS.md` | This short entrypoint |
-| `.agents/START_HERE.md` | 2-minute start |
-| `.agents/WHAT_NEXT.md` | Situation → skill map |
-| `.agents/` | **Kit** — skills, tools, settings, policy |
-| `.agents/AGENT_POLICY.md` | Detailed policy (reference) |
-| `.agents/settings.yaml` | Lean knobs |
-| `.agents/PRJ_REFERENCE.md` | Generated project facts |
-| `.agents/SKILL_PREAMBLE.md` | Shared skill rules |
-| `.agents/thinking/outcome-first.md` | Outcome-first Thinking method (normative) |
-| `.agents/thinking/input-process-output.md` | Input→Process→Output Thinking method (normative) |
-| `.agents/thinking/make-implicit-explicit.md` | Make-implicit-explicit Thinking method (normative) |
-| `.agents/thinking/single-source-of-truth.md` | Single Source of Truth Thinking method (normative) |
-| `.agents/thinking/small-batch.md` | Small-batch Thinking method (normative) |
-| `.agents/thinking/feedback-loop.md` | Feedback loop Thinking method (normative) |
-| `.agents/thinking/default-path-first.md` | Default path first Thinking method (normative) |
-| `.agents/thinking/reversible-decisions.md` | Reversible decisions Thinking method (normative) |
-| `.agents/thinking/standardize-before-automate.md` | Standardize before automate Thinking method (normative) |
-| `.agents/thinking/design-for-handoff.md` | Design for handoff Thinking method (normative) |
-| `.agents/thinking/evidence-over-confidence.md` | Evidence over confidence Thinking method (normative) |
-| `.agents/thinking/optimize-bottleneck.md` | Optimize bottleneck Thinking method (normative) |
-| `.agents/skills/` | Invokable skills |
-| `.agents/tools/` | session, lint, build_context, detect_agents, delegate_worker, … |
-| `.agent-work/` | **Work** — sessions + memory (nested git; `session.sh commit` / `archive`) |
-| `.agents/examples/` | Good/bad session shapes |
-| `.agents/MIGRATION.md` | Host upgrade notes |
+## Non-negotiables
 
-### Skill architecture
+1. **Types are strict.** No `any`, no `as unknown as` outside a JSON/storage
+   boundary, no non-null assertions. No `@ts-ignore`.
+2. **No swallowed errors.** `catch {}` and catch-and-ignore are bugs. Either map
+   to an `AppError` with a catalog code, or rethrow.
+3. **No silent fallbacks** that turn a configuration or programming mistake into
+   plausible behaviour. Fail where the mistake is.
+4. **Dependencies point one way.** `api-kernel` stays framework-free; a feature
+   never imports another feature's internals (only `/contracts`, `/schema`,
+   `/module`, `/testing`); features never import `apps/*`.
+5. **One exported class per file**, kebab-case filenames, ≤300 lines per file.
+6. **Tests travel with the code**: `src/**/__tests__/<name>.spec.ts`. Only
+   cross-feature HTTP flows go in `apps/api/test/*.e2e.spec.ts`.
+7. **No new abstraction without a second implementation.** Do not add a port,
+   interface, adapter or factory for something that has exactly one
+   implementation today. See `docs/CONVENTIONS.md` §2.
+8. **No per-feature copies of shared logic.** Pagination, sorting, mapping,
+   error shapes and cache invalidation come from the shared packages
+   (`@repo/api-runtime/pagination`, `@repo/api-sort`, `@repo/api-kernel`).
+9. **Schema changes ship as migrations.** Never edit applied SQL; add a new file.
+10. **Secrets never enter the repo or the logs.** Mask query strings, tokens and
+    personal data; `.env.development` holds non-secret defaults only.
 
-- `SKILL.md` is authoritative. First-party skills have **Contract** + `agents/openai.yaml`.
-- Tiny clear fix → **`quick-fix`** (Path=Quick). Unclear → Lite/Full lifecycle.
-- Inventory: `docs/config/first-party-skills.json`. Profiles: `core` default.
-- Validate: `validate_artifacts.py` + `lint_artifacts.py`. Handoff pack: `build_context.py`.
-- Kit vs Work: [AGENT_WORK.md](./.agents/AGENT_WORK.md).
-- Docs taxonomy (source): [README.md](./README.md).
+## Definition of done
 
-## Skill compliance
+A change is done when all of these are true:
 
-1. START_HERE → preamble (when pointed) → `SKILL.md` → Contract.
-2. Produce required artifacts; stop on safety / Spec quality / Quick violations.
-3. Before `review` Ready / `done`: `validate_artifacts.py` **and** `lint_artifacts.py` OK.
-4. Prefer `session.sh help` / `doctor` over inventing paths.
+```bash
+pnpm run check          # lint:policy + eslint + typecheck + unit tests
+pnpm run format:check
+```
 
-## Hard stops (summary)
+…plus, when you touched SQL or HTTP behaviour: `pnpm --filter api test:e2e`
+(with Postgres up), and when you touched `apps/mobile`: `pnpm run mobile:check`.
 
-Full text in `AGENT_POLICY.md`. Never: leak secrets; irreversible destructive
-commands without confirmation; weaken auth/TLS; hide security findings.
+Do not report a task as done on the strength of a build alone, and do not
+disable a failing gate to get green.
 
-## Workflow (summary)
+## Where the rules live
 
-- `session.sh help|doctor|current|status`
-- **Quick:** `quick-fix` → sync (`PASS`) → execution → review → done
-- **Full:** brainstorming → business-analysis → design → planning → sync → …
-- Step ledger + Spec quality on Full/Lite step skills; Quick forbids BA/design
-- TASK Dev context + `[Source:]`; Readable writing mandatory
+| Document | Status | What it answers |
+| --- | --- | --- |
+| **this file** | authoritative | how to work here, non-negotiables |
+| [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md) | authoritative | concrete shape of a feature, naming, when to add a layer |
+| [`docs/architecture/ARCHITECTURE_RULES.md`](docs/architecture/ARCHITECTURE_RULES.md) | reference | deep rationale, layer-by-layer |
+| [`CODING_RULES.md`](CODING_RULES.md) | reference | long-form code review checklist |
+| [`docs/architecture/NAMING_CONVENTIONS.md`](docs/architecture/NAMING_CONVENTIONS.md) | reference | naming details |
 
-## Detailed policy
+If two documents disagree, `AGENTS.md` and `docs/CONVENTIONS.md` win; fix the
+other one in the same change. Do not add a fourth rule document.
 
-Reference only: `.agents/AGENT_POLICY.md`. If conflict, policy wins on substance;
-this file wins on reading order.
+## Commands
+
+```bash
+pnpm bootstrap        # install + local env
+make dev              # docker + api + web + admin
+pnpm generate         # OpenAPI + TS/Dart clients
+pnpm run check        # the gate that matters
+pnpm verify           # full verification (needs Postgres)
+```
+
+## Agent kit (optional, not about this codebase)
+
+`.agents/START_HERE.md` documents the installed session/skill tooling
+(quick-fix vs full lifecycle). It is a workflow helper — it is never a substitute
+for the non-negotiables above, and it does not describe this project's code.
