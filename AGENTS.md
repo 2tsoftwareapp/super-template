@@ -46,6 +46,22 @@ pnpm run format:check
 Nothing is done because it compiled. A test that re-implements the logic it
 checks is not a test.
 
+## Run it
+
+```bash
+pnpm install
+docker compose up -d        # Postgres + Mailpit
+pnpm db:migrate && pnpm db:seed
+pnpm dev / dev:admin / dev:web / dev:worker
+pnpm run check              # typecheck + unit/e2e tests
+pnpm run format:check
+```
+
+Schema lives in `packages/db/src/schema.ts`; after changing it run
+`pnpm db:generate && pnpm db:migrate`. Jobs are claimed by `apps/worker` with
+`SKIP LOCKED`; a new job type is one entry in `apps/worker/src/handlers.ts` plus
+its allow-list in the API DTO.
+
 ## Where the rules live
 
 | Document              | Answers                                       |
