@@ -31,6 +31,7 @@ export interface AttachmentsRepositoryPort {
   listByEntity(
     entityType: string,
     entityId: string,
+    organizationId?: string | null,
     executor?: TransactionExecutor,
   ): Promise<AttachmentRecord[]>;
   softDelete(

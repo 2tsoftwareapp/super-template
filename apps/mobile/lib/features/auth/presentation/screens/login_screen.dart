@@ -9,6 +9,7 @@ import 'package:mobile_app/core/design/app_spacing.dart';
 import 'package:mobile_app/core/errors/app_exception.dart';
 import 'package:mobile_app/core/widgets/widgets.dart';
 import 'package:mobile_app/features/auth/data/auth_repository.dart';
+import 'package:mobile_app/features/auth/domain/login_validation.dart';
 import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -231,7 +232,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
                           autocorrect: false,
-                          validator: (v) => v != null && v.contains('@')
+                          validator: (v) => isValidEmail(v ?? '')
                               ? null
                               : 'Enter a valid email',
                         ),
@@ -259,7 +260,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           obscureText: _obscurePassword,
                           textInputAction: TextInputAction.done,
                           onFieldSubmitted: (_) => _submit(authState),
-                          validator: (v) => v != null && v.length >= 8
+                          validator: (v) => isValidPassword(v ?? '')
                               ? null
                               : 'Minimum 8 characters',
                         ),

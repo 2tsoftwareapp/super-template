@@ -8,6 +8,7 @@ describe("LoginUseCase", () => {
     const useCase = new LoginUseCase(
       {
         findByEmail: vi.fn(async () => null),
+        findByEmailStrong: vi.fn(async () => null),
       } as never,
       auditWriter as never,
       {} as never,

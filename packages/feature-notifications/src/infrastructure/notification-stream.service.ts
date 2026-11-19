@@ -1,7 +1,7 @@
-import type { JsonObject } from "@repo/api-kernel";
+import type { AppLogger, JsonObject } from "@repo/api-kernel";
 
-import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
-import { isJsonObject } from "@repo/api-kernel";
+import { Inject, Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import { APP_LOGGER, isJsonObject } from "@repo/api-kernel";
 import { adaptRedisClient, createRedisClient, EnvironmentService } from "@repo/api-runtime";
 import { Observable, Subject } from "rxjs";
 
@@ -37,10 +37,17 @@ export class NotificationStreamService
   private redisSubscriber: RedisStreamClient | null = null;
   private redisReady: Promise<void> | null = null;
 
-  constructor(private readonly environmentService: EnvironmentService) {}
+  constructor(
+    private readonly environmentService: EnvironmentService,
+    @Inject(APP_LOGGER) private readonly logger: AppLogger,
+  ) {}
 
-  async onModuleInit() {
-    // await this.ensureRedis();
+  onModuleInit(): void {
+    // A worker process never opens an SSE stream, so initialising the publisher
+    // only from stream() meant its emitted notifications were never published.
+    // Fire-and-forget: startup must not block on Redis availability, and
+    // `publish()` awaits the same cached promise before sending.
+    void this.ensureRedis();
   }
 
   async onModuleDestroy() {
@@ -48,8 +55,8 @@ export class NotificationStreamService
   }
 
   emit(userId: string, organizationId: string, event: NotificationStreamEvent): void {
-    if (!this.redisPublisher) {
-      // Fallback: no Redis configured, emit locally
+    if (!this.environmentService.values.REDIS_URL) {
+      // Single-process mode: no Redis configured, emit locally.
       this.getSubject(this.channelKey(userId, organizationId)).next(event);
       return;
     }
@@ -127,13 +134,24 @@ export class NotificationStreamService
     await this.ensureRedis();
 
     if (!this.redisPublisher) {
+      /* Redis is configured but unreachable. Delivering locally is better than
+       * dropping the event, and keeps `emit` from rejecting into a caller that
+       * cannot handle it. */
+      this.getSubject(this.channelKey(event.userId, event.organizationId)).next(event);
       return;
     }
 
-    await this.redisPublisher.publish(
-      "notifications.stream",
-      JSON.stringify({ ...event, organizationId }),
-    );
+    try {
+      await this.redisPublisher.publish(
+        "notifications.stream",
+        JSON.stringify({ ...event, organizationId }),
+      );
+    } catch (error) {
+      this.logger.warn("Failed to publish notification stream event", {
+        error: error instanceof Error ? error.message : String(error),
+        organizationId,
+      });
+    }
   }
 
   private parseMessage(message: string): NotificationStreamEvent | null {

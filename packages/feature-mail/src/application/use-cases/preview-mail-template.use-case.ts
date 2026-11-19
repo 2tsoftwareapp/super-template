@@ -15,6 +15,16 @@ export class PreviewMailTemplateUseCase {
   ) {}
 
   async execute(templateKey: string, variables?: Record<string, string>) {
+    // Validate against the known keys before the renderer joins the key into a
+    // filesystem path; a traversal segment would otherwise be resolved.
+    if (!this.templateRenderer.listTemplateKeys().includes(templateKey)) {
+      throw new AppError(
+        ERROR_CODES.VALIDATION_FAILED,
+        `Mail template "${templateKey}" was not found`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     try {
       return await this.templateRenderer.preview(templateKey, variables);
     } catch {

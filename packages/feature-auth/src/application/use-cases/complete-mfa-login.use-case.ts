@@ -30,7 +30,9 @@ export class CompleteMfaLoginUseCase {
       requestContext,
     );
 
-    const user = await this.usersRepository.findById(userId);
+    // Primary read: completing MFA issues a session, so account status must be
+    // the committed value, not a replica that may still show ACTIVE.
+    const user = await this.usersRepository.findByIdStrong(userId);
 
     if (!user) {
       throw new AppError(

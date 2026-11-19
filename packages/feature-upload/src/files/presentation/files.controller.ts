@@ -28,12 +28,14 @@ import {
 } from "@repo/api-runtime";
 import { CurrentUser } from "@repo/api-runtime";
 import { Authorize } from "@repo/api-runtime";
+import { Public } from "@repo/api-runtime";
 import { SkipEnvelope } from "@repo/api-runtime";
 
 import { BatchDeleteFilesUseCase } from "../application/use-cases/batch-delete-files.use-case";
 import { CreateFileVersionUseCase } from "../application/use-cases/create-file-version.use-case";
 import { DeleteFileUseCase } from "../application/use-cases/delete-file.use-case";
 import { DownloadFileUseCase } from "../application/use-cases/download-file.use-case";
+import { DownloadLocalFileUseCase } from "../application/use-cases/download-local-file.use-case";
 import { GetFileHistoryUseCase } from "../application/use-cases/get-file-history.use-case";
 import { GetFileSignedUrlUseCase } from "../application/use-cases/get-file-signed-url.use-case";
 import { GetFileUseCase } from "../application/use-cases/get-file.use-case";
@@ -60,6 +62,7 @@ export class FilesController {
     private readonly getFile: GetFileUseCase,
     private readonly getFileSignedUrl: GetFileSignedUrlUseCase,
     private readonly downloadFile: DownloadFileUseCase,
+    private readonly downloadLocalFile: DownloadLocalFileUseCase,
     private readonly deleteFile: DeleteFileUseCase,
     private readonly listFiles: ListFilesUseCase,
     private readonly createFileVersion: CreateFileVersionUseCase,
@@ -171,6 +174,35 @@ export class FilesController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const { content, file } = await this.downloadFile.execute(user, fileId, token);
+    const safeFilename = file.originalName.replace(/["\\\r\n]/g, "_");
+
+    response.setHeader("Content-Type", "application/octet-stream");
+    response.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${safeFilename}"; filename*=UTF-8''${encodeURIComponent(file.originalName)}`,
+    );
+    response.setHeader("Content-Length", content.length.toString());
+    response.setHeader("X-Content-Type-Options", "nosniff");
+
+    return new StreamableFile(content);
+  }
+
+  /**
+   * Capability-URL download used by the local storage driver. The HMAC token
+   * issued by GET /files/:id/url is the authorization, so a plain browser
+   * navigation (no Authorization header) works — same contract as an S3
+   * pre-signed URL. Disabled unless STORAGE_DRIVER=local.
+   */
+  @Get(":id/download/local")
+  @Public()
+  @SkipEnvelope()
+  @ApiProduces("application/octet-stream")
+  async downloadLocal(
+    @Param("id", new ParseUUIDPipe()) fileId: string,
+    @Query("token") token: string | undefined,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const { content, file } = await this.downloadLocalFile.execute(fileId, token);
     const safeFilename = file.originalName.replace(/["\\\r\n]/g, "_");
 
     response.setHeader("Content-Type", "application/octet-stream");

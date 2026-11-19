@@ -14,12 +14,11 @@ final authControllerProvider =
 
 class AuthController extends AsyncNotifier<AuthSession?> {
   @override
-  Future<AuthSession?> build() async {
-    try {
-      return await ref.read(authRepositoryProvider).restoreSession();
-    } catch (_) {
-      return null;
-    }
+  Future<AuthSession?> build() {
+    // Errors are intentionally not swallowed: a failed session check surfaces
+    // as AsyncError so the splash screen can offer a retry (see
+    // SessionUnavailableException). A 401 still resolves to null.
+    return ref.read(authRepositoryProvider).restoreSession();
   }
 
   Future<void> login(String email, String password) async {
@@ -78,7 +77,9 @@ class AuthController extends AsyncNotifier<AuthSession?> {
   }
 
   Future<void> refreshSession() async {
-    state = const AsyncLoading();
+    // Keep the current session readable while re-reading it. Setting the whole
+    // provider to AsyncLoading made the router redirect to /splash on every
+    // organization switch.
     state = await AsyncValue.guard(
       () => ref.read(authRepositoryProvider).restoreSession(),
     );

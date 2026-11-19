@@ -28,6 +28,15 @@ export class EnvironmentService {
     return this.env.APP_ENV === "test";
   }
 
+  /**
+   * E2E suites run under NODE_ENV=test but APP_ENV=development (they use the dev
+   * database). This flag keeps the tenant-override backdoor available to those
+   * suites only, and never in a deployed environment.
+   */
+  get allowsTenantOverrideForTests(): boolean {
+    return process.env.NODE_ENV === "test" && !this.isProductionLike;
+  }
+
   /** True for deployed, internet-facing environments (staging + production). */
   get isProductionLike(): boolean {
     return this.env.APP_ENV === "production" || this.env.APP_ENV === "staging";

@@ -37,6 +37,7 @@ function ErrorState({
             </Button>
           ) : null}
         </div>
+        {description ? <p className="text-sm">{description}</p> : null}
       </Alert>
     );
   }

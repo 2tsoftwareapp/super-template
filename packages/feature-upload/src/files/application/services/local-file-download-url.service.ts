@@ -23,7 +23,7 @@ export class LocalFileDownloadUrlService {
     const token = this.createToken(fileId, storageKey, expiresAt);
     const baseUrl = this.environmentService.values.API_INTERNAL_URL.replace(/\/$/, "");
 
-    return `${baseUrl}/api/v1/files/${fileId}/download?token=${encodeURIComponent(token)}`;
+    return `${baseUrl}/api/v1/files/${fileId}/download/local?token=${encodeURIComponent(token)}`;
   }
 
   assertValidToken(fileId: string, storageKey: string, token?: string) {

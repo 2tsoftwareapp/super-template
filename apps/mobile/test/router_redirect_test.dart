@@ -1,37 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-
-// Pure function mirroring the redirect logic in router.dart.
-String? resolveRedirect({
-  required bool isAuthenticated,
-  required bool isLoading,
-  required String location,
-}) {
-  const publicRoutes = {
-    '/splash',
-    '/login',
-    '/register',
-    '/forgot-password',
-    '/verify-email',
-    '/reset-password',
-  };
-  final isPublic = publicRoutes.contains(location);
-
-  if (isLoading) {
-    return location == '/splash' ? null : '/splash';
-  }
-
-  if (!isAuthenticated) {
-    if (location == '/splash') return '/login';
-    if (isPublic) return null;
-    return '/login';
-  }
-
-  if (isPublic) {
-    return '/home';
-  }
-
-  return null;
-}
+import 'package:mobile_app/app/redirect_policy.dart';
 
 void main() {
   group('loading state', () {
@@ -40,6 +8,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: false,
           isLoading: true,
+          hasError: false,
           location: '/splash',
         ),
         null,
@@ -51,17 +20,33 @@ void main() {
         resolveRedirect(
           isAuthenticated: false,
           isLoading: true,
+          hasError: false,
           location: '/home',
         ),
         '/splash',
       );
     });
+  });
 
-    test('redirects protected routes to /splash while loading', () {
+  group('session unavailable', () {
+    test('stays on /splash when the session check failed', () {
       expect(
         resolveRedirect(
           isAuthenticated: false,
-          isLoading: true,
+          isLoading: false,
+          hasError: true,
+          location: '/splash',
+        ),
+        null,
+      );
+    });
+
+    test('keeps splash for protected routes when the session check failed', () {
+      expect(
+        resolveRedirect(
+          isAuthenticated: false,
+          isLoading: false,
+          hasError: true,
           location: '/home',
         ),
         '/splash',
@@ -75,6 +60,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: false,
           isLoading: false,
+          hasError: false,
           location: '/splash',
         ),
         '/login',
@@ -86,6 +72,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: false,
           isLoading: false,
+          hasError: false,
           location: '/login',
         ),
         null,
@@ -97,6 +84,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: false,
           isLoading: false,
+          hasError: false,
           location: '/register',
         ),
         null,
@@ -108,6 +96,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: false,
           isLoading: false,
+          hasError: false,
           location: '/forgot-password',
         ),
         null,
@@ -119,6 +108,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: false,
           isLoading: false,
+          hasError: false,
           location: '/verify-email',
         ),
         null,
@@ -130,6 +120,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: false,
           isLoading: false,
+          hasError: false,
           location: '/reset-password',
         ),
         null,
@@ -141,6 +132,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: false,
           isLoading: false,
+          hasError: false,
           location: '/home',
         ),
         '/login',
@@ -154,6 +146,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: true,
           isLoading: false,
+          hasError: false,
           location: '/splash',
         ),
         '/home',
@@ -165,6 +158,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: true,
           isLoading: false,
+          hasError: false,
           location: '/login',
         ),
         '/home',
@@ -176,6 +170,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: true,
           isLoading: false,
+          hasError: false,
           location: '/register',
         ),
         '/home',
@@ -187,6 +182,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: true,
           isLoading: false,
+          hasError: false,
           location: '/forgot-password',
         ),
         '/home',
@@ -198,6 +194,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: true,
           isLoading: false,
+          hasError: false,
           location: '/verify-email',
         ),
         '/home',
@@ -209,6 +206,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: true,
           isLoading: false,
+          hasError: false,
           location: '/reset-password',
         ),
         '/home',
@@ -220,6 +218,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: true,
           isLoading: false,
+          hasError: false,
           location: '/notifications',
         ),
         null,
@@ -231,6 +230,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: true,
           isLoading: false,
+          hasError: false,
           location: '/home',
         ),
         null,

@@ -24,7 +24,7 @@ cleanup() {
 trap cleanup EXIT
 
 printf '[generate:check] Regenerating contracts\n'
-sh "$ROOT_DIR/scripts/generate-contracts.sh"
+REQUIRE_DART_GENERATION=1 sh "$ROOT_DIR/scripts/generate-contracts.sh"
 
 printf '[generate:check] Checking for drift in generated output\n'
 if ! git diff --exit-code -- $GENERATED_PATHS; then

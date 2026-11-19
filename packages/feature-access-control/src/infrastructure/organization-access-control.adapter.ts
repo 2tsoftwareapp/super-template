@@ -37,6 +37,10 @@ export class OrganizationAccessControlAdapter implements OrganizationAccessContr
   async invalidateAccessProfile(userId: string): Promise<void> {
     await this.accessControl.invalidateAccessProfile(userId);
   }
+
+  async invalidateAccessProfiles(userIds: string[]): Promise<void> {
+    await this.accessControl.invalidateAccessProfiles(userIds);
+  }
 }
 
 export const ORGANIZATION_ACCESS_CONTROL_PROVIDER = {

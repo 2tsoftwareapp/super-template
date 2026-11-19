@@ -3,6 +3,7 @@ import 'package:feature_platform/feature_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile_app/app/redirect_policy.dart';
 import 'package:mobile_app/app/shell_scaffold.dart';
 import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
 import 'package:mobile_app/features/auth/presentation/screens/forgot_password_screen.dart';
@@ -29,40 +30,25 @@ final _notifNavKey = GlobalKey<NavigatorState>(debugLabel: 'notif');
 final _galleryNavKey = GlobalKey<NavigatorState>(debugLabel: 'gallery');
 final _profileNavKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 
-const _publicRoutes = {
-  IdentityRoutes.splash,
-  IdentityRoutes.login,
-  IdentityRoutes.register,
-  IdentityRoutes.forgotPassword,
-  IdentityRoutes.verifyEmail,
-  IdentityRoutes.resetPassword,
-};
-
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authControllerProvider);
+  // Watching the auth state here rebuilt the router (and its navigator keys)
+  // on every auth emission. Build it once and let `refreshListenable` re-run
+  // `redirect` when the auth state changes instead.
+  final authRefresh = _AuthRefreshListenable(ref);
+  ref.onDispose(authRefresh.dispose);
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: IdentityRoutes.splash,
+    refreshListenable: authRefresh,
     redirect: (context, state) {
-      final isAuthed = authState.valueOrNull?.isAuthenticated ?? false;
-      final isLoading = authState.isLoading;
-      final location = state.matchedLocation;
-      final isPublic = _publicRoutes.contains(location);
-
-      if (isLoading) {
-        return location == IdentityRoutes.splash ? null : IdentityRoutes.splash;
-      }
-
-      if (!isAuthed) {
-        if (location == IdentityRoutes.splash) return IdentityRoutes.login;
-        if (isPublic) return null;
-        return IdentityRoutes.login;
-      }
-
-      if (location == IdentityRoutes.splash || isPublic) return '/home';
-
-      return null;
+      final authState = ref.read(authControllerProvider);
+      return resolveRedirect(
+        isAuthenticated: authState.valueOrNull?.isAuthenticated ?? false,
+        isLoading: authState.isLoading,
+        hasError: authState.hasError,
+        location: state.matchedLocation,
+      );
     },
     routes: [
       GoRoute(
@@ -172,3 +158,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+/// Bridges Riverpod auth-state changes to [GoRouter]'s `refreshListenable`.
+class _AuthRefreshListenable extends ChangeNotifier {
+  _AuthRefreshListenable(Ref ref) {
+    ref.listen(authControllerProvider, (_, _) => notifyListeners());
+  }
+}

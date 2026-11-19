@@ -1,4 +1,5 @@
 import { Test } from "@nestjs/testing";
+import { APP_LOGGER } from "@repo/api-kernel";
 import { EnvironmentService } from "@repo/api-runtime";
 import { describe, expect, it } from "vitest";
 import { NotificationStreamService } from "../notification-stream.service";
@@ -12,6 +13,7 @@ describe("NotificationStreamService", () => {
           provide: EnvironmentService,
           useValue: { values: { REDIS_URL: undefined } },
         },
+        { provide: APP_LOGGER, useValue: { warn: () => undefined } },
       ],
     }).compile();
 

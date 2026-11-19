@@ -1176,8 +1176,7 @@ AI không còn tự phát minh pattern nữa.
 ## Tạo generator (scaffold)
 
 ```bash
-pnpm scaffold:api-feature invoices
-pnpm scaffold:admin-feature invoices
+pnpm scaffold:feature invoices
 ```
 
 Generator sinh đúng:

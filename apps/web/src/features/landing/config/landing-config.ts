@@ -3,9 +3,22 @@
  * Presentation-oriented data only; no React components or runtime state.
  */
 
-export const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002";
-export const API_DOCS_URL =
-  process.env.NEXT_PUBLIC_API_DOCS_URL ?? "http://localhost:3001/api/docs";
+/**
+ * NEXT_PUBLIC_* is inlined at build time. An unset value in a production build
+ * returns null so the caller hides the link — the alternative was silently
+ * shipping `http://localhost:*` to real visitors.
+ */
+const publicUrl = (value: string | undefined, devFallback: string): string | null => {
+  if (value) return value;
+
+  return process.env.NODE_ENV === "production" ? null : devFallback;
+};
+
+export const ADMIN_URL = publicUrl(process.env.NEXT_PUBLIC_ADMIN_URL, "http://localhost:3002");
+export const API_DOCS_URL = publicUrl(
+  process.env.NEXT_PUBLIC_API_DOCS_URL,
+  "http://localhost:3001/api/docs",
+);
 export const GITHUB_URL = "https://github.com/truongnat/super-template";
 
 export const surfaces = [

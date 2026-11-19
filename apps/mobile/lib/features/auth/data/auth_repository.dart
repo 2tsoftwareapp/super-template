@@ -6,6 +6,7 @@ import 'package:mobile_app/core/auth/token_storage.dart';
 import 'package:mobile_app/core/errors/app_exception.dart';
 import 'package:mobile_app/core/network/api_client.dart';
 import 'package:mobile_app/features/auth/domain/auth_session.dart';
+import 'package:mobile_app/features/auth/domain/session_unavailable_exception.dart';
 import 'package:super_template_api/super_template_api.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>(
@@ -60,9 +61,14 @@ class AuthRepository {
         return null;
       }
 
-      // Network error / timeout / 5xx: keep tokens so the user can retry
-      // after connectivity is restored. Return null to skip straight to login
-      // UI without an error dialog.
+      if (statusCode == null || statusCode >= 500) {
+        // Transport failure, timeout or server error: the stored token may
+        // still be valid, so keep it and report a retryable failure instead
+        // of presenting the user as signed out.
+        throw SessionUnavailableException(statusCode: statusCode);
+      }
+
+      // Any other rejection: no usable session, but keep the tokens as before.
       return null;
     }
   }

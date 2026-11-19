@@ -69,14 +69,11 @@ export default defineConfig([
     // Architecture boundary: UI components are pure presentational — must not
     // fetch data or access the api/ or controllers/ layers directly.
     // See CODING_RULES.md §8.
-    // NOTE: severity is "warn" (not "error") because pre-existing code has
-    // violations. New code must not add new violations; existing violations
-    // should be migrated gradually (promote to "error" once clean).
     name: "admin/boundary-ui-layer",
     files: ["src/features/**/ui/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
-        "warn",
+        "error",
         {
           patterns: [
             {
@@ -155,10 +152,8 @@ export default defineConfig([
     name: "admin/boundary-api-no-notifications",
     files: ["src/features/**/api/**/*.{ts,tsx}"],
     rules: {
-      // NOTE: severity is "warn" — 8 pre-existing *.mutations.ts files raise
-      // toasts from api/. Promote to "error" once they are migrated.
       "no-restricted-imports": [
-        "warn",
+        "error",
         {
           paths: [
             {

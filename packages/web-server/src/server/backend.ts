@@ -300,6 +300,44 @@ export function createBackendHelpers({
       }
     }
 
+    const isJsonResponse = (response.headers.get("content-type") ?? "").includes(
+      "application/json",
+    );
+
+    if (!isJsonResponse) {
+      /* Downloads (CSV, files) and other binary responses must pass through
+       * byte-for-byte. Re-serialising them as JSON turned every CSV export into
+       * the literal `null`. */
+      const passthroughHeaders = new Headers();
+      for (const name of [
+        "content-type",
+        "content-disposition",
+        "content-length",
+        "cache-control",
+      ]) {
+        const value = response.headers.get(name);
+
+        if (value) {
+          passthroughHeaders.set(name, value);
+        }
+      }
+
+      passthroughHeaders.set("x-content-type-options", "nosniff");
+
+      const passthrough = new NextResponse(response.body, {
+        status: response.status,
+        headers: passthroughHeaders,
+      });
+
+      if (refreshedTokens) {
+        auth.setAuthCookies(passthrough, refreshedTokens, csrfToken ?? undefined);
+      } else if (response.status === 401) {
+        auth.clearAuthCookies(passthrough);
+      }
+
+      return passthrough;
+    }
+
     const payload = await parseJson<ApiEnvelope<JsonValue>>(response);
     const nextResponse = NextResponse.json(payload, { status: response.status });
 

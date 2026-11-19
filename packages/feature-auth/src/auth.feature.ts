@@ -1,5 +1,6 @@
 import { APP_GUARD, Reflector } from "@nestjs/core";
 import { defineFeature } from "@repo/api-plugin-kit";
+import { EnvironmentService } from "@repo/api-runtime";
 
 import {
   AuthSendVerificationEmailHandler,
@@ -35,9 +36,12 @@ export const authFeature = defineFeature({
     guards: [
       {
         provide: APP_GUARD,
-        useFactory: (reflector: Reflector, accessTokenAuthenticator: AccessTokenAuthenticator) =>
-          new AuthGuard(reflector, accessTokenAuthenticator),
-        inject: [Reflector, ACCESS_TOKEN_AUTHENTICATOR],
+        useFactory: (
+          reflector: Reflector,
+          accessTokenAuthenticator: AccessTokenAuthenticator,
+          environmentService: EnvironmentService,
+        ) => new AuthGuard(reflector, accessTokenAuthenticator, environmentService),
+        inject: [Reflector, ACCESS_TOKEN_AUTHENTICATOR, EnvironmentService],
       },
     ],
   },

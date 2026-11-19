@@ -80,6 +80,10 @@ export class AccessProfileUseCase {
     await this.accessProfileCache.invalidateUser(userId);
   }
 
+  async invalidateAccessProfiles(userIds: string[]): Promise<void> {
+    await this.accessProfileCache.invalidateUsers(userIds);
+  }
+
   async invalidateUsersForRole(roleId: string, executor?: TransactionExecutor): Promise<void> {
     const userIds = await this.accessControlRepository.findUserIdsForRole(roleId, executor);
 

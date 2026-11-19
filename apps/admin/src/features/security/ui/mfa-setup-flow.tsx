@@ -88,6 +88,7 @@ export function MfaSetupFlow({
                     type="button"
                     variant="ghost"
                     size="icon"
+                    aria-label="Copy setup key"
                     onClick={handleCopySecret}
                     className="size-6 ml-1"
                   >

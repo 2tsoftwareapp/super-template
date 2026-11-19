@@ -292,9 +292,6 @@ export function ResourceDataTable<TData>({
                         ? { action: { label: "Retry", onClick: error.onRetry } }
                         : {})}
                     />
-                    {error.description ? (
-                      <p className="px-4 text-xs text-muted-foreground">{error.description}</p>
-                    ) : null}
                   </div>
                 </TableCell>
               </TableRow>

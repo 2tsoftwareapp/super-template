@@ -107,6 +107,10 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
     return user ?? null;
   }
 
+  async findByEmailStrong(email: string) {
+    return this.findByEmail(email, this.primaryDatabase);
+  }
+
   async update(
     userId: string,
     values: Partial<typeof users.$inferInsert>,

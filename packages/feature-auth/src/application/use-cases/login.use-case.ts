@@ -25,7 +25,9 @@ export class LoginUseCase {
 
   async execute(input: LoginCommand, requestContext?: RequestContext) {
     const email = normalizeEmail(input.email);
-    const user = await this.usersRepository.findByEmail(email);
+    // Primary read: the password hash decides whether this login succeeds, so a
+    // replica lag window must not keep accepting a rotated password.
+    const user = await this.usersRepository.findByEmailStrong(email);
     const passwordMatches = await verifyPasswordWithTimingPadding(
       user?.passwordHash,
       input.password,

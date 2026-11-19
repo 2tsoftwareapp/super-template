@@ -60,6 +60,7 @@ function ScalarSettingCard({
           variant="ghost"
           size="icon"
           className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
+          aria-label="Reset draft value"
           onClick={() => form.reset({ value: initDraft(setting.value) })}
         >
           <RotateCcw className="size-3.5" />
@@ -145,6 +146,7 @@ function ObjectSettingCard({
             variant="ghost"
             size="icon"
             className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
+            aria-label="Reset draft value"
             onClick={() => form.reset()}
           >
             <RotateCcw className="size-3.5" />

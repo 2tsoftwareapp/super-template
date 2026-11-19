@@ -13,6 +13,8 @@ import { STORAGE_TRACKING_PORT, type StorageTrackingPort } from "./ports/storage
 const ORPHAN_GRACE_MS = 60 * 60 * 1000; // object untouched for 1h is a candidate
 const ORPHAN_BATCH_SIZE = 50;
 const DELETE_BATCH_SIZE = 50;
+/** Hard ceiling per invocation: a cron run must finish even if new orphans keep appearing. */
+const MAX_SWEEP_ROUNDS = 20;
 
 /**
  * Periodically closes every orphan/stuck storage lifecycle:
@@ -77,27 +79,53 @@ export class StorageCleanupService {
 
   private async sweepOrphans(): Promise<void> {
     const cutoff = new Date(Date.now() - ORPHAN_GRACE_MS);
+    const attempted = new Set<string>();
     let swept = 0;
+    let deferred = 0;
+    let rounds = 0;
 
-    for (;;) {
+    // The sweep is progress-driven, not state-driven: a failed delete leaves the
+    // row UPLOADED, so re-querying without remembering attempted keys would
+    // spin forever on the same batch. Failures are retried by the outbox.
+    while (rounds < MAX_SWEEP_ROUNDS) {
+      rounds += 1;
+
       const orphans = await this.platformTransactionPort.run((tx) =>
         this.tracking.listOrphans(cutoff, ORPHAN_BATCH_SIZE, tx),
       );
 
-      if (orphans.length === 0) {
+      const batch = orphans.filter((storageKey) => !attempted.has(storageKey));
+
+      if (batch.length === 0) {
         break;
       }
 
-      for (const storageKey of orphans) {
+      let deletedInRound = 0;
+
+      for (const storageKey of batch) {
+        attempted.add(storageKey);
+
         try {
           // Uses the tracked delete: success marks DELETED, failure enqueues a
           // retry in the outbox handled by processDeleteOutbox.
           await this.objectStorage.delete(storageKey);
           swept += 1;
+          deletedInRound += 1;
         } catch {
           // Handled via the outbox; keep sweeping the rest.
+          deferred += 1;
         }
       }
+
+      if (deletedInRound === 0) {
+        break;
+      }
+    }
+
+    if (deferred > 0) {
+      this.logger.warn(
+        `Storage cleanup deferred ${deferred} orphaned object(s) to the delete outbox`,
+      );
     }
 
     if (swept > 0) {
