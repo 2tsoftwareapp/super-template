@@ -12,6 +12,12 @@ export const envSchema = z.object({
   JWT_ACCESS_TTL: z.string().default("15m"),
   JWT_REFRESH_TTL: z.string().default("30d"),
   SMTP_URL: z.string().url().optional(),
+  STORAGE_DIR: z.string().default("./storage"),
+  MAX_UPLOAD_BYTES: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(5 * 1024 * 1024),
 });
 
 export type Env = z.infer<typeof envSchema>;

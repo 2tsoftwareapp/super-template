@@ -46,3 +46,21 @@ export const jobs = pgTable("jobs", {
 
 export type UserRow = typeof users.$inferSelect;
 export type JobRow = typeof jobs.$inferSelect;
+
+/**
+ * Uploaded object metadata. The bytes live in the storage driver; this row is
+ * the only source of truth for "what was uploaded by whom".
+ */
+export const files = pgTable("files", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  uploaderId: uuid("uploader_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  storageKey: text("storage_key").notNull().unique(),
+  originalName: text("original_name").notNull(),
+  mimeType: text("mime_type").notNull(),
+  sizeBytes: integer("size_bytes").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export type FileRow = typeof files.$inferSelect;

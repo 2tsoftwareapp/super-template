@@ -8,6 +8,13 @@
       "when": 1795106228495,
       "tag": "0000_flawless_forge",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795106653180,
+      "tag": "0001_tearful_sasquatch",
+      "breakpoints": true
     }
   ]
 }
