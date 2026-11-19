@@ -12,9 +12,7 @@ export interface MailTemplateSummary {
 
 @Injectable()
 export class ListMailTemplatesUseCase {
-  constructor(
-    private readonly templateRenderer: TemplateRendererService,
-  ) {}
+  constructor(private readonly templateRenderer: TemplateRendererService) {}
 
   async execute(): Promise<MailTemplateSummary[]> {
     const keys = this.templateRenderer.listTemplateKeys();

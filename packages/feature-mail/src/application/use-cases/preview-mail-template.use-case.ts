@@ -6,9 +6,7 @@ import { TemplateRendererService } from "../../infrastructure/template-renderer.
 
 @Injectable()
 export class PreviewMailTemplateUseCase {
-  constructor(
-    private readonly templateRenderer: TemplateRendererService,
-  ) {}
+  constructor(private readonly templateRenderer: TemplateRendererService) {}
 
   async execute(templateKey: string, variables?: Record<string, string>) {
     // Validate against the known keys before the renderer joins the key into a

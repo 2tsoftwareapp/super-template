@@ -9,9 +9,7 @@ import { SettingsMapper } from "../settings.mapper";
 
 @Injectable()
 export class ListSettingsUseCase {
-  constructor(
-    private readonly settingsRepository: SettingsRepository,
-  ) {}
+  constructor(private readonly settingsRepository: SettingsRepository) {}
 
   async execute(actor?: AuthenticatedRequestUser) {
     if (!actor?.roles.includes(PLATFORM_ROLE_NAMES.SUPER_ADMIN)) {

@@ -46,11 +46,6 @@ import { MAIL_TEMPLATE_SENDER } from "./public/mail-template-sender.port";
       useExisting: MailService,
     },
   ],
-  exports: [
-    MAILER,
-    MAIL_TEMPLATE_SENDER,
-    MAIL_DELIVERIES_REPOSITORY,
-    MailService,
-  ],
+  exports: [MAILER, MAIL_TEMPLATE_SENDER, MAIL_DELIVERIES_REPOSITORY, MailService],
 })
 export class MailModule {}

@@ -7,9 +7,7 @@ import { listSettingDefaults } from "../setting-definitions";
 
 @Injectable()
 export class EnsureSettingsSeedDataUseCase {
-  constructor(
-    private readonly settingsRepository: SettingsRepository,
-  ) {}
+  constructor(private readonly settingsRepository: SettingsRepository) {}
 
   async execute(executor?: TransactionExecutor) {
     // Defaults come from the settings registry (SETTING_DEFINITIONS), so the

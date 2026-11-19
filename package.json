@@ -10,7 +10,7 @@
     "bootstrap": "node scripts/bootstrap.mjs",
     "env:doctor": "node scripts/env-doctor.mjs",
     "lint:web-architecture": "node scripts/check-web-architecture-boundaries.mjs",
-    "lint:policy": "sh scripts/check-source-policy.sh && node scripts/check-web-architecture-boundaries.mjs && sh scripts/check-package-cycles.sh && node scripts/check-cross-feature-fks.mjs && node scripts/__tests__/check-cross-feature-fks.regression.mjs && node scripts/check-error-codes.mjs && node --test scripts/__tests__/*.spec.mjs && vitest run scripts/__tests__/*.spec.ts && node scripts/check-feature-manifest-deps.mjs && node scripts/generate-feature-indexes.mjs --check && sh scripts/clean-policy-artifacts.sh && pnpm exec turbo boundaries",
+    "lint:policy": "sh scripts/check-source-policy.sh && node scripts/check-web-architecture-boundaries.mjs && sh scripts/check-package-cycles.sh && node scripts/check-cross-feature-fks.mjs && node scripts/__tests__/check-cross-feature-fks.regression.mjs && node scripts/check-error-codes.mjs && node --test scripts/__tests__/*.spec.mjs && vitest run scripts/__tests__/*.spec.ts && node scripts/check-feature-manifest-deps.mjs && node scripts/generate-feature-indexes.mjs --check && node scripts/generate-folder-readmes.mjs --check && sh scripts/clean-policy-artifacts.sh && pnpm exec turbo boundaries",
     "test:scripts": "node --test scripts/__tests__/*.spec.mjs && vitest run scripts/__tests__/*.spec.ts",
     "lint:error-codes": "node scripts/check-error-codes.mjs",
     "build": "turbo run build",

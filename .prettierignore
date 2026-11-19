@@ -2,6 +2,9 @@
 **/generated/
 **/openapi.json
 
+# Folder READMEs come from scripts/generate-folder-readmes.mjs
+packages/feature-*/src/*/README.md
+
 # Agent work products live in their own nested git repo
 .agent-work/
 
