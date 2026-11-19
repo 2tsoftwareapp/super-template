@@ -1,7 +1,7 @@
 import type { ArgumentsHost, ExceptionFilter } from "@nestjs/common";
 import type { Response } from "express";
 
-import { Catch, HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { Catch, HttpException, HttpStatus, Injectable, Logger } from "@nestjs/common";
 
 import { AppError, ERROR_CODES } from "./errors";
 
@@ -9,6 +9,8 @@ import { AppError, ERROR_CODES } from "./errors";
 @Injectable()
 @Catch()
 export class AppExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(AppExceptionFilter.name);
+
   catch(exception: unknown, host: ArgumentsHost): void {
     const response = host.switchToHttp().getResponse<Response>();
 
@@ -36,6 +38,10 @@ export class AppExceptionFilter implements ExceptionFilter {
       return;
     }
 
+    this.logger.error(
+      "Unhandled exception",
+      exception instanceof Error ? exception.stack : String(exception),
+    );
     response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       error: { code: ERROR_CODES.INTERNAL_ERROR, message: "Unexpected error" },
     });

@@ -2,7 +2,7 @@ import { randomBytes, createHash } from "node:crypto";
 
 import type { PublicUser, SessionResponse } from "./auth.dto";
 
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { loadEnv } from "@lean/config";
 import { hashPassword, verifyPassword, type UserRow } from "@lean/db";
 
@@ -30,8 +30,8 @@ export class AuthService {
   private readonly dummyHash = hashPassword("timing-padding-not-a-password");
 
   constructor(
-    private readonly users: AuthRepository,
-    private readonly tokens: TokenService,
+    @Inject(AuthRepository) private readonly users: AuthRepository,
+    @Inject(TokenService) private readonly tokens: TokenService,
   ) {}
 
   async login(email: string, password: string): Promise<SessionResponse> {

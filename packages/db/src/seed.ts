@@ -1,6 +1,5 @@
 import { eq } from "drizzle-orm";
 
-import { loadEnv } from "@lean/config";
 import { createDatabase } from "./client";
 import { hashPassword } from "./password";
 import { users } from "./schema";
@@ -9,7 +8,13 @@ const email = (process.env.ADMIN_EMAIL ?? "admin@example.local").trim().toLowerC
 const password = process.env.ADMIN_PASSWORD ?? "ChangeMe123!";
 
 async function main(): Promise<void> {
-  const { db, pool } = createDatabase(loadEnv().DATABASE_URL);
+  const databaseUrl = process.env.DATABASE_URL;
+
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL is required to seed");
+  }
+
+  const { db, pool } = createDatabase(databaseUrl);
 
   try {
     const [existing] = await db.select().from(users).where(eq(users.email, email)).limit(1);

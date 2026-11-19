@@ -1,7 +1,7 @@
 import type { CanActivate, ExecutionContext } from "@nestjs/common";
 import type { Request } from "express";
 
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 
 import type { RequestUser } from "./current-user.decorator";
@@ -13,8 +13,8 @@ import { TokenService } from "./token.service";
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
-    private readonly reflector: Reflector,
-    private readonly tokens: TokenService,
+    @Inject(Reflector) private readonly reflector: Reflector,
+    @Inject(TokenService) private readonly tokens: TokenService,
   ) {}
 
   canActivate(context: ExecutionContext): boolean {

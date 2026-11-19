@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { and, eq, isNull } from "drizzle-orm";
 import { sessions, users, type UserRow } from "@lean/db";
 
@@ -12,7 +12,7 @@ export interface CreateSessionInput {
 
 @Injectable()
 export class AuthRepository {
-  constructor(private readonly database: DatabaseService) {}
+  constructor(@Inject(DatabaseService) private readonly database: DatabaseService) {}
 
   async findByEmail(email: string): Promise<UserRow | null> {
     const [user] = await this.database.db
