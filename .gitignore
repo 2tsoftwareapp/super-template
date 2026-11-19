@@ -6,3 +6,9 @@ coverage
 .env.*
 !.env.example
 *.log
+
+# Flutter
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
