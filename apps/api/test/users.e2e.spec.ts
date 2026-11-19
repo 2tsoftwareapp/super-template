@@ -8,6 +8,7 @@ import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { AppModule } from "../src/app.module";
+import { NotificationsService } from "../src/modules/notifications/notifications.service";
 import { UsersRepository } from "../src/modules/users/users.repository";
 import { AppExceptionFilter } from "../src/shared/app-exception.filter";
 
@@ -91,6 +92,9 @@ describe("users (e2e)", () => {
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
       .overrideProvider(UsersRepository)
       .useValue(new InMemoryUsersRepository())
+      // Creating a user also writes a welcome notification; keep the test off the DB.
+      .overrideProvider(NotificationsService)
+      .useValue({ create: async () => ({ id: "notification-1" }) })
       .compile();
 
     app = moduleRef.createNestApplication();

@@ -5,14 +5,20 @@
     "dev": "tsx watch src/main.ts",
     "start": "tsx src/main.ts",
     "run:once": "tsx src/main.ts --once",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
-    "@lean/db": "workspace:*"
+    "@lean/db": "workspace:*",
+    "nodemailer": "^7.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
     "tsx": "^4.19.0",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "@types/nodemailer": "^7.0.0",
+    "@types/smtp-server": "^3.5.10",
+    "smtp-server": "^3.13.6",
+    "vitest": "^4.1.9"
   }
 }

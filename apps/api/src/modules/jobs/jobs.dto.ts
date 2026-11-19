@@ -3,7 +3,7 @@ import { Transform } from "class-transformer";
 
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from "../../shared/pagination";
 
-export const JOB_TYPES = ["demo.echo", "demo.fail"] as const;
+export const JOB_TYPES = ["demo.echo", "demo.fail", "mail.send"] as const;
 export const JOB_STATUSES = ["PENDING", "PROCESSING", "DONE", "FAILED"] as const;
 
 export class EnqueueJobDto {

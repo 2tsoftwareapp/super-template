@@ -8,5 +8,6 @@ import { JobsService } from "./jobs.service";
 @Module({
   controllers: [JobsController],
   providers: [JobsRepository, JobsService, RolesGuard],
+  exports: [JobsRepository],
 })
 export class JobsModule {}

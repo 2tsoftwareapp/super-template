@@ -69,3 +69,25 @@ export const files = pgTable("files", {
 });
 
 export type FileRow = typeof files.$inferSelect;
+
+/**
+ * In-app notifications. Per user, no fan-out table: an app that needs broadcast
+ * writes one row per recipient in the same transaction as the event.
+ */
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").notNull(),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("notifications_user_idx").on(table.userId, table.createdAt)],
+);
+
+export type NotificationRow = typeof notifications.$inferSelect;

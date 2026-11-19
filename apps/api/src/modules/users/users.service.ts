@@ -3,6 +3,7 @@ import { hashPassword, type UserRow } from "@lean/db";
 
 import { AppError, ERROR_CODES } from "../../shared/errors";
 import { buildPageMeta, type PageMeta } from "../../shared/pagination";
+import { NotificationsService } from "../notifications/notifications.service";
 import { UsersRepository, type ListUsersInput } from "./users.repository";
 import type { CreateUserDto, UpdateUserDto, UserDto } from "./users.dto";
 
@@ -17,7 +18,10 @@ const toUserDto = (user: UserRow): UserDto => ({
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject(UsersRepository) private readonly users: UsersRepository) {}
+  constructor(
+    @Inject(UsersRepository) private readonly users: UsersRepository,
+    @Inject(NotificationsService) private readonly notifications: NotificationsService,
+  ) {}
 
   async list(input: ListUsersInput): Promise<{ data: UserDto[]; meta: PageMeta }> {
     const { rows, total } = await this.users.list(input);
@@ -44,6 +48,13 @@ export class UsersService {
       passwordHash: hashPassword(input.password),
       displayName: input.displayName.trim(),
       role: input.role,
+    });
+
+    await this.notifications.create({
+      userId: user.id,
+      type: "user.welcome",
+      title: "Welcome",
+      body: `Hi ${user.displayName}, your account is ready.`,
     });
 
     return toUserDto(user);
