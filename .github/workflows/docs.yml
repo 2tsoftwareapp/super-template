@@ -37,8 +37,21 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm docs:build
+
+      # The Pages site is shared: keep serving the `max` Architecture Wiki under /docs-wiki/.
+      - uses: actions/checkout@v5
+        with:
+          ref: max
+          path: max
+          sparse-checkout: docs/architecture-wiki
+
+      - uses: actions/jekyll-build-pages@v1
+        with:
+          source: max/docs/architecture-wiki
+          destination: docs/.vitepress/dist/docs-wiki
+
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: docs/.vitepress/dist
 

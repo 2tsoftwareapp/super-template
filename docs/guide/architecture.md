@@ -64,3 +64,5 @@ than once (for example, creating a user and the welcome notification).
 | ------ | ---------------------------------------------------------------------------------- |
 | `main` | this lean template                                                                 |
 | `max`  | the full enterprise template (plugin architecture, multi-tenant, SSO/MFA, codegen) |
+
+The `max` track keeps its [Architecture Wiki](https://2tsoftwareapp.github.io/super-template/docs-wiki/), published alongside this site.
