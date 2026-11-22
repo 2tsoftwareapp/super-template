@@ -28,7 +28,7 @@ NestJS API · Next.js web and admin · Flutter mobile · Postgres-backed worker
 
 ## Why this template
 
-|                             |                                                                                                   |
+| **Feature**                 | **What you get**                                                                                  |
 | --------------------------- | ------------------------------------------------------------------------------------------------- |
 | **Accounts out of the box** | Sign-up, sign-in, rotating refresh tokens, forgot/reset/change password by email, profile page.   |
 | **Secure by default**       | httpOnly cookies behind a BFF, blocking a user or changing a password kills live tokens at once.  |
