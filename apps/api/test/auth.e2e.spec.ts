@@ -1,4 +1,5 @@
 import type { INestApplication } from "@nestjs/common";
+import type { NestExpressApplication } from "@nestjs/platform-express";
 
 import request from "supertest";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
@@ -18,6 +19,8 @@ describe("auth (e2e)", () => {
 
   beforeAll(async () => {
     app = await createTestApp(undefined, auth);
+    // As in main.ts behind the admin BFF: X-Forwarded-For decides request.ip.
+    (app as NestExpressApplication).set("trust proxy", true);
   });
 
   afterAll(async () => {
@@ -151,5 +154,21 @@ describe("auth (e2e)", () => {
     expect(statuses.slice(0, 10).every((status) => status === 401)).toBe(true);
     expect(statuses[10]).toBe(429);
     expect((await login(email, "wrong-password")).body.error.code).toBe("RATE_LIMITED");
+  });
+
+  it("caps attempts per account even when every request claims a new IP", async () => {
+    const email = "spoofed@example.local";
+    const statuses: number[] = [];
+
+    for (let attempt = 0; attempt < 51; attempt += 1) {
+      const response = await request(app.getHttpServer())
+        .post("/api/v1/auth/login")
+        .set("x-forwarded-for", `203.0.113.${attempt}`)
+        .send({ email, password: "wrong-password" });
+      statuses.push(response.status);
+    }
+
+    expect(statuses.slice(0, 50).every((status) => status === 401)).toBe(true);
+    expect(statuses[50]).toBe(429);
   });
 });

@@ -8,22 +8,38 @@ import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./jwt-auth.guard";
 import { TokenService } from "./token.service";
 
-const LOGIN_WINDOW_MS = 60_000;
-const LOGIN_ATTEMPTS_PER_WINDOW = 10;
+const MINUTE_MS = 60_000;
 
-/** Login attempts are counted per client IP and email, so one account cannot be brute-forced. */
-function loginTracker(request: Record<string, unknown>): string {
+function loginEmail(request: Record<string, unknown>): string {
   const body = request.body;
   const email = body instanceof Object && "email" in body ? String(body.email) : "";
 
-  return `${String(request.ip)}:${email.trim().toLowerCase()}`;
+  return email.trim().toLowerCase();
 }
 
+/**
+ * Two limits on login: per client IP + email (tight, so a single attacker is
+ * stopped fast without locking out the owner elsewhere) and per email alone
+ * (looser, so a spoofed or rotating IP still cannot brute-force one account).
+ */
 @Module({
   imports: [
     ThrottlerModule.forRoot({
-      throttlers: [{ ttl: LOGIN_WINDOW_MS, limit: LOGIN_ATTEMPTS_PER_WINDOW }],
-      getTracker: loginTracker,
+      throttlers: [
+        {
+          name: "client",
+          ttl: MINUTE_MS,
+          limit: 10,
+          getTracker: (request: Record<string, unknown>) =>
+            `${String(request.ip)}:${loginEmail(request)}`,
+        },
+        {
+          name: "account",
+          ttl: 15 * MINUTE_MS,
+          limit: 50,
+          getTracker: (request: Record<string, unknown>) => loginEmail(request),
+        },
+      ],
     }),
   ],
   controllers: [AuthController],
