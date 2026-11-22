@@ -2,17 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { FormError } from "@/components/form-error";
+import { JobsTable, type Job } from "@/components/jobs/jobs-table";
+import { PageHeader } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { adminFetch } from "@/lib/admin-fetch";
-
-interface Job {
-  id: string;
-  type: string;
-  status: string;
-  attempts: number;
-  maxAttempts: number;
-  lastError: string | null;
-  createdAt: string;
-}
 
 interface ListResponse {
   data: Job[];
@@ -59,47 +54,20 @@ export default function JobsPage() {
   }
 
   return (
-    <main style={{ maxWidth: 860, margin: "6vh auto", fontFamily: "system-ui", padding: 24 }}>
-      <h1 style={{ fontSize: 26 }}>Jobs ({total})</h1>
-      <p style={{ color: "#666" }}>
-        The worker claims PENDING rows with SKIP LOCKED; run it with{" "}
-        <code>pnpm --filter @lean/worker run:once</code>.
-      </p>
-
-      <button
-        type="button"
-        onClick={() => void enqueue()}
-        style={{ padding: "8px 14px", marginBottom: 16 }}
-      >
-        Enqueue demo job
-      </button>
-
-      {error ? <p style={{ color: "crimson" }}>{error}</p> : null}
-
-      <table width="100%" cellPadding={8} style={{ borderCollapse: "collapse" }}>
-        <thead>
-          <tr style={{ textAlign: "left", borderBottom: "1px solid #ddd" }}>
-            <th>Type</th>
-            <th>Status</th>
-            <th>Attempts</th>
-            <th>Last error</th>
-            <th>Created</th>
-          </tr>
-        </thead>
-        <tbody>
-          {jobs.map((job) => (
-            <tr key={job.id} style={{ borderBottom: "1px solid #eee" }}>
-              <td>{job.type}</td>
-              <td>{job.status}</td>
-              <td>
-                {job.attempts}/{job.maxAttempts}
-              </td>
-              <td>{job.lastError ?? "—"}</td>
-              <td>{new Date(job.createdAt).toLocaleString()}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <main className="mx-auto max-w-5xl space-y-6 p-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <PageHeader
+          title={`Jobs (${total})`}
+          description="The worker claims PENDING rows with SKIP LOCKED; run it with pnpm --filter @lean/worker run:once."
+        />
+        <Button onClick={() => void enqueue()}>Enqueue demo job</Button>
+      </div>
+      <FormError message={error} />
+      <Card>
+        <CardContent>
+          <JobsTable jobs={jobs} />
+        </CardContent>
+      </Card>
     </main>
   );
 }
