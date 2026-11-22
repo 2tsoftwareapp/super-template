@@ -52,10 +52,16 @@ describe("AppExceptionFilter", () => {
 
   it.each([
     [new PayloadTooLargeException("File too large"), 413, "FILE_TOO_LARGE"],
-    [new ThrottlerException(), 429, "RATE_LIMITED"],
     [new HttpException("gone", HttpStatus.GONE), 410, "REQUEST_REJECTED"],
   ])("maps framework status %#", (exception, status, code) => {
     expect(respond(exception)).toMatchObject({ status, body: { error: { code } } });
+  });
+
+  it("replaces the throttler's message with a user-facing one", () => {
+    expect(respond(new ThrottlerException())).toEqual({
+      status: 429,
+      body: { error: { code: "RATE_LIMITED", message: "Too many attempts, try again later" } },
+    });
   });
 
   it("never leaks the message of an unexpected or 5xx error", () => {

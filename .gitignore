@@ -15,3 +15,4 @@ build/
 .turbo
 *.tsbuildinfo
 .DS_Store
+storage/

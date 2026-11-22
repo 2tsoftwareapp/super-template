@@ -24,7 +24,8 @@ export default function LoginPage() {
     setPending(false);
 
     if (!response.ok) {
-      setError("Invalid email or password");
+      const body = (await response.json().catch(() => ({}))) as { error?: { message?: string } };
+      setError(body.error?.message ?? "Could not sign in");
       return;
     }
 

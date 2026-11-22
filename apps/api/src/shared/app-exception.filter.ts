@@ -63,6 +63,14 @@ function fromHttpException(exception: HttpException): ErrorBody {
     return { status, code: ERROR_CODES.ROUTE_NOT_FOUND, message: "Route not found" };
   }
 
+  if (status === HttpStatus.TOO_MANY_REQUESTS) {
+    return {
+      status,
+      code: ERROR_CODES.RATE_LIMITED,
+      message: "Too many attempts, try again later",
+    };
+  }
+
   const body = exception.getResponse();
   const message =
     typeof body === "object" && body !== null && "message" in body
