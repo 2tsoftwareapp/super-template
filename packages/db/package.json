@@ -9,8 +9,9 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "generate": "drizzle-kit generate",
-    "migrate": "drizzle-kit migrate",
+    "migrate": "tsx --env-file-if-exists=../../.env src/migrate.ts",
     "seed": "tsx --env-file-if-exists=../../.env src/seed.ts",
+    "build": "esbuild src/migrate.ts src/seed.ts --bundle --platform=node --target=node24 --outdir=dist --external:pg-native",
     "test": "vitest run"
   },
   "dependencies": {

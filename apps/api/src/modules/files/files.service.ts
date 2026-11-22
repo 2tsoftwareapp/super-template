@@ -8,6 +8,8 @@ import { AppError, ERROR_CODES } from "../../shared/errors";
 import type { RequestUser } from "../../shared/current-user.decorator";
 import { LocalStorageService } from "../../shared/storage/local-storage.service";
 import { FilesRepository } from "./files.repository";
+import type { FileRow } from "@lean/db";
+
 import type { FileDto } from "./files.dto";
 
 const ALLOWED_MIME = new Set([
@@ -76,13 +78,13 @@ export class FilesService {
         throw error;
       });
 
-    return toFileDto(row.id, row.originalName, row.mimeType, row.sizeBytes, row.createdAt);
+    return toFileDto(row);
   }
 
   async get(requester: RequestUser, fileId: string): Promise<FileDto> {
     const row = await this.requireFile(requester, fileId);
 
-    return toFileDto(row.id, row.originalName, row.mimeType, row.sizeBytes, row.createdAt);
+    return toFileDto(row);
   }
 
   async download(requester: RequestUser, fileId: string): Promise<FileContent> {
@@ -105,19 +107,13 @@ export class FilesService {
   }
 }
 
-function toFileDto(
-  id: string,
-  originalName: string,
-  mimeType: string,
-  sizeBytes: number,
-  createdAt: Date,
-): FileDto {
+function toFileDto(row: FileRow): FileDto {
   return {
-    id,
-    originalName,
-    mimeType,
-    sizeBytes,
-    createdAt: createdAt.toISOString(),
-    downloadUrl: `/api/v1/files/${id}/download`,
+    id: row.id,
+    originalName: row.originalName,
+    mimeType: row.mimeType,
+    sizeBytes: row.sizeBytes,
+    createdAt: row.createdAt.toISOString(),
+    downloadUrl: `/api/v1/files/${row.id}/download`,
   };
 }

@@ -15,6 +15,22 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+/** Resolves to the error to show, or null once the BFF has set the session cookies. */
+async function signIn(email: string, password: string): Promise<string | null> {
+  const response = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (response.ok) {
+    return null;
+  }
+
+  const body = (await response.json().catch(() => ({}))) as { error?: { message?: string } };
+  return body.error?.message ?? "Could not sign in";
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -27,17 +43,11 @@ export default function LoginPage() {
     setPending(true);
     setError(null);
 
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
+    const failure = await signIn(email, password);
     setPending(false);
 
-    if (!response.ok) {
-      const body = (await response.json().catch(() => ({}))) as { error?: { message?: string } };
-      setError(body.error?.message ?? "Could not sign in");
+    if (failure) {
+      setError(failure);
       return;
     }
 

@@ -5,7 +5,7 @@
     "dev": "next dev -p 3002",
     "build": "next build",
     "start": "next start -p 3002",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "next typegen && tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

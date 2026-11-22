@@ -3,7 +3,8 @@ import type { INestApplication } from "@nestjs/common";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { ADMIN_ID, createTestApp, signToken } from "./support";
+import { DatabaseService } from "../src/shared/database.service";
+import { ADMIN_ID, createTestApp, passThroughDatabase, signToken } from "./support";
 
 describe("http surface (e2e)", () => {
   let app: INestApplication;
@@ -42,5 +43,35 @@ describe("http surface (e2e)", () => {
       .expect(400);
 
     expect(response.body.error.message).toContain("property role should not exist");
+  });
+
+  it("reports health with a database round trip and sends security headers", async () => {
+    const response = await request(app.getHttpServer()).get("/api/v1/health").expect(200);
+
+    expect(response.body).toEqual({ status: "ok", database: "ok" });
+    expect(response.headers["x-content-type-options"]).toBe("nosniff");
+    expect(response.headers["x-powered-by"]).toBeUndefined();
+  });
+
+  it("answers 503 when the database is unreachable", async () => {
+    const down = await createTestApp((builder) =>
+      builder.overrideProvider(DatabaseService).useValue({
+        ...passThroughDatabase,
+        ping: async () => {
+          throw new Error("connect ECONNREFUSED");
+        },
+      }),
+    );
+
+    try {
+      const response = await request(down.getHttpServer()).get("/api/v1/health").expect(503);
+
+      expect(response.body.error).toEqual({
+        code: "SERVICE_UNAVAILABLE",
+        message: "Database unreachable",
+      });
+    } finally {
+      await down.close();
+    }
   });
 });

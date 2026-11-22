@@ -5,6 +5,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import { Global, Injectable, Module, type OnModuleDestroy } from "@nestjs/common";
 import { loadEnv } from "@lean/config";
 import { createDatabase } from "@lean/db";
+import { sql } from "drizzle-orm";
 
 type Pool = ReturnType<typeof createDatabase>["pool"];
 
@@ -33,6 +34,11 @@ export class DatabaseService implements OnModuleDestroy {
     }
 
     return this.root.transaction((tx) => this.scope.run(tx, work));
+  }
+
+  /** A round trip to Postgres; rejects when the database is unreachable. */
+  async ping(): Promise<void> {
+    await this.root.execute(sql`select 1`);
   }
 
   async onModuleDestroy(): Promise<void> {

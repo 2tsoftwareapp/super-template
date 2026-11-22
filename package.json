@@ -7,21 +7,33 @@
   },
   "scripts": {
     "dev": "pnpm --filter @lean/api dev",
+    "dev:admin": "pnpm --filter @lean/admin dev",
+    "dev:web": "pnpm --filter @lean/web dev",
+    "dev:worker": "pnpm --filter @lean/worker dev",
+    "dev:all": "pnpm --parallel --filter \"./apps/*\" dev",
+    "bootstrap": "docker compose up -d --wait && pnpm db:migrate && pnpm db:seed",
+    "lint": "eslint .",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
-    "check": "pnpm run typecheck && pnpm run test",
+    "check": "pnpm run lint && pnpm run typecheck && pnpm run test",
+    "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "dev:admin": "pnpm --filter @lean/admin dev",
+    "build": "pnpm -r --filter \"!@lean/docs\" build",
     "db:generate": "pnpm --filter @lean/db generate",
     "db:migrate": "pnpm --filter @lean/db migrate",
     "db:seed": "pnpm --filter @lean/db seed",
-    "dev:web": "pnpm --filter @lean/web dev",
-    "dev:worker": "pnpm --filter @lean/worker dev",
     "docs:dev": "pnpm --filter @lean/docs dev",
-    "docs:build": "pnpm --filter @lean/docs build"
+    "docs:build": "pnpm --filter @lean/docs build",
+    "prod:up": "docker compose -f compose.prod.yaml --env-file .env.production up -d --build"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "esbuild": "^0.25.12",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
     "prettier": "3.6.2",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "typescript-eslint": "^8.73.0"
   }
 }

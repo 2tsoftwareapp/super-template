@@ -1,4 +1,4 @@
-# super-template-lean
+# super-template
 
 A full-stack starter with four surfaces — **api, web, admin, mobile** — plus a
 worker, built with clean code and no ceremony.
@@ -42,8 +42,6 @@ Debug builds allow plain HTTP to the local API; release builds expect HTTPS.
 | ------ | ---------------------------------------------------------------------------------- |
 | `main` | **this** lean template (simple, four surfaces)                                     |
 | `max`  | the full enterprise template (plugin architecture, multi-tenant, SSO/MFA, codegen) |
-
-See `docs/plans/lean-template-v2.md` in the `max` branch for the rationale.
 
 ## What the code looks like
 

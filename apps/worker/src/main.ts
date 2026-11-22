@@ -9,6 +9,7 @@ import {
 } from "@lean/db";
 
 import { handlers } from "./handlers";
+import { log } from "./log";
 import { PermanentJobError } from "./permanent-job-error";
 
 const BATCH_SIZE = 5;
@@ -19,17 +20,23 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 async function runJob(db: Database, job: ClaimedJob): Promise<void> {
   const handler = handlers[job.type];
 
+  const fields = { jobId: job.id, type: job.type, attempt: job.attempts };
+
   if (!handler) {
     await failJob(db, job, `No handler for ${job.type}`, false);
+    log("error", "job has no handler", fields);
     return;
   }
 
   try {
     await completeJob(db, job, await handler(job.payload));
+    log("info", "job completed", fields);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
+    const retryable = !(error instanceof PermanentJobError);
 
-    await failJob(db, job, message, !(error instanceof PermanentJobError));
+    await failJob(db, job, message, retryable);
+    log(retryable ? "warn" : "error", "job failed", { ...fields, retryable, error: message });
   }
 }
 
@@ -40,10 +47,13 @@ async function main(): Promise<void> {
   let stopping = false;
   const stop = () => {
     stopping = true;
+    log("info", "stopping after the current batch");
   };
 
   process.once("SIGTERM", stop);
   process.once("SIGINT", stop);
+
+  log("info", "worker started", { once: runOnce });
 
   try {
     while (!stopping) {
@@ -68,6 +78,6 @@ async function main(): Promise<void> {
 }
 
 void main().catch((error: unknown) => {
-  console.error(error);
+  log("error", "worker crashed", { error: error instanceof Error ? error.stack : String(error) });
   process.exit(1);
 });

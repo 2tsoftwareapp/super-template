@@ -111,9 +111,10 @@ export class InMemoryAuthRepository {
 }
 
 /** Repositories are replaced in memory, so a transaction is just the work itself. */
-const passThroughDatabase = {
+export const passThroughDatabase = {
   db: {},
   transaction: <T>(work: () => Promise<T>): Promise<T> => work(),
+  ping: async (): Promise<void> => undefined,
 };
 
 export async function createTestApp(

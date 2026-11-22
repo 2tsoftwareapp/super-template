@@ -19,3 +19,5 @@ build/
 /apps/api/storage/
 docs/.vitepress/cache
 docs/.vitepress/dist
+!.env.production.example
+next-env.d.ts

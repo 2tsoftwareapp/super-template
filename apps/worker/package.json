@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch --env-file-if-exists=../../.env src/main.ts",
-    "start": "tsx --env-file-if-exists=../../.env src/main.ts",
+    "build": "esbuild src/main.ts --bundle --platform=node --target=node24 --sourcemap --outfile=dist/main.js --external:pg-native",
+    "start": "node --enable-source-maps --env-file-if-exists=../../.env dist/main.js",
     "run:once": "tsx --env-file-if-exists=../../.env src/main.ts --once",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
