@@ -23,7 +23,7 @@ flowchart LR
     admin["admin :3002<br/>BFF routes"]
   end
   api["NestJS API :3001<br/>/api/v1"]
-  db[("Postgres<br/>users · sessions · jobs<br/>files · notifications")]
+  db[("Postgres")]
   worker["worker"]
   smtp[["SMTP / Mailpit"]]
   disk[("STORAGE_DIR")]
@@ -35,7 +35,7 @@ flowchart LR
   phone -- "Bearer" --> api
   api -- "Drizzle" --> db
   api --> disk
-  worker -- "claim: SKIP LOCKED" --> db
+  worker -- "SKIP LOCKED" --> db
   worker --> smtp
 ```
 
@@ -73,12 +73,17 @@ through `JobsService`.
 ## Request pipeline
 
 ```mermaid
-flowchart LR
-  req([request]) --> h["helmet<br/>CORS"] --> rid["request id"] --> jwt["JwtAuthGuard"] --> roles["RolesGuard"] --> val["validate(Dto)"] --> ctl["controller"] --> ok(["{ data }"])
-  jwt -. "401" .-> err(["AppExceptionFilter<br/>{ error }"])
+flowchart TD
+  req([request]) --> mw["helmet · CORS · request id"]
+  mw --> jwt["JwtAuthGuard"]
+  jwt --> roles["RolesGuard"]
+  roles --> val["validate(Dto)"]
+  val --> ctl["controller → service"]
+  ctl --> ok(["200 { data }"])
+  jwt -. "401" .-> err(["AppExceptionFilter → { error }"])
   roles -. "403" .-> err
   val -. "400" .-> err
-  ctl -. "throws" .-> err
+  ctl -. "AppError" .-> err
 ```
 
 Every request to the API passes, in order:
