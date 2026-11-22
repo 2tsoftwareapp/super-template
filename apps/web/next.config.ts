@@ -7,6 +7,8 @@ const config: NextConfig = {
   output: "standalone",
   outputFileTracingRoot: resolve(__dirname, "../.."),
   poweredByHeader: false,
+  transpilePackages: ["@lean/next-bff"],
+  agentRules: false,
 };
 
 export default config;

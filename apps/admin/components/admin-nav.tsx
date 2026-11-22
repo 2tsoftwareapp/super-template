@@ -9,7 +9,9 @@ import { cn } from "@/lib/utils";
 const LINKS = [
   { href: "/users", label: "Users" },
   { href: "/jobs", label: "Jobs" },
+  { href: "/files", label: "Files" },
   { href: "/notifications", label: "Notifications" },
+  { href: "/account", label: "Account" },
 ];
 
 export function AdminNav() {

@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { DatabaseService } from "../../../shared/database.service";
+import type { NotificationsService } from "../../notifications/notifications.service";
 import type { AuthRepository } from "../auth.repository";
 
 import { AuthService } from "../auth.service";
@@ -44,7 +46,12 @@ describe("AuthService.refresh", () => {
     rotateSession: vi.fn(),
     revokeAllForUser: vi.fn(),
   };
-  const service = new AuthService(repository as unknown as AuthRepository, new TokenService());
+  const service = new AuthService(
+    repository as unknown as AuthRepository,
+    new TokenService(),
+    {} as NotificationsService,
+    {} as DatabaseService,
+  );
 
   beforeEach(() => {
     vi.resetAllMocks();

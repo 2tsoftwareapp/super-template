@@ -7,16 +7,18 @@ const adminUrl = process.env.ADMIN_URL ?? "http://localhost:3002";
 const SURFACES = [
   {
     title: "API",
-    description: "Auth with refresh rotation, users, files, jobs, mail, notifications.",
+    description:
+      "Sign-up, password reset, refresh rotation, users, files, jobs, mail, notifications.",
   },
   { title: "Worker", description: "Claims the jobs table with SKIP LOCKED, retries with backoff." },
-  { title: "Admin", description: "Users, jobs and notifications over a cookie BFF." },
-  { title: "Mobile", description: "Flutter login + home against the same API." },
+  { title: "Web", description: "This site: sign-up, sign-in, password reset and an account page." },
+  { title: "Admin", description: "Users, files, jobs and notifications over a cookie BFF." },
+  { title: "Mobile", description: "Flutter app: sign-in, notifications and file uploads." },
 ];
 
 export default function LandingPage() {
   return (
-    <main className="mx-auto max-w-3xl space-y-10 px-6 py-24">
+    <main className="mx-auto w-full max-w-3xl space-y-10 px-6 py-24">
       <section className="space-y-4">
         <Badge variant="secondary">NestJS · Next.js · Flutter · Postgres</Badge>
         <h1 className="text-4xl font-bold tracking-tight">Lean full-stack template</h1>
@@ -26,7 +28,10 @@ export default function LandingPage() {
         </p>
         <div className="flex gap-3">
           <Button asChild size="lg">
-            <a href={`${adminUrl}/login`}>Sign in to the admin console</a>
+            <a href="/register">Create an account</a>
+          </Button>
+          <Button asChild size="lg" variant="outline">
+            <a href={`${adminUrl}/login`}>Admin console</a>
           </Button>
           <Button asChild size="lg" variant="outline">
             <a href="https://github.com/2tsoftwareapp/super-template/tree/main">Source</a>

@@ -118,7 +118,7 @@ describe("auth (e2e)", () => {
 
   it("uses the role stored for the user, not the one in the token", async () => {
     const forged = (await import("jsonwebtoken")).default.sign(
-      { role: "ADMIN" },
+      { role: "ADMIN", issuedAtMs: Date.now() },
       process.env.JWT_ACCESS_SECRET ?? "",
       { subject: MEMBER_ID, expiresIn: "15m" },
     );

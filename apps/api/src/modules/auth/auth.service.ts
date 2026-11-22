@@ -1,12 +1,16 @@
-import { randomBytes, createHash } from "node:crypto";
+import { randomBytes } from "node:crypto";
 
-import type { PublicUser, SessionResponse } from "./auth.dto";
+import type { PublicUser, RegisterDto, SessionResponse } from "./auth.dto";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { loadEnv } from "@lean/config";
 import { hashPassword, verifyPassword, type UserRow } from "@lean/db";
 
+import { isUniqueViolation } from "../../shared/database-errors";
+import { DatabaseService } from "../../shared/database.service";
 import { AppError, ERROR_CODES } from "../../shared/errors";
+import { NotificationsService } from "../notifications/notifications.service";
+import { hashToken } from "./hash-token";
 import { AuthRepository, type CreateSessionInput } from "./auth.repository";
 import { TokenService } from "./token.service";
 
@@ -15,8 +19,7 @@ const REFRESH_TOKEN_BYTES = 32;
 const ROTATION_GRACE_MS = 10_000;
 const ACCESS_DENIED = "Invalid email or password";
 
-const hashRefreshToken = (token: string): string =>
-  createHash("sha256").update(token).digest("hex");
+const hashRefreshToken = hashToken;
 
 const sessionRotated = (): AppError =>
   new AppError(ERROR_CODES.AUTH_SESSION_ROTATED, "Session was already refreshed", 401);
@@ -40,7 +43,58 @@ export class AuthService {
   constructor(
     @Inject(AuthRepository) private readonly users: AuthRepository,
     @Inject(TokenService) private readonly tokens: TokenService,
+    @Inject(NotificationsService) private readonly notifications: NotificationsService,
+    @Inject(DatabaseService) private readonly database: DatabaseService,
   ) {}
+
+  /** Self-service sign-up: a USER account plus a welcome notification, then a session. */
+  async register(input: RegisterDto): Promise<SessionResponse> {
+    if (!this.env.ALLOW_REGISTRATION) {
+      throw new AppError(
+        ERROR_CODES.AUTH_REGISTRATION_DISABLED,
+        "Registration is disabled",
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const passwordHash = hashPassword(input.password);
+    const user = await this.database
+      .transaction(async () => {
+        const created = await this.users.createUser({
+          email: input.email.trim().toLowerCase(),
+          passwordHash,
+          displayName: input.displayName.trim(),
+        });
+
+        await this.notifications.create({
+          userId: created.id,
+          type: "user.welcome",
+          title: "Welcome",
+          body: `Hi ${created.displayName}, your account is ready.`,
+        });
+
+        return created;
+      })
+      .catch((error: unknown) => {
+        if (isUniqueViolation(error)) {
+          throw new AppError(ERROR_CODES.USER_EMAIL_TAKEN, "Email is already registered", 409);
+        }
+
+        throw error;
+      });
+
+    return this.startSession(user);
+  }
+
+  async updateProfile(userId: string, displayName: string): Promise<PublicUser> {
+    const user = await this.users.updateUser(userId, { displayName: displayName.trim() });
+
+    if (!user) {
+      throw new AppError(ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
+    }
+
+    return toPublicUser(user);
+  }
 
   async login(email: string, password: string): Promise<SessionResponse> {
     const user = await this.users.findByEmail(email.trim().toLowerCase());
@@ -56,7 +110,7 @@ export class AuthService {
       throw new AppError(ERROR_CODES.AUTH_UNAUTHORIZED, "Account is not active", 403);
     }
 
-    return this.issueSession(user);
+    return this.startSession(user);
   }
 
   /**
@@ -124,7 +178,8 @@ export class AuthService {
     return toPublicUser(user);
   }
 
-  private async issueSession(user: UserRow): Promise<SessionResponse> {
+  /** A fresh refresh token + access token for `user`; used by login, sign-up and password change. */
+  async startSession(user: UserRow): Promise<SessionResponse> {
     const next = this.newRefreshToken(user.id);
 
     await this.users.createSession(next.session);

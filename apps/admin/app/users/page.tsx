@@ -1,48 +1,20 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
+import { errorMessage, sendJson } from "@lean/next-bff/client";
 
 import { FormError } from "@/components/form-error";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { UserCreateForm, type NewUser } from "@/components/users/user-create-form";
+import { useUserList } from "@/components/users/use-user-list";
 import { UsersTable, type User } from "@/components/users/users-table";
-import { adminFetch } from "@/lib/admin-fetch";
-import { errorMessage } from "@/lib/error-message";
-
-interface ListResponse {
-  data: User[];
-  meta: { page: number; limit: number; total: number; totalPages: number };
-}
-
-const send = (path: string, method: string, body?: unknown) =>
-  adminFetch(path, {
-    method,
-    headers: { "content-type": "application/json" },
-    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-  });
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [total, setTotal] = useState(0);
+  const [search, setSearch] = useState("");
   const [error, setError] = useState<string | null>(null);
-
-  const load = useCallback(async () => {
-    const response = await adminFetch("/api/users?page=1&limit=20");
-
-    if (!response.ok) {
-      setError("Could not load users");
-      return;
-    }
-
-    const body = (await response.json()) as ListResponse;
-    setUsers(body.data);
-    setTotal(body.meta.total);
-  }, []);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
+  const { users, total, load } = useUserList(search, setError);
 
   async function run(request: Promise<Response>, fallback: string): Promise<boolean> {
     setError(null);
@@ -57,18 +29,18 @@ export default function UsersPage() {
   }
 
   const create = (user: NewUser) =>
-    run(send("/api/users", "POST", user), "Could not create the user");
+    run(sendJson("/api/users", "POST", user), "Could not create the user");
 
   const toggleStatus = (user: User) =>
     void run(
-      send(`/api/users/${user.id}/status`, "PATCH", {
+      sendJson(`/api/users/${user.id}/status`, "PATCH", {
         status: user.status === "ACTIVE" ? "BLOCKED" : "ACTIVE",
       }),
       "Could not change the status",
     );
 
   const remove = (user: User) =>
-    void run(send(`/api/users/${user.id}`, "DELETE"), "Could not delete the user");
+    void run(sendJson(`/api/users/${user.id}`, "DELETE"), "Could not delete the user");
 
   return (
     <main className="mx-auto max-w-5xl space-y-6 p-6">
@@ -83,7 +55,14 @@ export default function UsersPage() {
       </Card>
       <FormError message={error} />
       <Card>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <Input
+            type="search"
+            aria-label="Search users"
+            placeholder="Search by email or name"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
           <UsersTable users={users} onToggleStatus={toggleStatus} onDelete={remove} />
         </CardContent>
       </Card>

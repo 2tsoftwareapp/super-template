@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle, CardAction } from "@/components/ui/card";
-import { adminFetch } from "@/lib/admin-fetch";
+import { sessionFetch } from "@lean/next-bff/client";
 import { cn } from "@/lib/utils";
 
 interface Notification {
@@ -30,7 +30,7 @@ export default function NotificationsPage() {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const response = await adminFetch("/api/notifications?page=1&limit=20");
+    const response = await sessionFetch("/api/notifications?page=1&limit=20");
 
     if (!response.ok) {
       setError("Could not load notifications");
@@ -47,7 +47,7 @@ export default function NotificationsPage() {
   }, [load]);
 
   async function markRead(id: string): Promise<void> {
-    await adminFetch(`/api/notifications/${id}/read`, { method: "PATCH" });
+    await sessionFetch(`/api/notifications/${id}/read`, { method: "PATCH" });
     await load();
   }
 

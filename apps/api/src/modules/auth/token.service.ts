@@ -11,15 +11,16 @@ export class TokenService {
   private readonly env = loadEnv();
 
   sign(user: { id: string; role: string }): string {
-    return jwt.sign({ role: user.role }, this.env.JWT_ACCESS_SECRET, {
+    // `iat` has one-second resolution; `issuedAtMs` lets a revocation in the same second still apply.
+    return jwt.sign({ role: user.role, issuedAtMs: Date.now() }, this.env.JWT_ACCESS_SECRET, {
       algorithm: ALGORITHM,
       subject: user.id,
       expiresIn: this.env.JWT_ACCESS_TTL as jwt.SignOptions["expiresIn"],
     });
   }
 
-  /** Returns the subject only: role and status are read fresh from the database. */
-  verify(token: string): { userId: string } {
+  /** Returns subject and issue time only: role and status are read fresh from the database. */
+  verify(token: string): { userId: string; issuedAt: number } {
     let payload: string | jwt.JwtPayload;
 
     try {
@@ -28,10 +29,14 @@ export class TokenService {
       throw new AppError(ERROR_CODES.AUTH_UNAUTHORIZED, "Invalid or expired token", 401);
     }
 
-    if (typeof payload === "string" || typeof payload.sub !== "string") {
+    if (
+      typeof payload === "string" ||
+      typeof payload.sub !== "string" ||
+      typeof payload.issuedAtMs !== "number"
+    ) {
       throw new AppError(ERROR_CODES.AUTH_UNAUTHORIZED, "Invalid or expired token", 401);
     }
 
-    return { userId: payload.sub };
+    return { userId: payload.sub, issuedAt: payload.issuedAtMs };
   }
 }

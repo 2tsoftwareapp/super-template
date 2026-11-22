@@ -33,6 +33,13 @@ export const envSchema = z.object({
   JWT_ACCESS_SECRET: z.string().min(32, "must be at least 32 characters"),
   JWT_ACCESS_TTL: z.string().default("15m"),
   JWT_REFRESH_TTL: z.string().default("30d"),
+  /** Public URL of apps/web: the password-reset mail links to `${WEB_URL}/reset-password`. */
+  WEB_URL: z.string().url().default("http://localhost:3000"),
+  /** `false` turns off `POST /auth/register`; admins still create users. */
+  ALLOW_REGISTRATION: z
+    .enum(["true", "false"])
+    .default("true")
+    .transform((value) => value === "true"),
   STORAGE_DIR: z.string().default("./storage"),
   MAX_UPLOAD_BYTES: z.coerce
     .number()

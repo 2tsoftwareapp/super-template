@@ -8,7 +8,9 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 const SECTIONS = [
   { href: "/users", title: "Users", description: "Create, block and delete accounts." },
   { href: "/jobs", title: "Jobs", description: "Inspect the Postgres queue and enqueue jobs." },
+  { href: "/files", title: "Files", description: "Browse, download and delete uploads." },
   { href: "/notifications", title: "Notifications", description: "Read your in-app inbox." },
+  { href: "/account", title: "Account", description: "Change your password." },
 ];
 
 export default async function HomePage() {

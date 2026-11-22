@@ -6,7 +6,12 @@ import jwt from "jsonwebtoken";
 
 import { configureApp } from "../src/app-setup";
 import { AppModule } from "../src/app.module";
-import { AuthRepository, type CreateSessionInput } from "../src/modules/auth/auth.repository";
+import {
+  AuthRepository,
+  type CreatePasswordResetInput,
+  type CreateSessionInput,
+  type CreateUserInput,
+} from "../src/modules/auth/auth.repository";
 import { DatabaseService } from "../src/shared/database.service";
 
 process.env.DATABASE_URL = "postgresql://unused";
@@ -30,6 +35,7 @@ export function makeUser(overrides: Partial<UserRow> = {}): UserRow {
     displayName: "Member",
     role: "USER",
     status: "ACTIVE",
+    tokensValidAfter: null,
     createdAt: now,
     updatedAt: now,
     ...overrides,
@@ -38,11 +44,15 @@ export function makeUser(overrides: Partial<UserRow> = {}): UserRow {
 
 /** A token as the API signs it; the guard still reads role and status from the repository. */
 export const signToken = (userId: string): string =>
-  jwt.sign({ role: "USER" }, process.env.JWT_ACCESS_SECRET ?? "", {
+  jwt.sign({ role: "USER", issuedAtMs: Date.now() }, process.env.JWT_ACCESS_SECRET ?? "", {
     algorithm: "HS256",
     subject: userId,
     expiresIn: "15m",
   });
+
+interface ResetRecord extends CreatePasswordResetInput {
+  usedAt: Date | null;
+}
 
 interface SessionRecord extends CreateSessionInput {
   id: string;
@@ -53,6 +63,7 @@ interface SessionRecord extends CreateSessionInput {
 export class InMemoryAuthRepository {
   readonly users = new Map<string, UserRow>();
   readonly sessions = new Map<string, SessionRecord>();
+  readonly resets: ResetRecord[] = [];
 
   constructor() {
     this.add(makeUser({ id: ADMIN_ID, email: "admin@example.local", role: "ADMIN" }));
@@ -62,6 +73,34 @@ export class InMemoryAuthRepository {
   add(user: UserRow): UserRow {
     this.users.set(user.id, user);
     return user;
+  }
+
+  async createUser(input: CreateUserInput) {
+    if ([...this.users.values()].some((user) => user.email === input.email)) {
+      throw constraintError("23505");
+    }
+
+    return this.add(makeUser(input));
+  }
+
+  async updateUser(userId: string, values: { displayName?: string; passwordHash?: string }) {
+    const user = this.users.get(userId);
+    if (!user) return null;
+    Object.assign(user, values, { updatedAt: new Date() });
+    return user;
+  }
+
+  async createPasswordReset(input: CreatePasswordResetInput) {
+    this.resets.push({ ...input, usedAt: null });
+  }
+
+  async consumePasswordReset(tokenHash: string) {
+    const reset = this.resets.find(
+      (row) => row.tokenHash === tokenHash && !row.usedAt && row.expiresAt > new Date(),
+    );
+    if (!reset) return null;
+    reset.usedAt = new Date();
+    return reset.userId;
   }
 
   async findByEmail(email: string) {
@@ -104,6 +143,8 @@ export class InMemoryAuthRepository {
   }
 
   async revokeAllForUser(userId: string) {
+    const user = this.users.get(userId);
+    if (user) user.tokensValidAfter = new Date();
     for (const session of this.sessions.values()) {
       if (session.userId === userId && !session.revokedAt) session.revokedAt = new Date();
     }

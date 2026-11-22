@@ -40,11 +40,15 @@ export class JwtAuthGuard implements CanActivate {
       throw new AppError(ERROR_CODES.AUTH_UNAUTHORIZED, "Authentication required", 401);
     }
 
-    const { userId } = this.tokens.verify(header.slice("Bearer ".length));
+    const { userId, issuedAt } = this.tokens.verify(header.slice("Bearer ".length));
     const user = await this.users.findById(userId);
 
     if (!user || user.status !== "ACTIVE") {
       throw new AppError(ERROR_CODES.AUTH_UNAUTHORIZED, "Account is not active", 401);
+    }
+
+    if (user.tokensValidAfter && issuedAt < user.tokensValidAfter.getTime()) {
+      throw new AppError(ERROR_CODES.AUTH_UNAUTHORIZED, "Session has been revoked", 401);
     }
 
     request.user = { userId: user.id, role: user.role };

@@ -35,6 +35,9 @@ importers:
 
   apps/admin:
     dependencies:
+      '@lean/next-bff':
+        specifier: workspace:*
+        version: link:../../packages/next-bff
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -157,6 +160,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@lean/next-bff':
+        specifier: workspace:*
+        version: link:../../packages/next-bff
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -287,6 +293,18 @@ importers:
       vitest:
         specifier: ^4.1.9
         version: 4.1.12(@types/node@24.19.2)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
+
+  packages/next-bff:
+    devDependencies:
+      '@types/node':
+        specifier: ^24.0.0
+        version: 24.19.2
+      next:
+        specifier: ^16.0.0
+        version: 16.4.6(@babel/core@7.29.13)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
 
 packages:
 

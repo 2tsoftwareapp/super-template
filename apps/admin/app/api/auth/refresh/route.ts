@@ -2,8 +2,8 @@ import type { NextRequest } from "next/server";
 
 import { NextResponse } from "next/server";
 
-import { callApi } from "@/lib/backend";
-import { clearSessionCookies, setSessionCookies } from "@/lib/cookies";
+import { callApi } from "@lean/next-bff";
+import { clearSessionCookies, setSessionCookies } from "@lean/next-bff";
 import { isSameOrigin } from "@/lib/is-same-origin";
 
 interface SessionPayload {

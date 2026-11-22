@@ -11,6 +11,7 @@ import { FilesRepository } from "./files.repository";
 import type { FileRow } from "@lean/db";
 
 import type { FileDto } from "./files.dto";
+import { buildPageMeta, type PageMeta } from "../../shared/pagination";
 
 const ALLOWED_MIME = new Set([
   "image/png",
@@ -81,6 +82,28 @@ export class FilesService {
     return toFileDto(row);
   }
 
+  /** Admins see every file, everyone else only their own uploads. */
+  async list(
+    requester: RequestUser,
+    page: { page: number; limit: number },
+  ): Promise<{ data: FileDto[]; meta: PageMeta }> {
+    const uploaderId = requester.role === "ADMIN" ? undefined : requester.userId;
+    const { rows, total } = await this.files.list({ ...page, uploaderId });
+
+    return {
+      data: rows.map(toFileDto),
+      meta: buildPageMeta(total, page.page, page.limit),
+    };
+  }
+
+  /** Row first: once it is gone nobody can reach the bytes, so a failed unlink only leaks disk. */
+  async remove(requester: RequestUser, fileId: string): Promise<void> {
+    const row = await this.requireFile(requester, fileId);
+
+    await this.files.delete(row.id);
+    await this.storage.remove(row.storageKey);
+  }
+
   async get(requester: RequestUser, fileId: string): Promise<FileDto> {
     const row = await this.requireFile(requester, fileId);
 
@@ -113,6 +136,7 @@ function toFileDto(row: FileRow): FileDto {
     originalName: row.originalName,
     mimeType: row.mimeType,
     sizeBytes: row.sizeBytes,
+    uploaderId: row.uploaderId,
     createdAt: row.createdAt.toISOString(),
     downloadUrl: `/api/v1/files/${row.id}/download`,
   };

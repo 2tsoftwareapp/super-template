@@ -1,0 +1,19 @@
+{
+  "name": "@lean/next-bff",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "next": "^16.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "next": "^16.0.0",
+    "typescript": "5.9.3"
+  }
+}

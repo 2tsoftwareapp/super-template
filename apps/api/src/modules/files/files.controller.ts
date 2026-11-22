@@ -2,12 +2,14 @@ import type { Response } from "express";
 
 import {
   Controller,
+  Delete,
   Get,
   HttpCode,
   Inject,
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
   Res,
   StreamableFile,
   UploadedFile,
@@ -17,7 +19,8 @@ import { FileInterceptor } from "@nestjs/platform-express";
 
 import { CurrentUser, type RequestUser } from "../../shared/current-user.decorator";
 import { AppError, ERROR_CODES } from "../../shared/errors";
-import type { FileDto } from "./files.dto";
+import { validate } from "../../shared/validation";
+import { ListFilesQueryDto, type FileDto } from "./files.dto";
 import { FilesService, type UploadedFileInput } from "./files.service";
 
 @Controller("files")
@@ -36,6 +39,23 @@ export class FilesController {
     }
 
     return { data: await this.files.upload(user.userId, file) };
+  }
+
+  @Get()
+  async list(
+    @CurrentUser() user: RequestUser,
+    @Query(validate(ListFilesQueryDto)) query: ListFilesQueryDto,
+  ) {
+    return this.files.list(user, { page: query.page, limit: query.limit });
+  }
+
+  @Delete(":id")
+  @HttpCode(204)
+  async remove(
+    @CurrentUser() user: RequestUser,
+    @Param("id", ParseUUIDPipe) fileId: string,
+  ): Promise<void> {
+    await this.files.remove(user, fileId);
   }
 
   @Get(":id")

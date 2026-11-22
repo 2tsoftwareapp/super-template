@@ -7,7 +7,7 @@ import { JobsTable, type Job } from "@/components/jobs/jobs-table";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { adminFetch } from "@/lib/admin-fetch";
+import { sessionFetch } from "@lean/next-bff/client";
 
 interface ListResponse {
   data: Job[];
@@ -20,7 +20,7 @@ export default function JobsPage() {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const response = await adminFetch("/api/jobs?page=1&limit=20");
+    const response = await sessionFetch("/api/jobs?page=1&limit=20");
 
     if (!response.ok) {
       setError("Could not load jobs");
@@ -39,7 +39,7 @@ export default function JobsPage() {
   async function enqueue(): Promise<void> {
     setError(null);
 
-    const response = await adminFetch("/api/jobs", {
+    const response = await sessionFetch("/api/jobs", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ type: "demo.echo", payload: { at: new Date().toISOString() } }),

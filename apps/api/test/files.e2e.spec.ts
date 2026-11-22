@@ -53,6 +53,19 @@ class InMemoryFilesRepository {
   async findById(id: string) {
     return this.rows.find((row) => row.id === id) ?? null;
   }
+
+  async list(input: { page: number; limit: number; uploaderId?: string }) {
+    const rows = this.rows.filter(
+      (row) => !input.uploaderId || row.uploaderId === input.uploaderId,
+    );
+    const start = (input.page - 1) * input.limit;
+    return { rows: rows.slice(start, start + input.limit), total: rows.length };
+  }
+
+  async delete(id: string) {
+    const index = this.rows.findIndex((row) => row.id === id);
+    if (index >= 0) this.rows.splice(index, 1);
+  }
 }
 
 describe("files (e2e)", () => {
@@ -78,7 +91,7 @@ describe("files (e2e)", () => {
     await app.close();
   });
 
-  const as = (userId: string, method: "get" | "post", path: string) =>
+  const as = (userId: string, method: "get" | "post" | "delete", path: string) =>
     request(app.getHttpServer())
       [method](`/api/v1${path}`)
       .set("authorization", `Bearer ${signToken(userId)}`);
@@ -149,5 +162,32 @@ describe("files (e2e)", () => {
   it("returns 404 for an unknown file and 401 without a token", async () => {
     await as(MEMBER_ID, "get", `/files/${crypto.randomUUID()}`).expect(404);
     await request(app.getHttpServer()).get(`/api/v1/files/${crypto.randomUUID()}`).expect(401);
+  });
+
+  it("lists only your own uploads, while an admin sees every file", async () => {
+    await upload(stranger.id, Buffer.from("theirs")).expect(201);
+
+    const mine = (await as(MEMBER_ID, "get", "/files?limit=50").expect(200)).body;
+    expect(mine.data.length).toBeGreaterThan(0);
+    expect(mine.data.every((file: { uploaderId: string }) => file.uploaderId === MEMBER_ID)).toBe(
+      true,
+    );
+
+    const all = (await as(ADMIN_ID, "get", "/files?limit=50").expect(200)).body;
+    expect(all.meta.total).toBe(repository.rows.length);
+    await as(MEMBER_ID, "get", "/files?limit=500").expect(400);
+  });
+
+  it("deletes a file and its bytes for the owner or an admin, never a stranger", async () => {
+    const own = (await upload(MEMBER_ID, Buffer.from("bye")).expect(201)).body.data;
+    const other = (await upload(MEMBER_ID, Buffer.from("bye2")).expect(201)).body.data;
+    const objects = storage.objects.size;
+
+    await as(stranger.id, "delete", `/files/${own.id}`).expect(404);
+    await as(MEMBER_ID, "delete", `/files/${own.id}`).expect(204);
+    await as(ADMIN_ID, "delete", `/files/${other.id}`).expect(204);
+
+    expect(storage.objects.size).toBe(objects - 2);
+    await as(MEMBER_ID, "get", `/files/${own.id}`).expect(404);
   });
 });

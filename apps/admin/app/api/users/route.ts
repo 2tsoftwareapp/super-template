@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { isSameOrigin } from "@/lib/is-same-origin";
-import { proxyWithSession } from "@/lib/session";
+import { proxyWithSession } from "@lean/next-bff";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   return proxyWithSession(request, `/users${request.nextUrl.search}`);
