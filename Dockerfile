@@ -1,13 +1,13 @@
 # One image per surface: docker build --target <api|worker|admin|web> .
+# Bun installs and runs the scripts; the images run on Node.
 FROM node:24-alpine AS base
-RUN corepack enable
+COPY --from=oven/bun:1.4.5-alpine /usr/local/bin/bun /usr/local/bin/bun
 WORKDIR /repo
 
 FROM base AS build
 COPY . .
-RUN pnpm install --frozen-lockfile
-RUN pnpm --filter @lean/db --filter @lean/api --filter @lean/worker build \
-  && pnpm --filter @lean/admin --filter @lean/web build
+RUN bun install --frozen-lockfile
+RUN bun run build
 
 FROM node:24-alpine AS runtime
 ENV NODE_ENV=production

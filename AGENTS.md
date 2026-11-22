@@ -1,7 +1,7 @@
 # Working in this repository
 
 The engineering contract. Read it before touching code. If a rule here cannot be
-checked by `pnpm run check`, a reviewer or a grep, it does not belong here.
+checked by `bun run check`, a reviewer or a grep, it does not belong here.
 
 ## What this is
 
@@ -40,8 +40,8 @@ apps/api/src/modules/<feature>/
 ## Definition of done
 
 ```bash
-pnpm run check        # typecheck + tests
-pnpm run format:check
+bun run check        # typecheck + tests
+bun run format:check
 ```
 
 Nothing is done because it compiled. A test that re-implements the logic it
@@ -50,16 +50,16 @@ checks is not a test.
 ## Run it
 
 ```bash
-pnpm install
+bun install
 docker compose up -d        # Postgres + Mailpit
-pnpm db:migrate && pnpm db:seed
-pnpm dev / dev:admin / dev:web / dev:worker
-pnpm run check              # typecheck + unit/e2e tests
-pnpm run format:check
+bun run db:migrate && bun run db:seed
+bun run dev / dev:admin / dev:web / dev:worker
+bun run check              # typecheck + unit/e2e tests
+bun run format:check
 ```
 
 Schema lives in `packages/db/src/schema.ts`; after changing it run
-`pnpm db:generate && pnpm db:migrate`. Jobs are claimed by `apps/worker` with
+`bun run db:generate && bun run db:migrate`. Jobs are claimed by `apps/worker` with
 `SKIP LOCKED`; a new job type is one entry in `apps/worker/src/handlers.ts` plus
 its allow-list in the API DTO.
 

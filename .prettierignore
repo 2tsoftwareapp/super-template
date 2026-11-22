@@ -2,7 +2,7 @@ node_modules
 dist
 .next
 coverage
-pnpm-lock.yaml
+bun.lock
 .turbo
 *.tsbuildinfo
 apps/mobile/android

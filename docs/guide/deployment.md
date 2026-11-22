@@ -4,12 +4,37 @@ The repository ships one `Dockerfile` with a target per surface and
 `compose.prod.yaml`, which runs the whole stack on one host: Postgres,
 a one-shot migrate + seed step, the API, the worker, web and admin.
 
-```
-                     ┌──────────── your reverse proxy (TLS) ────────────┐
-www.example.com ─────▶ web   :3000 ──┐
-admin.example.com ───▶ admin :3002 ──┼──▶ api :3001 ──▶ postgres
-api.example.com ─────▶ api   :3001   │        ▲
-                                     │     worker ──▶ SMTP
+```mermaid
+flowchart LR
+  subgraph internet["Internet"]
+    u1([www.example.com])
+    u2([admin.example.com])
+    u3([api.example.com<br/>mobile])
+  end
+  proxy["reverse proxy<br/>TLS (Caddy, nginx…)"]
+  subgraph host["compose.prod.yaml"]
+    web["web :3000"]
+    admin["admin :3002"]
+    api["api :3001"]
+    worker["worker"]
+    migrate["migrate + seed<br/>(one-shot)"]
+    pg[("postgres<br/>volume")]
+    st[("storage<br/>volume")]
+  end
+  smtp[["SMTP provider"]]
+  u1 --> proxy
+  u2 --> proxy
+  u3 --> proxy
+  proxy --> web
+  proxy --> admin
+  proxy --> api
+  web --> api
+  admin --> api
+  api --> pg
+  api --> st
+  worker --> pg
+  worker --> smtp
+  migrate --> pg
 ```
 
 ## 1. Prepare the server
@@ -42,7 +67,7 @@ All variables: [Configuration](./configuration).
 ## 3. Start it
 
 ```bash
-pnpm prod:up
+bun run prod:up
 # same as: docker compose -f compose.prod.yaml --env-file .env.production up -d --build
 ```
 
@@ -85,7 +110,7 @@ api.example.com {
 
 ```bash
 git pull
-pnpm prod:up        # rebuilds images, runs new migrations, restarts changed services
+bun run prod:up        # rebuilds images, runs new migrations, restarts changed services
 ```
 
 Migrations run before the new API starts. Write them so the previous API
@@ -129,13 +154,13 @@ Test a restore before you need one.
 ## Without Docker
 
 ```bash
-pnpm install --frozen-lockfile
-pnpm build                                   # API, worker, db scripts, admin, web
+bun install --frozen-lockfile
+bun run build                                   # API, worker, db scripts, admin, web
 node packages/db/dist/migrate.js && node packages/db/dist/seed.js
-pnpm --filter @lean/api start                # reads ../../.env when present
-pnpm --filter @lean/worker start
-pnpm --filter @lean/web start
-pnpm --filter @lean/admin start
+bun run --filter @lean/api start                # reads ../../.env when present
+bun run --filter @lean/worker start
+bun run --filter @lean/web start
+bun run --filter @lean/admin start
 ```
 
 Run each under a supervisor (systemd, pm2) and export the variables from

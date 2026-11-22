@@ -15,6 +15,25 @@ request:
   password change and blocking set that column, so every access token already
   in circulation dies immediately instead of living out its 15 minutes.
 
+```mermaid
+sequenceDiagram
+  autonumber
+  participant B as Browser
+  participant N as web / admin BFF
+  participant A as API
+  participant D as Postgres
+  B->>N: POST /api/auth/login (email, password)
+  N->>A: POST /auth/login
+  A->>D: verify hash, insert session (token hash)
+  A-->>N: { accessToken, refreshToken }
+  N-->>B: Set-Cookie (httpOnly) — no tokens in JS
+  B->>N: GET /api/files (cookie)
+  N->>A: GET /files (Bearer access)
+  A->>D: load user: active? tokens_valid_after?
+  A-->>N: { data }
+  N-->>B: { data }
+```
+
 ## Account flows
 
 | Flow            | Route                        | What happens                                                                                                                    |
@@ -32,6 +51,21 @@ reset token and its mail are written in one transaction, so a mail is never
 queued for a token that was not stored.
 
 ## Refresh rotation
+
+```mermaid
+sequenceDiagram
+  participant N as BFF (or mobile)
+  participant A as API
+  participant D as Postgres
+  N->>A: GET /files (expired access token)
+  A-->>N: 401
+  N->>A: POST /auth/refresh (refresh R1)
+  A->>D: one transaction: revoke R1, insert R2
+  A-->>N: new pair (access, R2)
+  N->>A: retry GET /files (new access token)
+  A-->>N: { data }
+  Note over N,A: another request reusing R1<br/>gets 401 (see table below)
+```
 
 `POST /auth/refresh` revokes the presented session and creates its successor in
 one transaction (`AuthRepository.rotateSession`). Only one of several

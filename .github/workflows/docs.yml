@@ -26,17 +26,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 11.9.0
+      - uses: oven-sh/setup-bun@v2
 
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm docs:build
+      - run: bun install --frozen-lockfile
+      - run: bun run docs:build
 
       # The Pages site is shared: keep serving the `max` Architecture Wiki under /docs-wiki/.
       - uses: actions/checkout@v5

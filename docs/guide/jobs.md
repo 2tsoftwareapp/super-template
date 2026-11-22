@@ -6,11 +6,17 @@ without Redis.
 
 ## Lifecycle
 
-```
-PENDING ──claim──▶ PROCESSING ──ok──▶ DONE
-                        │
-                        ├─error, attempts left──▶ PENDING (backoff)
-                        └─error, no attempts / permanent──▶ FAILED
+```mermaid
+stateDiagram-v2
+  [*] --> PENDING: API inserts row
+  PENDING --> PROCESSING: worker claims (SKIP LOCKED)
+  PROCESSING --> DONE: handler ok
+  PROCESSING --> PENDING: error, attempts left (backoff)
+  PROCESSING --> FAILED: no attempts left / PermanentJobError
+  PROCESSING --> PENDING: idle > 600 s (stale reclaim)
+  FAILED --> PENDING: manual retry (SQL)
+  DONE --> [*]
+  FAILED --> [*]
 ```
 
 - Default budget: 5 attempts (`max_attempts`).
@@ -46,7 +52,7 @@ PENDING ──claim──▶ PROCESSING ──ok──▶ DONE
 Process the queue once and exit (handy in scripts and while debugging a handler):
 
 ```bash
-pnpm --filter @lean/worker run:once
+bun run --filter @lean/worker run:once
 ```
 
 Run more workers to go faster; `SKIP LOCKED` keeps them from taking the same row:

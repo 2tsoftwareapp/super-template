@@ -6,6 +6,18 @@ layer once — schema, API module, tests, web BFF and page, Flutter — and is t
 pattern to copy for your own features. Every snippet below was built, type
 checked and tested against this template.
 
+```mermaid
+flowchart LR
+  s["1 · schema.ts<br/>+ migration"] --> api
+  subgraph api["2 · API module"]
+    direction LR
+    dto["DTO"] --> repo["repository"] --> svc["service"] --> ctl["controller"] --> mod["module in AppModule"]
+  end
+  api --> t["3 · e2e test"]
+  t --> web["4 · web BFF route + page"]
+  t --> fl["5 · Flutter model + screen"]
+```
+
 ## 1. Schema and migration
 
 Add the table to `packages/db/src/schema.ts`:
@@ -32,8 +44,8 @@ Generate and apply the migration, then commit the new SQL file and the
 `meta/` snapshot:
 
 ```bash
-pnpm db:generate   # → packages/db/migrations/0006_<name>.sql
-pnpm db:migrate
+bun run db:generate   # → packages/db/migrations/0006_<name>.sql
+bun run db:migrate
 ```
 
 ## 2. The API module
@@ -328,7 +340,7 @@ describe("notes (e2e)", () => {
 ```
 
 ```bash
-pnpm --filter @lean/api exec vitest run test/notes.e2e.spec.ts
+(cd apps/api && bunx vitest run test/notes.e2e.spec.ts)
 ```
 
 ## 4. Web: BFF routes and a page
@@ -516,8 +528,8 @@ Write a widget test with `MockClient` like `test/screens_test.dart`.
 ## 6. Done means
 
 ```bash
-pnpm run check
-pnpm run format:check
+bun run check
+bun run format:check
 cd apps/mobile && flutter analyze && flutter test
 ```
 

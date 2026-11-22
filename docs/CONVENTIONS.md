@@ -46,7 +46,7 @@ Add a layer only when it holds something the others must not:
   also across features.
 - Let constraints decide races (unique email, foreign keys) and map the error with
   `isUniqueViolation` / `isForeignKeyViolation`; a pre-read is not a check.
-- New column = new migration (`pnpm --filter @lean/db generate`).
+- New column = new migration (`bun run --filter @lean/db generate`).
 
 ## Tests
 

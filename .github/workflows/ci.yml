@@ -13,18 +13,15 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 11.9.0
+      - uses: oven-sh/setup-bun@v2
 
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run check
-      - run: pnpm run format:check
+      - run: bun install --frozen-lockfile
+      - run: bun run check
+      - run: bun run format:check
 
   build:
     name: Next builds
@@ -33,19 +30,16 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 11.9.0
+      - uses: oven-sh/setup-bun@v2
 
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @lean/admin build
-      - run: pnpm --filter @lean/web build
-      - run: pnpm --filter @lean/docs build
+      - run: bun install --frozen-lockfile
+      - run: bun run --filter @lean/admin build
+      - run: bun run --filter @lean/web build
+      - run: bun run --filter @lean/docs build
 
   mobile:
     name: Flutter analyze

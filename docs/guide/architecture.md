@@ -14,11 +14,29 @@ packages/
 docs/        this site + CONVENTIONS.md
 ```
 
-```
-browser ──▶ web / admin BFF (httpOnly cookies) ──Bearer──▶ API ──Drizzle──▶ Postgres
-mobile  ───────────────────────────────────────Bearer──▶ API            ▲
-                                                                        │ SKIP LOCKED
-                                                      SMTP ◀── worker ──┘
+```mermaid
+flowchart LR
+  browser([Browser])
+  phone([Flutter app])
+  subgraph next["Next.js"]
+    web["web :3000<br/>BFF routes"]
+    admin["admin :3002<br/>BFF routes"]
+  end
+  api["NestJS API :3001<br/>/api/v1"]
+  db[("Postgres<br/>users · sessions · jobs<br/>files · notifications")]
+  worker["worker"]
+  smtp[["SMTP / Mailpit"]]
+  disk[("STORAGE_DIR")]
+
+  browser -- "httpOnly cookies" --> web
+  browser -- "httpOnly cookies" --> admin
+  web -- "Bearer" --> api
+  admin -- "Bearer" --> api
+  phone -- "Bearer" --> api
+  api -- "Drizzle" --> db
+  api --> disk
+  worker -- "claim: SKIP LOCKED" --> db
+  worker --> smtp
 ```
 
 - Browsers never hold tokens. The Next.js apps keep them in `httpOnly` cookies
@@ -54,6 +72,15 @@ through `JobsService`.
 
 ## Request pipeline
 
+```mermaid
+flowchart LR
+  req([request]) --> h["helmet<br/>CORS"] --> rid["request id"] --> jwt["JwtAuthGuard"] --> roles["RolesGuard"] --> val["validate(Dto)"] --> ctl["controller"] --> ok(["{ data }"])
+  jwt -. "401" .-> err(["AppExceptionFilter<br/>{ error }"])
+  roles -. "403" .-> err
+  val -. "400" .-> err
+  ctl -. "throws" .-> err
+```
+
 Every request to the API passes, in order:
 
 1. `helmet` security headers and CORS (`CORS_ORIGINS`).
@@ -70,20 +97,50 @@ Every request to the API passes, in order:
 
 Schema: `packages/db/src/schema.ts`.
 
-| Table             | Holds                                                                     |
-| ----------------- | ------------------------------------------------------------------------- |
-| `users`           | email, password hash, role, status, `tokens_valid_after`                  |
-| `sessions`        | one row per refresh token (hash only), with rotation chain and revocation |
-| `password_resets` | hashed single-use reset tokens, one hour lifetime                         |
-| `jobs`            | the queue: type, payload, status, attempts, `run_at`, last error          |
-| `files`           | upload metadata; bytes live under `STORAGE_DIR`                           |
-| `notifications`   | per-user in-app messages with `read_at`                                   |
+```mermaid
+erDiagram
+  users ||--o{ sessions : "refresh tokens"
+  users ||--o{ password_resets : "reset tokens"
+  users ||--o{ files : uploads
+  users ||--o{ notifications : receives
+  users {
+    uuid id PK
+    text email
+    text role
+    text status
+    timestamptz tokens_valid_after
+  }
+  sessions {
+    uuid id PK
+    uuid user_id FK
+    text refresh_token_hash
+    timestamptz expires_at
+    timestamptz revoked_at
+  }
+  jobs {
+    uuid id PK
+    text type
+    jsonb payload
+    text status
+    int attempts
+    timestamptz run_at
+  }
+```
+
+| Table             | Holds                                                             |
+| ----------------- | ----------------------------------------------------------------- |
+| `users`           | email, password hash, role, status, `tokens_valid_after`          |
+| `sessions`        | one row per refresh token (hash only), with expiry and revocation |
+| `password_resets` | hashed single-use reset tokens, one hour lifetime                 |
+| `jobs`            | the queue: type, payload, status, attempts, `run_at`, last error  |
+| `files`           | upload metadata; bytes live under `STORAGE_DIR`                   |
+| `notifications`   | per-user in-app messages with `read_at`                           |
 
 A schema change is a new migration:
 
 ```bash
-pnpm db:generate   # writes packages/db/migrations/NNNN_*.sql from schema.ts
-pnpm db:migrate
+bun run db:generate   # writes packages/db/migrations/NNNN_*.sql from schema.ts
+bun run db:migrate
 ```
 
 Never edit an applied migration. Commit the generated SQL and the `meta/`

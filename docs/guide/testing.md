@@ -4,11 +4,11 @@ Everything runs locally; no CI minutes are needed. A change is done when these
 pass:
 
 ```bash
-pnpm run check            # ESLint + typecheck (every package) + all Vitest suites
-pnpm run format:check     # Prettier
-pnpm --filter @lean/admin build
-pnpm --filter @lean/web build
-pnpm docs:build           # when docs changed
+bun run check            # ESLint + typecheck (every package) + all Vitest suites
+bun run format:check     # Prettier
+bun run --filter @lean/admin build
+bun run --filter @lean/web build
+bun run docs:build           # when docs changed
 cd apps/mobile && dart format --output=none --set-exit-if-changed . && flutter analyze && flutter test
 ```
 
@@ -44,18 +44,18 @@ unreachable database are handled. They are not failures.
 ## Run one thing
 
 ```bash
-pnpm --filter @lean/api test                                   # one package
-pnpm --filter @lean/api exec vitest run test/auth.e2e.spec.ts  # one file
-pnpm --filter @lean/api exec vitest -t "rotates"               # by test name, watch mode
-pnpm lint                                                      # ESLint only
-pnpm typecheck                                                 # tsc only
+bun run --filter @lean/api test                    # one package
+(cd apps/api && bunx vitest run test/auth.e2e.spec.ts)   # one file
+(cd apps/api && bunx vitest -t "rotates")                # by test name, watch mode
+bun run lint                                         # ESLint only
+bun run typecheck                                    # tsc only
 cd apps/mobile && flutter test test/screens_test.dart
 ```
 
 ## Against a real stack
 
 The suites above use fakes. To exercise the real database, worker and mail,
-run the stack (`pnpm bootstrap && pnpm dev:all`) and walk the main flows:
+run the stack (`bun run bootstrap && bun run dev:all`) and walk the main flows:
 
 ```bash
 API=http://localhost:3001/api/v1
@@ -67,7 +67,7 @@ curl -s -X POST $API/auth/forgot-password -H 'content-type: application/json' \
 ```
 
 The production images can be checked the same way with
-`pnpm prod:up` (see [Deployment](./deployment)).
+`bun run prod:up` (see [Deployment](./deployment)).
 
 ## Writing tests
 

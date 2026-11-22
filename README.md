@@ -18,16 +18,14 @@ worker, built with clean code and no ceremony.
 ## Quick start
 
 ```bash
-pnpm install
+bun install
 docker compose up -d          # Postgres 18 + Mailpit (or point DATABASE_URL at any Postgres)
 cp .env.example .env          # read by db scripts, api and worker; exported vars win
-pnpm db:migrate && pnpm db:seed
+bun run db:migrate && bun run db:seed
 
-pnpm dev                      # api      -> http://localhost:3001
-pnpm dev:admin                # admin    -> http://localhost:3002
-pnpm dev:web                  # web      -> http://localhost:3000
-pnpm dev:worker               # worker   (claim jobs)
-pnpm run check                # typecheck + all tests
+bun run dev:all                  # api :3001, web :3000, admin :3002, worker
+bun run dev                      # or one at a time: api, dev:admin, dev:web, dev:worker
+bun run check                    # lint + typecheck + all tests
 ```
 
 Mobile (needs Flutter 3.5+):
@@ -60,4 +58,4 @@ apps/api/src/modules/<feature>/
 ```
 
 Rules: `AGENTS.md` (contract) and `docs/CONVENTIONS.md` (shape). Both are short
-on purpose; `pnpm run check` is the referee.
+on purpose; `bun run check` is the referee.

@@ -2,16 +2,20 @@
 
 ## Setup
 
-**`pnpm: command not found`**
-Run `corepack enable` (ships with Node 24). With nvm, open a new shell or
-`source ~/.nvm/nvm.sh && nvm use 24` first.
+**`bun: command not found`**
+Install it with `curl -fsSL https://bun.sh/install | bash`, then open a new
+shell (the installer adds `~/.bun/bin` to your `PATH`).
+
+**`node: command not found` or `Unsupported engine` during a script**
+Bun runs the scripts, but the API, worker, Next.js and Vitest still run on
+Node 24. With nvm: `source ~/.nvm/nvm.sh && nvm use 24`.
 
 **`docker compose up` fails: port 5434, 1025 or 8025 is already allocated**
 Another Postgres or Mailpit is running. Stop it, or change the left side of the
 port mapping in `docker-compose.yml` and the matching `DATABASE_URL` / `SMTP_URL` in `.env`.
 
-**`pnpm db:migrate` fails with `ECONNREFUSED 127.0.0.1:5434`**
-Postgres is not up yet. `pnpm bootstrap` waits for it; otherwise run
+**`bun run db:migrate` fails with `ECONNREFUSED 127.0.0.1:5434`**
+Postgres is not up yet. `bun run bootstrap` waits for it; otherwise run
 `docker compose up -d --wait` first.
 
 **`DATABASE_URL` is empty / `Invalid environment` on start**
@@ -26,7 +30,7 @@ It needs at least 32 characters. Generate one with `openssl rand -base64 48`.
 **Admin login says "Invalid email or password" with the right password**
 The seed only creates the admin when the email does not exist; changing
 `ADMIN_PASSWORD` later does not update it. Change it from the admin **Account**
-page, or delete the user row and run `pnpm db:seed` again.
+page, or delete the user row and run `bun run db:seed` again.
 
 **"Too many attempts"**
 The login limit is 10 per minute per IP and email, and 50 per 15 minutes per
@@ -48,7 +52,7 @@ Expected: a password change, reset or block revokes every session and access tok
 **No reset mail**
 
 1. Open Mailpit at http://localhost:8025.
-2. Is the worker running? `pnpm dev:all` starts it; alone: `pnpm dev:worker`.
+2. Is the worker running? `bun run dev:all` starts it; alone: `bun run dev:worker`.
 3. Look at the admin **Jobs** page: a failed `mail.send` shows its error.
 4. Forgot-password answers 202 for unknown or blocked accounts too, and sends nothing.
 
@@ -97,7 +101,7 @@ See [Configuration](./configuration).
 
 **`migrate` exited with an error and nothing else starts**
 The other services wait for it. Read `docker compose -f compose.prod.yaml logs migrate`,
-fix the cause, and run `pnpm prod:up` again.
+fix the cause, and run `bun run prod:up` again.
 
 **Rate limits hit everyone at once**
 The API sees the proxy's address for every request. Set `TRUST_PROXY` to your
@@ -108,7 +112,7 @@ proxy's address or network.
 **`next dev` created `AGENTS.md` files in `apps/web` or `apps/admin`**
 It should not (`agentRules: false` in `next.config.ts`). Delete them.
 
-**Type errors after pulling** — `pnpm install`, then `pnpm typecheck`.
+**Type errors after pulling** — `bun install`, then `bun run typecheck`.
 
 **API tests print `Error: insert failed` or `ECONNREFUSED`**
 Expected: those tests simulate failures. Look at the final pass/fail count.

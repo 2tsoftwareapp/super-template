@@ -5,12 +5,12 @@ the mobile app, with a database, a seeded admin and a local mail inbox.
 
 ## 1. Install the tools
 
-| Tool    | Version    | Why                                                     |
-| ------- | ---------- | ------------------------------------------------------- |
-| Node.js | 24         | every TypeScript app                                    |
-| pnpm    | 11.9       | `corepack enable` picks the version from `package.json` |
-| Docker  | any recent | Postgres 18 and Mailpit for local development           |
-| Flutter | stable     | only for `apps/mobile`                                  |
+| Tool    | Version    | Why                                                                     |
+| ------- | ---------- | ----------------------------------------------------------------------- |
+| Bun     | 1.3+       | package manager and script runner (`curl -fsSL bun.sh/install \| bash`) |
+| Node.js | 24         | runtime for the API, worker, Next.js and Vitest                         |
+| Docker  | any recent | Postgres 18 and Mailpit for local development                           |
+| Flutter | stable     | only for `apps/mobile`                                                  |
 
 Any Postgres reachable through `DATABASE_URL` works instead of Docker.
 
@@ -19,8 +19,7 @@ Any Postgres reachable through `DATABASE_URL` works instead of Docker.
 ```bash
 git clone https://github.com/2tsoftwareapp/super-template.git my-app
 cd my-app
-corepack enable
-pnpm install
+bun install
 cp .env.example .env
 ```
 
@@ -31,15 +30,15 @@ local placeholder; see [Configuration](./configuration) for the full list.
 ## 3. Start the database and seed it
 
 ```bash
-pnpm bootstrap
+bun run bootstrap
 ```
 
 `bootstrap` runs three steps you can also run alone:
 
 ```bash
 docker compose up -d --wait   # Postgres on :5434, Mailpit SMTP :1025, UI :8025
-pnpm db:migrate               # apply packages/db/migrations
-pnpm db:seed                  # create the admin from ADMIN_EMAIL / ADMIN_PASSWORD
+bun run db:migrate               # apply packages/db/migrations
+bun run db:seed                  # create the admin from ADMIN_EMAIL / ADMIN_PASSWORD
 ```
 
 The seed is idempotent: it prints `admin already exists` on later runs.
@@ -47,7 +46,7 @@ The seed is idempotent: it prints `admin already exists` on later runs.
 ## 4. Run the apps
 
 ```bash
-pnpm dev:all
+bun run dev:all
 ```
 
 | Surface | URL                                 | Sign in with                                 |
@@ -58,8 +57,8 @@ pnpm dev:all
 | Mailpit | http://localhost:8025               | — (every mail the worker sends lands here)   |
 
 `dev:all` starts the API, worker, web and admin in one terminal with prefixed
-logs. To run them separately: `pnpm dev`, `pnpm dev:worker`, `pnpm dev:web`,
-`pnpm dev:admin`.
+logs. To run them separately: `bun run dev`, `bun run dev:worker`, `bun run dev:web`,
+`bun run dev:admin`.
 
 ![Web home](/screenshots/web-home.png)
 
@@ -89,8 +88,8 @@ builds: [Mobile](./mobile).
 ## 7. Check your work
 
 ```bash
-pnpm run check          # ESLint + typecheck + unit and e2e tests
-pnpm run format:check   # Prettier
+bun run check          # ESLint + typecheck + unit and e2e tests
+bun run format:check   # Prettier
 ```
 
 Both must pass before a change is done. The full list, including builds and
@@ -99,8 +98,8 @@ Flutter, is in [Testing](./testing).
 ## These docs
 
 ```bash
-pnpm docs:dev     # http://localhost:5173/super-template/
-pnpm docs:build
+bun run docs:dev     # http://localhost:5173/super-template/
+bun run docs:build
 ```
 
 A push to `main` that touches `docs/` redeploys the site to GitHub Pages.

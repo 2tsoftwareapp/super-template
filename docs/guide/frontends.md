@@ -9,7 +9,7 @@ Add a component with the shadcn CLI from the app folder:
 
 ```bash
 cd apps/web
-pnpm dlx shadcn@latest add dropdown-menu
+bunx shadcn@latest add dropdown-menu
 ```
 
 ## Web (`apps/web`, port 3000)

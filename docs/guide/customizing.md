@@ -26,10 +26,10 @@ Renaming the `@lean` scope is optional. If you do it, replace it everywhere at
 once and reinstall:
 
 ```bash
-grep -rl "@lean/" --exclude-dir=node_modules --exclude-dir=.next --exclude=pnpm-lock.yaml . \
+grep -rl "@lean/" --exclude-dir=node_modules --exclude-dir=.next --exclude=bun.lock . \
   | xargs sed -i 's#@lean/#@acme/#g'
-pnpm install
-pnpm run check
+bun install
+bun run check
 ```
 
 (On macOS use `sed -i ''`.)
@@ -53,7 +53,7 @@ Run `flutter analyze && flutter test` afterwards.
 - Colours, radius and fonts: the CSS variables in `apps/web/app/globals.css`
   and `apps/admin/app/globals.css`. Any [shadcn theme](https://ui.shadcn.com/themes)
   can be pasted over them.
-- Components: `pnpm dlx shadcn@latest add <component>` inside the app folder.
+- Components: `bunx shadcn@latest add <component>` inside the app folder.
 - Mobile: `ThemeData` in `apps/mobile/lib/main.dart`.
 
 ## 5. Behaviour switches
@@ -77,7 +77,7 @@ Run `flutter analyze && flutter test` afterwards.
 Run the full check after every removal:
 
 ```bash
-pnpm install && pnpm run check && pnpm run format:check
+bun install && bun run check && bun run format:check
 ```
 
 ## 7. Then
