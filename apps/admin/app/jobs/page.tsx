@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { adminFetch } from "@/lib/admin-fetch";
+
 interface Job {
   id: string;
   type: string;
@@ -23,7 +25,7 @@ export default function JobsPage() {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const response = await fetch("/api/jobs?page=1&limit=20");
+    const response = await adminFetch("/api/jobs?page=1&limit=20");
 
     if (!response.ok) {
       setError("Could not load jobs");
@@ -42,7 +44,7 @@ export default function JobsPage() {
   async function enqueue(): Promise<void> {
     setError(null);
 
-    const response = await fetch("/api/jobs", {
+    const response = await adminFetch("/api/jobs", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ type: "demo.echo", payload: { at: new Date().toISOString() } }),

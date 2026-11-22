@@ -29,7 +29,7 @@ export async function proxyWithSession(
 
   let result = await callApi<unknown>(path, { ...init, ...(accessToken ? { accessToken } : {}) });
   let refreshed: SessionTokens | null = null;
-  let lostRefreshRace = false;
+  let lostRace: RefreshPayload | null = null;
 
   if (result.status === 401 && refreshToken) {
     const refresh = await callApi<RefreshPayload | null>("/auth/refresh", {
@@ -40,9 +40,15 @@ export async function proxyWithSession(
     if (refresh.status === 200 && refresh.body?.data) {
       refreshed = refresh.body.data;
       result = await callApi<unknown>(path, { ...init, accessToken: refreshed.accessToken });
-    } else {
-      lostRefreshRace = refresh.body?.error?.code === "AUTH_SESSION_ROTATED";
+    } else if (refresh.body?.error?.code === "AUTH_SESSION_ROTATED") {
+      lostRace = refresh.body;
     }
+  }
+
+  // A parallel request won the refresh: tell the client to retry with the rotated
+  // cookies (see adminFetch) and leave those cookies alone.
+  if (lostRace) {
+    return NextResponse.json(lostRace, { status: 401 });
   }
 
   // 204 (and any empty body) must not be wrapped in a JSON body.
@@ -53,8 +59,7 @@ export async function proxyWithSession(
 
   if (refreshed) {
     setSessionCookies(response, refreshed);
-  } else if (result.status === 401 && !lostRefreshRace) {
-    // When a parallel request won the refresh, its rotated cookies must survive this 401.
+  } else if (result.status === 401) {
     clearSessionCookies(response);
   }
 

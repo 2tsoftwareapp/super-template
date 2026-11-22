@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 
+import { adminFetch } from "@/lib/admin-fetch";
+
 interface User {
   id: string;
   email: string;
@@ -16,7 +18,7 @@ interface ListResponse {
 }
 
 const send = (path: string, method: string, body?: unknown) =>
-  fetch(path, {
+  adminFetch(path, {
     method,
     headers: { "content-type": "application/json" },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
@@ -29,7 +31,7 @@ export default function UsersPage() {
   const [form, setForm] = useState({ email: "", displayName: "", password: "" });
 
   const load = useCallback(async () => {
-    const response = await fetch("/api/users?page=1&limit=20");
+    const response = await adminFetch("/api/users?page=1&limit=20");
 
     if (!response.ok) {
       setError("Could not load users");

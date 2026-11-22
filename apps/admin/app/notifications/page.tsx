@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { adminFetch } from "@/lib/admin-fetch";
+
 interface Notification {
   id: string;
   type: string;
@@ -22,7 +24,7 @@ export default function NotificationsPage() {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const response = await fetch("/api/notifications?page=1&limit=20");
+    const response = await adminFetch("/api/notifications?page=1&limit=20");
 
     if (!response.ok) {
       setError("Could not load notifications");
@@ -39,7 +41,7 @@ export default function NotificationsPage() {
   }, [load]);
 
   async function markRead(id: string): Promise<void> {
-    await fetch(`/api/notifications/${id}/read`, { method: "PATCH" });
+    await adminFetch(`/api/notifications/${id}/read`, { method: "PATCH" });
     await load();
   }
 
