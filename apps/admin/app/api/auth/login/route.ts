@@ -45,9 +45,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
+  // The API rate-limits per client IP + email; without this every admin shares the BFF's IP.
+  const forwardedFor = request.headers.get("x-forwarded-for");
   const result = await callApi<SessionPayload>("/auth/login", {
     method: "POST",
     body: JSON.stringify({ email: body.email, password: body.password }),
+    ...(forwardedFor ? { headers: { "x-forwarded-for": forwardedFor } } : {}),
   });
 
   if (result.status !== 200 || !result.body.data) {

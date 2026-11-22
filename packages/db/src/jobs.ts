@@ -11,7 +11,11 @@ export interface ClaimedJob {
   payload: unknown;
   attempts: number;
   maxAttempts: number;
+  /** The claim's `updated_at`: an outcome is recorded only while it still matches. */
+  claimedAt: Date;
 }
+
+type ClaimRef = Pick<ClaimedJob, "id" | "claimedAt">;
 
 export interface EnqueueJobInput {
   type: string;
@@ -59,27 +63,29 @@ export async function enqueueJob(db: Executor, input: EnqueueJobInput): Promise<
  * worker marks them done/failed, or until JOB_LOCK_TIMEOUT_SECONDS passes.
  */
 export async function claimJobs(db: Executor, limit: number): Promise<ClaimedJob[]> {
+  await failAbandonedJobs(db);
+
   const result = await db.execute<{
     id: string;
     type: string;
     payload: unknown;
     attempts: number;
     max_attempts: number;
+    updated_at: Date | string;
   }>(sql`
     UPDATE jobs
     SET status = 'PROCESSING',
         attempts = CASE WHEN status = 'PROCESSING' THEN attempts + 1 ELSE attempts END,
-        updated_at = now()
+        updated_at = date_trunc('milliseconds', now())
     WHERE id IN (
       SELECT id FROM jobs
       WHERE (status = 'PENDING' AND run_at <= now())
-         OR (status = 'PROCESSING'
-             AND updated_at < now() - (${JOB_LOCK_TIMEOUT_SECONDS} * interval '1 second'))
+         OR (status = 'PROCESSING' AND ${isAbandoned} AND attempts + 1 < max_attempts)
       ORDER BY run_at ASC
       LIMIT ${limit}
       FOR UPDATE SKIP LOCKED
     )
-    RETURNING id, type, payload, attempts, max_attempts
+    RETURNING id, type, payload, attempts, max_attempts, updated_at
   `);
 
   return (result.rows ?? []).map((row) => ({
@@ -88,10 +94,26 @@ export async function claimJobs(db: Executor, limit: number): Promise<ClaimedJob
     payload: row.payload,
     attempts: row.attempts,
     maxAttempts: row.max_attempts,
+    claimedAt: new Date(row.updated_at),
   }));
 }
 
-export async function completeJob(db: Executor, id: string, result: unknown): Promise<void> {
+const isAbandoned = sql`updated_at < now() - (${JOB_LOCK_TIMEOUT_SECONDS} * interval '1 second')`;
+
+/** An abandoned job whose missed attempt was its last one fails instead of running again. */
+async function failAbandonedJobs(db: Executor): Promise<void> {
+  await db.execute(sql`
+    UPDATE jobs
+    SET status = 'FAILED',
+        attempts = attempts + 1,
+        last_error = 'Worker stopped before finishing the last attempt',
+        updated_at = now()
+    WHERE status = 'PROCESSING' AND ${isAbandoned} AND attempts + 1 >= max_attempts
+  `);
+}
+
+/** No-op when the claim expired and another worker took the job over. */
+export async function completeJob(db: Executor, job: ClaimRef, result: unknown): Promise<void> {
   await db
     .update(jobs)
     .set({
@@ -100,17 +122,20 @@ export async function completeJob(db: Executor, id: string, result: unknown): Pr
       lastError: null,
       updatedAt: new Date(),
     })
-    .where(eq(jobs.id, id));
+    .where(ownsClaim(job));
 }
+
+const ownsClaim = (job: ClaimRef) =>
+  and(eq(jobs.id, job.id), eq(jobs.status, "PROCESSING"), eq(jobs.updatedAt, job.claimedAt));
 
 /**
  * Failed attempt: attempts + 1, then either FAILED (budget exhausted or the
  * error is not retryable) or back to PENDING with an exponential delay, so
- * retries do not spin in one pass.
+ * retries do not spin in one pass. Like `completeJob`, a no-op for an expired claim.
  */
 export async function failJob(
   db: Executor,
-  job: Pick<ClaimedJob, "id" | "attempts" | "maxAttempts">,
+  job: Pick<ClaimedJob, "id" | "attempts" | "maxAttempts" | "claimedAt">,
   error: string,
   retryable = true,
 ): Promise<void> {
@@ -124,7 +149,7 @@ export async function failJob(
         run_at = now() + (${delaySeconds} * interval '1 second'),
         last_error = ${error},
         updated_at = now()
-    WHERE id = ${job.id}
+    WHERE id = ${job.id} AND status = 'PROCESSING' AND updated_at = ${job.claimedAt.toISOString()}
   `);
 }
 

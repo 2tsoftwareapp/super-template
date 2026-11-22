@@ -21,6 +21,9 @@ const hashRefreshToken = (token: string): string =>
 const sessionRotated = (): AppError =>
   new AppError(ERROR_CODES.AUTH_SESSION_ROTATED, "Session was already refreshed", 401);
 
+const accountInactive = (): AppError =>
+  new AppError(ERROR_CODES.AUTH_UNAUTHORIZED, "Account is not active", 403);
+
 const toPublicUser = (user: UserRow): PublicUser => ({
   id: user.id,
   email: user.email,
@@ -82,13 +85,18 @@ export class AuthService {
 
     if (!user || user.status !== "ACTIVE") {
       await this.users.revokeAllForUser(session.userId);
-      throw new AppError(ERROR_CODES.AUTH_UNAUTHORIZED, "Account is not active", 403);
+      throw accountInactive();
     }
 
     const next = this.newRefreshToken(user.id);
+    const outcome = await this.users.rotateSession(session.id, next.session);
 
-    if (!(await this.users.rotateSession(session.id, next.session))) {
+    if (outcome === "lost-race") {
       throw sessionRotated();
+    }
+
+    if (outcome === "inactive") {
+      throw accountInactive();
     }
 
     return this.toSessionResponse(user, next.token);

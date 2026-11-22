@@ -85,12 +85,17 @@ export class InMemoryAuthRepository {
     const current = [...this.sessions.values()].find((session) => session.id === sessionId);
 
     if (!current || current.revokedAt) {
-      return false;
+      return "lost-race" as const;
     }
 
     current.revokedAt = new Date();
+
+    if (this.users.get(next.userId)?.status !== "ACTIVE") {
+      return "inactive" as const;
+    }
+
     await this.createSession(next);
-    return true;
+    return "rotated" as const;
   }
 
   async revokeSessionByHash(hash: string) {

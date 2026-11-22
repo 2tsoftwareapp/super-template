@@ -90,4 +90,26 @@ void main() {
     expect(
         await const FlutterSecureStorage().read(key: 'refresh_token'), isNull);
   });
+
+  test('keeps the stored token when the server is temporarily down', () async {
+    FlutterSecureStorage.setMockInitialValues({'refresh_token': 'stored'});
+    final api = ApiClient(
+      client: MockClient((_) async => http.Response('bad gateway', 503)),
+    );
+
+    await expectLater(api.restore(), throwsA(isA<ApiException>()));
+    expect(await const FlutterSecureStorage().read(key: 'refresh_token'),
+        'stored');
+  });
+
+  test('drops the stored token once the server rejects it', () async {
+    FlutterSecureStorage.setMockInitialValues({'refresh_token': 'stale'});
+    final api = ApiClient(
+      client: MockClient((_) async => http.Response('{}', 401)),
+    );
+
+    expect(await api.restore(), isNull);
+    expect(
+        await const FlutterSecureStorage().read(key: 'refresh_token'), isNull);
+  });
 }

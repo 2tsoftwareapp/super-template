@@ -24,7 +24,8 @@ const userNotFound = (): AppError =>
 
 /** An admin cannot lock themselves out: no self-block, self-delete or self-demotion. */
 function assertNotSelf(actorId: string, userId: string, action: string): void {
-  if (actorId === userId) {
+  // ParseUUIDPipe accepts upper-case hex; Postgres compares the value, so must we.
+  if (actorId.toLowerCase() === userId.toLowerCase()) {
     throw new AppError(
       ERROR_CODES.USER_SELF_ACTION_FORBIDDEN,
       `You cannot ${action} your own account`,

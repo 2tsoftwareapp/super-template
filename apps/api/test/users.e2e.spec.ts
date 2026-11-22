@@ -172,6 +172,10 @@ describe("users (e2e)", () => {
     await asAdmin("patch", `/users/${ADMIN_ID}`).send({ displayName: "Still Admin" }).expect(200);
   });
 
+  it("recognises the admin's own id in upper case", async () => {
+    await asAdmin("delete", `/users/${ADMIN_ID.toUpperCase()}`).expect(403);
+  });
+
   it("rejects an invalid payload with the shared validation envelope", async () => {
     const response = await asAdmin("post", "/users")
       .send({ email: "not-an-email", password: "short", displayName: "" })

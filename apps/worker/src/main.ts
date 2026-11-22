@@ -25,7 +25,7 @@ async function runJob(db: Database, job: ClaimedJob): Promise<void> {
   }
 
   try {
-    await completeJob(db, job.id, await handler(job.payload));
+    await completeJob(db, job, await handler(job.payload));
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
 

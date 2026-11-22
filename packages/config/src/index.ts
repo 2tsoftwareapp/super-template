@@ -18,6 +18,8 @@ export const envSchema = z.object({
   ...databaseShape,
   ...mailShape,
   API_PORT: z.coerce.number().int().positive().default(3001),
+  /** Express `trust proxy`: which hops may set X-Forwarded-For (the admin BFF). */
+  TRUST_PROXY: z.string().default("loopback"),
   JWT_ACCESS_SECRET: z.string().min(32, "must be at least 32 characters"),
   JWT_ACCESS_TTL: z.string().default("15m"),
   JWT_REFRESH_TTL: z.string().default("30d"),

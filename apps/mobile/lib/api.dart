@@ -53,7 +53,7 @@ class ApiClient {
   }
 
   /// Signs back in with the stored refresh token; null when there is none or
-  /// the server no longer accepts it.
+  /// the server rejected it. Outages (5xx, network) keep the token and throw.
   Future<Session?> restore() async {
     final refreshToken = await _store.readRefreshToken();
 
@@ -61,7 +61,8 @@ class ApiClient {
 
     try {
       return await _refresh(refreshToken);
-    } on ApiException {
+    } on ApiException catch (error) {
+      if (error.statusCode != 401 && error.statusCode != 403) rethrow;
       await _store.clear();
       return null;
     }

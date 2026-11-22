@@ -49,7 +49,7 @@ describe("AuthService.refresh", () => {
   beforeEach(() => {
     vi.resetAllMocks();
     repository.findById.mockResolvedValue(activeUser);
-    repository.rotateSession.mockResolvedValue(true);
+    repository.rotateSession.mockResolvedValue("rotated");
   });
 
   it("rotates an active session into a new token pair", async () => {
@@ -66,7 +66,7 @@ describe("AuthService.refresh", () => {
 
   it("rejects the loser of a concurrent rotation without revoking anything", async () => {
     repository.findSessionByHash.mockResolvedValue(session());
-    repository.rotateSession.mockResolvedValue(false);
+    repository.rotateSession.mockResolvedValue("lost-race");
 
     await expect(service.refresh(TOKEN)).rejects.toMatchObject({ code: "AUTH_SESSION_ROTATED" });
     expect(repository.revokeAllForUser).not.toHaveBeenCalled();
@@ -108,5 +108,12 @@ describe("AuthService.refresh", () => {
 
     await expect(service.refresh(TOKEN)).rejects.toMatchObject({ status: 403 });
     expect(repository.revokeAllForUser).toHaveBeenCalledWith(USER_ID);
+  });
+
+  it("refuses to issue a successor when the user was blocked mid-rotation", async () => {
+    repository.findSessionByHash.mockResolvedValue(session());
+    repository.rotateSession.mockResolvedValue("inactive");
+
+    await expect(service.refresh(TOKEN)).rejects.toMatchObject({ status: 403 });
   });
 });
