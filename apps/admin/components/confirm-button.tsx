@@ -35,10 +35,7 @@ export function ConfirmButton({ label, title, description, onConfirm }: ConfirmB
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            className="bg-destructive text-white hover:bg-destructive/90"
-            onClick={onConfirm}
-          >
+          <AlertDialogAction variant="destructive" onClick={onConfirm}>
             {label}
           </AlertDialogAction>
         </AlertDialogFooter>
