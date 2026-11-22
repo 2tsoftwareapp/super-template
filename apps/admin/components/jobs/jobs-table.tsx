@@ -40,7 +40,7 @@ export function JobsTable({ jobs }: { jobs: Job[] }) {
             <TableCell>
               {job.attempts}/{job.maxAttempts}
             </TableCell>
-            <TableCell className="max-w-xs truncate text-muted-foreground">
+            <TableCell className="max-w-xs whitespace-normal break-words text-muted-foreground">
               {job.lastError ?? "—"}
             </TableCell>
             <TableCell className="text-muted-foreground">
