@@ -11,11 +11,12 @@ import {
   Post,
   Query,
   UseGuards,
-  ValidationPipe,
 } from "@nestjs/common";
 
+import { CurrentUser, type RequestUser } from "../../shared/current-user.decorator";
 import { Roles } from "../../shared/roles.decorator";
 import { RolesGuard } from "../../shared/roles.guard";
+import { validate } from "../../shared/validation";
 import {
   CreateUserDto,
   ListUsersQueryDto,
@@ -32,10 +33,7 @@ export class UsersController {
   constructor(@Inject(UsersService) private readonly users: UsersService) {}
 
   @Get()
-  async list(
-    @Query(new ValidationPipe({ expectedType: ListUsersQueryDto, transform: true }))
-    query: ListUsersQueryDto,
-  ) {
+  async list(@Query(validate(ListUsersQueryDto)) query: ListUsersQueryDto) {
     return this.users.list(query);
   }
 
@@ -46,31 +44,34 @@ export class UsersController {
 
   @Post()
   @HttpCode(201)
-  async create(
-    @Body(new ValidationPipe({ expectedType: CreateUserDto })) input: CreateUserDto,
-  ): Promise<{ data: UserDto }> {
+  async create(@Body(validate(CreateUserDto)) input: CreateUserDto): Promise<{ data: UserDto }> {
     return { data: await this.users.create(input) };
   }
 
   @Patch(":id")
   async update(
+    @CurrentUser() actor: RequestUser,
     @Param("id", ParseUUIDPipe) userId: string,
-    @Body(new ValidationPipe({ expectedType: UpdateUserDto })) input: UpdateUserDto,
+    @Body(validate(UpdateUserDto)) input: UpdateUserDto,
   ): Promise<{ data: UserDto }> {
-    return { data: await this.users.update(userId, input) };
+    return { data: await this.users.update(actor.userId, userId, input) };
   }
 
   @Patch(":id/status")
   async setStatus(
+    @CurrentUser() actor: RequestUser,
     @Param("id", ParseUUIDPipe) userId: string,
-    @Body(new ValidationPipe({ expectedType: UpdateUserStatusDto })) input: UpdateUserStatusDto,
+    @Body(validate(UpdateUserStatusDto)) input: UpdateUserStatusDto,
   ): Promise<{ data: UserDto }> {
-    return { data: await this.users.setStatus(userId, input.status) };
+    return { data: await this.users.setStatus(actor.userId, userId, input.status) };
   }
 
   @Delete(":id")
   @HttpCode(204)
-  async remove(@Param("id", ParseUUIDPipe) userId: string): Promise<void> {
-    await this.users.remove(userId);
+  async remove(
+    @CurrentUser() actor: RequestUser,
+    @Param("id", ParseUUIDPipe) userId: string,
+  ): Promise<void> {
+    await this.users.remove(actor.userId, userId);
   }
 }

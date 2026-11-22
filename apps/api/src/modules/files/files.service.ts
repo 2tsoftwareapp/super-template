@@ -5,7 +5,8 @@ import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { loadEnv } from "@lean/config";
 
 import { AppError, ERROR_CODES } from "../../shared/errors";
-import { STORAGE, type StoragePort } from "../../shared/storage/storage.port";
+import type { RequestUser } from "../../shared/current-user.decorator";
+import { LocalStorageService } from "../../shared/storage/local-storage.service";
 import { FilesRepository } from "./files.repository";
 import type { FileDto } from "./files.dto";
 
@@ -37,7 +38,7 @@ export class FilesService {
 
   constructor(
     @Inject(FilesRepository) private readonly files: FilesRepository,
-    @Inject(STORAGE) private readonly storage: StoragePort,
+    @Inject(LocalStorageService) private readonly storage: LocalStorageService,
   ) {}
 
   async upload(uploaderId: string, file: UploadedFileInput): Promise<FileDto> {
@@ -59,36 +60,44 @@ export class FilesService {
 
     const storageKey = `${new Date().toISOString().slice(0, 10)}/${randomUUID()}${extname(file.originalname)}`;
 
-    await this.storage.put(storageKey, file.buffer, file.mimetype);
+    await this.storage.put(storageKey, file.buffer);
 
-    const row = await this.files.create({
-      uploaderId,
-      storageKey,
-      originalName: file.originalname,
-      mimeType: file.mimetype,
-      sizeBytes: file.size,
-    });
+    const row = await this.files
+      .create({
+        uploaderId,
+        storageKey,
+        originalName: file.originalname,
+        mimeType: file.mimetype,
+        sizeBytes: file.size,
+      })
+      .catch(async (error: unknown) => {
+        // No row means nobody can reach the bytes: delete them, keep the real error.
+        await this.storage.remove(storageKey);
+        throw error;
+      });
 
     return toFileDto(row.id, row.originalName, row.mimeType, row.sizeBytes, row.createdAt);
   }
 
-  async get(fileId: string): Promise<FileDto> {
-    const row = await this.requireFile(fileId);
+  async get(requester: RequestUser, fileId: string): Promise<FileDto> {
+    const row = await this.requireFile(requester, fileId);
 
     return toFileDto(row.id, row.originalName, row.mimeType, row.sizeBytes, row.createdAt);
   }
 
-  async download(fileId: string): Promise<FileContent> {
-    const row = await this.requireFile(fileId);
+  async download(requester: RequestUser, fileId: string): Promise<FileContent> {
+    const row = await this.requireFile(requester, fileId);
     const content = await this.storage.read(row.storageKey);
 
     return { originalName: row.originalName, mimeType: row.mimeType, content };
   }
 
-  private async requireFile(fileId: string) {
+  /** Only the uploader or an admin may see a file; anyone else gets the same 404 as a missing one. */
+  private async requireFile(requester: RequestUser, fileId: string) {
     const row = await this.files.findById(fileId);
+    const allowed = row && (row.uploaderId === requester.userId || requester.role === "ADMIN");
 
-    if (!row) {
+    if (!row || !allowed) {
       throw new AppError(ERROR_CODES.FILE_NOT_FOUND, "File not found", HttpStatus.NOT_FOUND);
     }
 

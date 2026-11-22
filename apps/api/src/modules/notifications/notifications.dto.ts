@@ -1,5 +1,5 @@
 import { Transform } from "class-transformer";
-import { IsInt, IsOptional, IsString, Min, MinLength, Max } from "class-validator";
+import { IsInt, IsOptional, IsString, IsUUID, Min, MinLength, Max } from "class-validator";
 
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from "../../shared/pagination";
 
@@ -19,8 +19,7 @@ export class ListNotificationsQueryDto {
 }
 
 export class CreateNotificationDto {
-  @IsString()
-  @MinLength(1)
+  @IsUUID()
   userId!: string;
 
   @IsString()

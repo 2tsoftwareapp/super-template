@@ -1,4 +1,7 @@
+import { loadMailEnv } from "@lean/config";
 import nodemailer from "nodemailer";
+
+import { PermanentJobError } from "./permanent-job-error";
 
 export type JobHandler = (payload: unknown) => Promise<unknown>;
 
@@ -8,19 +11,31 @@ interface MailPayload {
   text: string;
 }
 
-let transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
+let transporter: { url: string; transport: ReturnType<typeof nodemailer.createTransport> } | null =
+  null;
 
 /** Created lazily so a worker without mail configured still runs other jobs. */
-function mailTransport() {
-  const url = process.env.SMTP_URL;
-
-  if (!url) {
-    throw new Error("SMTP_URL is not configured");
+function mailTransport(url: string) {
+  if (transporter?.url !== url) {
+    transporter = { url, transport: nodemailer.createTransport(url) };
   }
 
-  transporter ??= nodemailer.createTransport(url);
+  return transporter.transport;
+}
 
-  return transporter;
+const isText = (value: unknown): value is string => typeof value === "string" && value.length > 0;
+
+/** The queue stores JSON: validate it here instead of trusting a cast. */
+function parseMailPayload(payload: unknown): MailPayload {
+  if (payload instanceof Object && "to" in payload && "subject" in payload && "text" in payload) {
+    const { to, subject, text } = payload;
+
+    if (isText(to) && isText(subject) && isText(text)) {
+      return { to, subject, text };
+    }
+  }
+
+  throw new PermanentJobError("mail.send payload needs non-empty to, subject and text");
 }
 
 /**
@@ -35,13 +50,14 @@ export const handlers: Record<string, JobHandler> = {
   },
 
   "mail.send": async (payload) => {
-    const { to, subject, text } = payload as MailPayload;
-    const info = await mailTransport().sendMail({
-      from: process.env.MAIL_FROM ?? "no-reply@example.local",
-      to,
-      subject,
-      text,
-    });
+    const mail = parseMailPayload(payload);
+    const env = loadMailEnv();
+
+    if (!env.SMTP_URL) {
+      throw new Error("SMTP_URL is not configured");
+    }
+
+    const info = await mailTransport(env.SMTP_URL).sendMail({ from: env.MAIL_FROM, ...mail });
 
     return { messageId: info.messageId };
   },

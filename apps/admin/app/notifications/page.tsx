@@ -2,6 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { FormError } from "@/components/form-error";
+import { PageHeader } from "@/components/page-header";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardDescription, CardHeader, CardTitle, CardAction } from "@/components/ui/card";
+import { adminFetch } from "@/lib/admin-fetch";
+import { cn } from "@/lib/utils";
+
 interface Notification {
   id: string;
   type: string;
@@ -22,7 +30,7 @@ export default function NotificationsPage() {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const response = await fetch("/api/notifications?page=1&limit=20");
+    const response = await adminFetch("/api/notifications?page=1&limit=20");
 
     if (!response.ok) {
       setError("Could not load notifications");
@@ -39,48 +47,41 @@ export default function NotificationsPage() {
   }, [load]);
 
   async function markRead(id: string): Promise<void> {
-    await fetch(`/api/notifications/${id}/read`, { method: "PATCH" });
+    await adminFetch(`/api/notifications/${id}/read`, { method: "PATCH" });
     await load();
   }
 
   return (
-    <main style={{ maxWidth: 760, margin: "6vh auto", fontFamily: "system-ui", padding: 24 }}>
-      <h1 style={{ fontSize: 26 }}>Notifications {unread > 0 ? `(${unread} unread)` : ""}</h1>
-
-      {error ? <p style={{ color: "crimson" }}>{error}</p> : null}
-
-      <ul style={{ listStyle: "none", padding: 0 }}>
+    <main className="mx-auto max-w-3xl space-y-6 p-6">
+      <PageHeader title="Notifications" description={`${unread} unread`} />
+      <FormError message={error} />
+      <div className="space-y-3">
         {items.map((item) => (
-          <li
-            key={item.id}
-            style={{
-              border: "1px solid #e5e5e5",
-              borderRadius: 8,
-              padding: 12,
-              marginBottom: 10,
-              opacity: item.readAt ? 0.6 : 1,
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-              <strong>{item.title}</strong>
-              <span style={{ color: "#666", fontSize: 12 }}>{item.type}</span>
-            </div>
-            <p style={{ margin: "6px 0" }}>{item.body}</p>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ color: "#888", fontSize: 12 }}>
-                {new Date(item.createdAt).toLocaleString()}
-              </span>
-              {item.readAt ? (
-                <span style={{ color: "#2e7d32", fontSize: 12 }}>Read</span>
-              ) : (
-                <button type="button" onClick={() => void markRead(item.id)}>
-                  Mark read
-                </button>
-              )}
-            </div>
-          </li>
+          <Card key={item.id} className={cn(item.readAt && "opacity-60")}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                {item.title}
+                <Badge variant="secondary">{item.type}</Badge>
+              </CardTitle>
+              <CardDescription>
+                {item.body}
+                <span className="mt-2 block text-xs">
+                  {new Date(item.createdAt).toLocaleString()}
+                </span>
+              </CardDescription>
+              <CardAction>
+                {item.readAt ? (
+                  <Badge variant="outline">Read</Badge>
+                ) : (
+                  <Button variant="outline" size="sm" onClick={() => void markRead(item.id)}>
+                    Mark read
+                  </Button>
+                )}
+              </CardAction>
+            </CardHeader>
+          </Card>
         ))}
-      </ul>
+      </div>
     </main>
   );
 }

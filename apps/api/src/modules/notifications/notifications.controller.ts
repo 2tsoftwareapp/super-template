@@ -9,12 +9,12 @@ import {
   Post,
   Query,
   UseGuards,
-  ValidationPipe,
 } from "@nestjs/common";
 
 import { CurrentUser, type RequestUser } from "../../shared/current-user.decorator";
 import { Roles } from "../../shared/roles.decorator";
 import { RolesGuard } from "../../shared/roles.guard";
+import { validate } from "../../shared/validation";
 import {
   CreateNotificationDto,
   ListNotificationsQueryDto,
@@ -29,7 +29,7 @@ export class NotificationsController {
   @Get()
   list(
     @CurrentUser() user: RequestUser,
-    @Query(new ValidationPipe({ expectedType: ListNotificationsQueryDto, transform: true }))
+    @Query(validate(ListNotificationsQueryDto))
     query: ListNotificationsQueryDto,
   ) {
     return this.notifications.listForUser(user.userId, query.page, query.limit);
@@ -47,7 +47,7 @@ export class NotificationsController {
   @UseGuards(RolesGuard)
   @Roles("ADMIN")
   async create(
-    @Body(new ValidationPipe({ expectedType: CreateNotificationDto })) input: CreateNotificationDto,
+    @Body(validate(CreateNotificationDto)) input: CreateNotificationDto,
   ): Promise<{ data: NotificationDto }> {
     return { data: await this.notifications.create(input) };
   }

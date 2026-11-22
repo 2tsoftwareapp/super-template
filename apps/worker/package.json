@@ -2,15 +2,16 @@
   "name": "@lean/worker",
   "private": true,
   "scripts": {
-    "dev": "tsx watch src/main.ts",
-    "start": "tsx src/main.ts",
-    "run:once": "tsx src/main.ts --once",
+    "dev": "tsx watch --env-file-if-exists=../../.env src/main.ts",
+    "start": "tsx --env-file-if-exists=../../.env src/main.ts",
+    "run:once": "tsx --env-file-if-exists=../../.env src/main.ts --once",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
     "@lean/db": "workspace:*",
-    "nodemailer": "^7.0.0"
+    "nodemailer": "^7.0.0",
+    "@lean/config": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

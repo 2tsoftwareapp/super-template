@@ -45,6 +45,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @lean/admin build
       - run: pnpm --filter @lean/web build
+      - run: pnpm --filter @lean/docs build
 
   mobile:
     name: Flutter analyze

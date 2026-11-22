@@ -5,6 +5,13 @@ export interface ApiResult<T> {
   body: T;
 }
 
+const BAD_GATEWAY = {
+  status: 502,
+  body: {
+    error: { code: "UPSTREAM_INVALID_RESPONSE", message: "The API returned an invalid response" },
+  },
+};
+
 /** One place that knows how to reach the API and what its envelope looks like. */
 export async function callApi<T>(
   path: string,
@@ -26,5 +33,17 @@ export async function callApi<T>(
 
   const text = await response.text();
 
-  return { status: response.status, body: (text ? JSON.parse(text) : null) as T };
+  if (!text) {
+    return { status: response.status, body: null as T };
+  }
+
+  try {
+    return { status: response.status, body: JSON.parse(text) as T };
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return BAD_GATEWAY as ApiResult<T>;
+    }
+
+    throw error;
+  }
 }

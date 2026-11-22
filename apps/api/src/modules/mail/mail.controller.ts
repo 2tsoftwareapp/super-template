@@ -1,15 +1,8 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  Inject,
-  Post,
-  UseGuards,
-  ValidationPipe,
-} from "@nestjs/common";
+import { Body, Controller, HttpCode, Inject, Post, UseGuards } from "@nestjs/common";
 
 import { Roles } from "../../shared/roles.decorator";
 import { RolesGuard } from "../../shared/roles.guard";
+import { validate } from "../../shared/validation";
 import { SendMailDto } from "./mail.dto";
 import { MailService } from "./mail.service";
 
@@ -21,7 +14,7 @@ export class MailController {
 
   @Post("send")
   @HttpCode(202)
-  async send(@Body(new ValidationPipe({ expectedType: SendMailDto })) input: SendMailDto) {
+  async send(@Body(validate(SendMailDto)) input: SendMailDto) {
     return { data: await this.mail.send(input) };
   }
 }

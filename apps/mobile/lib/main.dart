@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'api.dart';
-import 'screens/login_screen.dart';
+import 'screens/startup_screen.dart';
 
 void main() {
   runApp(const LeanApp());
@@ -15,7 +15,7 @@ class LeanApp extends StatelessWidget {
     return MaterialApp(
       title: 'Lean Template',
       theme: ThemeData(colorSchemeSeed: Colors.green, useMaterial3: true),
-      home: LoginScreen(api: ApiClient()),
+      home: StartupScreen(api: ApiClient()),
     );
   }
 }

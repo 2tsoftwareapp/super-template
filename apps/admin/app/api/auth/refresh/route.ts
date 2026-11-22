@@ -4,12 +4,21 @@ import { NextResponse } from "next/server";
 
 import { callApi } from "@/lib/backend";
 import { clearSessionCookies, setSessionCookies } from "@/lib/cookies";
+import { isSameOrigin } from "@/lib/is-same-origin";
 
 interface SessionPayload {
   data?: { accessToken: string; refreshToken: string; user: unknown };
+  error?: { code: string; message: string };
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  if (!isSameOrigin(request)) {
+    return NextResponse.json(
+      { error: { code: "AUTH_FORBIDDEN", message: "Bad origin" } },
+      { status: 403 },
+    );
+  }
+
   const refreshToken = request.cookies.get("refresh_token")?.value;
 
   if (!refreshToken) {
@@ -26,7 +35,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   if (result.status !== 200 || !result.body.data) {
     const response = NextResponse.json(result.body, { status: result.status });
-    clearSessionCookies(response);
+
+    // A concurrent refresh already rotated the cookie; clearing it would log the user out.
+    if (result.body?.error?.code !== "AUTH_SESSION_ROTATED") {
+      clearSessionCookies(response);
+    }
+
     return response;
   }
 

@@ -21,7 +21,8 @@ apps/api/src/modules/<feature>/
 
 ## Non-negotiables
 
-1. No `any`, no `as unknown as` outside JSON/transport boundaries, no `!`.
+1. No `any`, no `as unknown as` outside JSON/transport boundaries, no `!`
+   (except definite assignment on class-validator DTO fields: `email!: string`).
 2. No swallowed errors: `catch {}` is a bug. Map to `AppError` or rethrow.
 3. Dependencies point one way: `modules/a` never imports `modules/b` internals;
    cross-feature needs go through `b`'s exported service or a shared type.

@@ -3,6 +3,8 @@
 A full-stack starter with four surfaces — **api, web, admin, mobile** — plus a
 worker, built with clean code and no ceremony.
 
+**Docs:** https://2tsoftwareapp.github.io/super-template/ (source in `docs/`).
+
 - Backend: NestJS + Drizzle + Postgres, one folder per feature.
 - Web: Next.js landing. Admin: Next.js console. Mobile: Flutter.
 - Queue and jobs live in Postgres (`SKIP LOCKED`); no Redis requirement.
@@ -13,7 +15,7 @@ worker, built with clean code and no ceremony.
 ```bash
 pnpm install
 docker compose up -d          # Postgres 18 + Mailpit (or point DATABASE_URL at any Postgres)
-cp .env.example .env
+cp .env.example .env          # read by db scripts, api and worker; exported vars win
 pnpm db:migrate && pnpm db:seed
 
 pnpm dev                      # api      -> http://localhost:3001
@@ -29,7 +31,10 @@ Mobile (needs Flutter 3.5+):
 cd apps/mobile
 flutter pub get
 flutter run --dart-define=API_BASE_URL=http://10.0.2.2:3001   # Android emulator
+flutter run --dart-define=API_BASE_URL=http://localhost:3001  # iOS simulator
 ```
+
+Debug builds allow plain HTTP to the local API; release builds expect HTTPS.
 
 ## Branches — two tracks
 
@@ -38,8 +43,7 @@ flutter run --dart-define=API_BASE_URL=http://10.0.2.2:3001   # Android emulator
 | `main` | **this** lean template (simple, four surfaces)                                     |
 | `max`  | the full enterprise template (plugin architecture, multi-tenant, SSO/MFA, codegen) |
 
-`lean` is the working branch until the switch-over; see
-`docs/plans/lean-template-v2.md` in the `max` branch for the full rationale.
+See `docs/plans/lean-template-v2.md` in the `max` branch for the rationale.
 
 ## What the code looks like
 

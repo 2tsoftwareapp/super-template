@@ -1,21 +1,20 @@
 import "reflect-metadata";
 
-import { ValidationPipe } from "@nestjs/common";
+import type { NestExpressApplication } from "@nestjs/platform-express";
+
 import { NestFactory } from "@nestjs/core";
 import { loadEnv } from "@lean/config";
 
 import { AppModule } from "./app.module";
-import { AppExceptionFilter } from "./shared/app-exception.filter";
+import { configureApp } from "./app-setup";
 
 async function bootstrap(): Promise<void> {
   const env = loadEnv();
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.setGlobalPrefix("api/v1");
-  app.useGlobalPipes(
-    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
-  );
-  app.useGlobalFilters(new AppExceptionFilter());
+  // Login throttling keys on the client IP the admin BFF forwards.
+  app.set("trust proxy", env.TRUST_PROXY);
+  configureApp(app);
   app.enableShutdownHooks();
   await app.listen(env.API_PORT);
 }

@@ -4,10 +4,9 @@ import { dirname, join, resolve } from "node:path";
 import { Injectable } from "@nestjs/common";
 import { loadEnv } from "@lean/config";
 
-import type { StoragePort } from "./storage.port";
-
+/** Object storage on local disk. Extract an interface when a second driver (S3) lands. */
 @Injectable()
-export class LocalStorageService implements StoragePort {
+export class LocalStorageService {
   private readonly root = resolve(loadEnv().STORAGE_DIR);
 
   /** Keys are generated internally, but never trust a path that reaches the disk. */
@@ -21,7 +20,7 @@ export class LocalStorageService implements StoragePort {
     return full;
   }
 
-  async put(key: string, data: Buffer, _contentType: string): Promise<void> {
+  async put(key: string, data: Buffer): Promise<void> {
     const path = this.pathFor(key);
 
     await mkdir(dirname(path), { recursive: true });

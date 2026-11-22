@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { Response } from "express";
 
 import {
   Controller,
@@ -15,9 +15,8 @@ import {
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 
-import { AppError, ERROR_CODES } from "../../shared/errors";
-
 import { CurrentUser, type RequestUser } from "../../shared/current-user.decorator";
+import { AppError, ERROR_CODES } from "../../shared/errors";
 import type { FileDto } from "./files.dto";
 import { FilesService, type UploadedFileInput } from "./files.service";
 
@@ -31,7 +30,6 @@ export class FilesController {
   async upload(
     @CurrentUser() user: RequestUser,
     @UploadedFile() file: UploadedFileInput | undefined,
-    _request: Request,
   ): Promise<{ data: FileDto }> {
     if (!file) {
       throw new AppError(ERROR_CODES.VALIDATION_FAILED, "multipart field 'file' is required", 400);
@@ -41,16 +39,20 @@ export class FilesController {
   }
 
   @Get(":id")
-  async get(@Param("id", ParseUUIDPipe) fileId: string): Promise<{ data: FileDto }> {
-    return { data: await this.files.get(fileId) };
+  async get(
+    @CurrentUser() user: RequestUser,
+    @Param("id", ParseUUIDPipe) fileId: string,
+  ): Promise<{ data: FileDto }> {
+    return { data: await this.files.get(user, fileId) };
   }
 
   @Get(":id/download")
   async download(
+    @CurrentUser() user: RequestUser,
     @Param("id", ParseUUIDPipe) fileId: string,
     @Res({ passthrough: true }) response: Response,
   ): Promise<StreamableFile> {
-    const file = await this.files.download(fileId);
+    const file = await this.files.download(user, fileId);
     const safeName = file.originalName.replace(/["\\\r\n]/g, "_");
 
     response.setHeader("content-type", file.mimeType);

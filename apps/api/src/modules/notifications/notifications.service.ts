@@ -1,6 +1,7 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import type { NotificationRow } from "@lean/db";
 
+import { isForeignKeyViolation } from "../../shared/database-errors";
 import { AppError, ERROR_CODES } from "../../shared/errors";
 import { buildPageMeta, type PageMeta } from "../../shared/pagination";
 import { NotificationsRepository, type CreateNotificationInput } from "./notifications.repository";
@@ -22,7 +23,15 @@ export class NotificationsService {
   ) {}
 
   async create(input: CreateNotificationInput): Promise<NotificationDto> {
-    return toNotificationDto(await this.notifications.create(input));
+    try {
+      return toNotificationDto(await this.notifications.create(input));
+    } catch (error) {
+      if (isForeignKeyViolation(error)) {
+        throw new AppError(ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
+      }
+
+      throw error;
+    }
   }
 
   async listForUser(

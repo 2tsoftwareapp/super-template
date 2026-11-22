@@ -3,9 +3,21 @@
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
+import { FormError } from "@/components/form-error";
+import { TextField } from "@/components/text-field";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("admin@example.local");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -24,7 +36,8 @@ export default function LoginPage() {
     setPending(false);
 
     if (!response.ok) {
-      setError("Invalid email or password");
+      const body = (await response.json().catch(() => ({}))) as { error?: { message?: string } };
+      setError(body.error?.message ?? "Could not sign in");
       return;
     }
 
@@ -33,34 +46,41 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={{ maxWidth: 360, margin: "10vh auto", fontFamily: "system-ui", padding: 24 }}>
-      <h1 style={{ fontSize: 24, marginBottom: 16 }}>Sign in</h1>
-      <form onSubmit={onSubmit} style={{ display: "grid", gap: 12 }}>
-        <label>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-            style={{ display: "block", width: "100%", padding: 8, marginTop: 4 }}
-          />
-        </label>
-        <label>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-            style={{ display: "block", width: "100%", padding: 8, marginTop: 4 }}
-          />
-        </label>
-        {error ? <p style={{ color: "crimson", margin: 0 }}>{error}</p> : null}
-        <button type="submit" disabled={pending} style={{ padding: 10 }}>
-          {pending ? "Signing in…" : "Sign in"}
-        </button>
-      </form>
+    <main className="flex min-h-screen items-center justify-center p-6">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle className="text-xl">Sign in</CardTitle>
+          <CardDescription>Use an admin account to open the console.</CardDescription>
+        </CardHeader>
+        <form onSubmit={onSubmit}>
+          <CardContent className="grid gap-4">
+            <TextField
+              id="email"
+              label="Email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+            />
+            <TextField
+              id="password"
+              label="Password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+            <FormError message={error} />
+          </CardContent>
+          <CardFooter className="pt-6">
+            <Button type="submit" className="w-full" disabled={pending}>
+              {pending ? "Signing in…" : "Sign in"}
+            </Button>
+          </CardFooter>
+        </form>
+      </Card>
     </main>
   );
 }

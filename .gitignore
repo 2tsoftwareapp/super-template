@@ -12,3 +12,10 @@ coverage
 build/
 .flutter-plugins
 .flutter-plugins-dependencies
+.turbo
+*.tsbuildinfo
+.DS_Store
+/storage/
+/apps/api/storage/
+docs/.vitepress/cache
+docs/.vitepress/dist

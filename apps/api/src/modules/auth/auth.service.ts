@@ -7,14 +7,22 @@ import { loadEnv } from "@lean/config";
 import { hashPassword, verifyPassword, type UserRow } from "@lean/db";
 
 import { AppError, ERROR_CODES } from "../../shared/errors";
-import { TokenService } from "../../shared/token.service";
-import { AuthRepository } from "./auth.repository";
+import { AuthRepository, type CreateSessionInput } from "./auth.repository";
+import { TokenService } from "./token.service";
 
 const REFRESH_TOKEN_BYTES = 32;
+/** How long a just-rotated token is treated as a lost race rather than a replay. */
+const ROTATION_GRACE_MS = 10_000;
 const ACCESS_DENIED = "Invalid email or password";
 
 const hashRefreshToken = (token: string): string =>
   createHash("sha256").update(token).digest("hex");
+
+const sessionRotated = (): AppError =>
+  new AppError(ERROR_CODES.AUTH_SESSION_ROTATED, "Session was already refreshed", 401);
+
+const accountInactive = (): AppError =>
+  new AppError(ERROR_CODES.AUTH_UNAUTHORIZED, "Account is not active", 403);
 
 const toPublicUser = (user: UserRow): PublicUser => ({
   id: user.id,
@@ -52,9 +60,11 @@ export class AuthService {
   }
 
   /**
-   * Rotation: the presented token is revoked before a new one is issued. A
-   * revoked token coming back means it was stolen or replayed — every session
-   * of that user is revoked.
+   * Rotation: the presented token is revoked and its successor inserted in one
+   * transaction. A revoked token coming back after the grace window means it was
+   * stolen or replayed — every session of that user is revoked. Inside the
+   * window it is a concurrent refresh that lost the race (two tabs, two BFF
+   * requests) and only that request is rejected.
    */
   async refresh(refreshToken: string): Promise<SessionResponse> {
     const session = await this.users.findSessionByHash(hashRefreshToken(refreshToken));
@@ -64,8 +74,7 @@ export class AuthService {
     }
 
     if (session.revokedAt) {
-      await this.users.revokeAllForUser(session.userId);
-      throw new AppError(ERROR_CODES.AUTH_TOKEN_REUSED, "Refresh token reuse detected", 401);
+      return this.rejectRevoked(session.userId, session.revokedAt);
     }
 
     if (session.expiresAt.getTime() <= Date.now()) {
@@ -75,13 +84,26 @@ export class AuthService {
     const user = await this.users.findById(session.userId);
 
     if (!user || user.status !== "ACTIVE") {
-      await this.users.revokeSession(session.id);
-      throw new AppError(ERROR_CODES.AUTH_UNAUTHORIZED, "Account is not active", 403);
+      await this.users.revokeAllForUser(session.userId);
+      throw accountInactive();
     }
 
-    await this.users.revokeSession(session.id);
+    const next = this.newRefreshToken(user.id);
+    const outcome = await this.users.rotateSession(session.id, next.session);
 
-    return this.issueSession(user);
+    if (outcome === "lost-race") {
+      throw sessionRotated();
+    }
+
+    if (outcome === "inactive") {
+      throw accountInactive();
+    }
+
+    return this.toSessionResponse(user, next.token);
+  }
+
+  async revokeAllSessions(userId: string): Promise<void> {
+    await this.users.revokeAllForUser(userId);
   }
 
   async logout(refreshToken: string | undefined): Promise<void> {
@@ -103,19 +125,37 @@ export class AuthService {
   }
 
   private async issueSession(user: UserRow): Promise<SessionResponse> {
-    const refreshToken = randomBytes(REFRESH_TOKEN_BYTES).toString("base64url");
+    const next = this.newRefreshToken(user.id);
 
-    await this.users.createSession({
-      userId: user.id,
-      refreshTokenHash: hashRefreshToken(refreshToken),
-      expiresAt: new Date(Date.now() + this.refreshTtlMs()),
-    });
+    await this.users.createSession(next.session);
+
+    return this.toSessionResponse(user, next.token);
+  }
+
+  private async rejectRevoked(userId: string, revokedAt: Date): Promise<never> {
+    if (Date.now() - revokedAt.getTime() < ROTATION_GRACE_MS) {
+      throw sessionRotated();
+    }
+
+    await this.users.revokeAllForUser(userId);
+    throw new AppError(ERROR_CODES.AUTH_TOKEN_REUSED, "Refresh token reuse detected", 401);
+  }
+
+  private newRefreshToken(userId: string): { token: string; session: CreateSessionInput } {
+    const token = randomBytes(REFRESH_TOKEN_BYTES).toString("base64url");
 
     return {
-      accessToken: this.tokens.sign(user),
-      refreshToken,
-      user: toPublicUser(user),
+      token,
+      session: {
+        userId,
+        refreshTokenHash: hashRefreshToken(token),
+        expiresAt: new Date(Date.now() + this.refreshTtlMs()),
+      },
     };
+  }
+
+  private toSessionResponse(user: UserRow, refreshToken: string): SessionResponse {
+    return { accessToken: this.tokens.sign(user), refreshToken, user: toPublicUser(user) };
   }
 
   /** `30d` / `12h` / `45m` — the one place that understands the env format. */

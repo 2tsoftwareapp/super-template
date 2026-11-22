@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../api.dart';
+import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.api, required this.session});
@@ -31,8 +32,23 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _logout() async {
-    await widget.api.logout(widget.session.refreshToken);
-    if (mounted) Navigator.of(context).pop();
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
+    try {
+      await widget.api.logout();
+    } on Exception {
+      messenger.showSnackBar(const SnackBar(
+          content:
+              Text('Signed out on this device; the server was unreachable.')));
+    }
+
+    if (!mounted) return;
+
+    await navigator.pushAndRemoveUntil(
+      MaterialPageRoute<void>(builder: (_) => LoginScreen(api: widget.api)),
+      (_) => false,
+    );
   }
 
   @override
