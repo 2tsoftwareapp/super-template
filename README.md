@@ -3,10 +3,15 @@
 A full-stack starter with four surfaces — **api, web, admin, mobile** — plus a
 worker, built with clean code and no ceremony.
 
-**Docs:** https://2tsoftwareapp.github.io/super-template/ (source in `docs/`).
+**Docs:** https://2tsoftwareapp.github.io/super-template/ (source in `docs/`):
+[getting started](https://2tsoftwareapp.github.io/super-template/guide/getting-started),
+[add a feature](https://2tsoftwareapp.github.io/super-template/guide/add-a-feature),
+[deployment](https://2tsoftwareapp.github.io/super-template/guide/deployment),
+[make it yours](https://2tsoftwareapp.github.io/super-template/guide/customizing).
 
 - Backend: NestJS + Drizzle + Postgres, one folder per feature.
-- Web: Next.js landing. Admin: Next.js console. Mobile: Flutter.
+- Web: Next.js with sign-up, password reset and account pages. Admin: Next.js console.
+  Both use shadcn/ui. Mobile: Flutter with notifications and uploads.
 - Queue and jobs live in Postgres (`SKIP LOCKED`); no Redis requirement.
 - No plugin system, no ports with one implementation, no codegen pipeline.
 

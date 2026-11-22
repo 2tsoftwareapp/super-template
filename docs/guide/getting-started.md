@@ -1,29 +1,79 @@
 # Getting started
 
-## Requirements
+This page takes a fresh clone to a running stack: API, worker, web, admin and
+the mobile app, with a database, a seeded admin and a local mail inbox.
 
-- Node.js 24 and pnpm 11.9 (`corepack enable` picks the version from `package.json`)
-- Docker, for Postgres 18 and Mailpit (or any Postgres reachable through `DATABASE_URL`)
-- Flutter stable, only for `apps/mobile`
+## 1. Install the tools
 
-## Run everything
+| Tool    | Version    | Why                                                     |
+| ------- | ---------- | ------------------------------------------------------- |
+| Node.js | 24         | every TypeScript app                                    |
+| pnpm    | 11.9       | `corepack enable` picks the version from `package.json` |
+| Docker  | any recent | Postgres 18 and Mailpit for local development           |
+| Flutter | stable     | only for `apps/mobile`                                  |
+
+Any Postgres reachable through `DATABASE_URL` works instead of Docker.
+
+## 2. Install and configure
 
 ```bash
+git clone https://github.com/2tsoftwareapp/super-template.git my-app
+cd my-app
+corepack enable
 pnpm install
-docker compose up -d          # Postgres on :5434, Mailpit on :1025 (SMTP) / :8025 (UI)
-cp .env.example .env          # read by db scripts, api and worker; exported vars win
-pnpm db:migrate && pnpm db:seed
-
-pnpm dev                      # api    -> http://localhost:3001/api/v1
-pnpm dev:admin                # admin  -> http://localhost:3002
-pnpm dev:web                  # web    -> http://localhost:3000
-pnpm dev:worker               # worker (claims jobs)
+cp .env.example .env
 ```
 
-`pnpm db:seed` creates the first admin from `ADMIN_EMAIL` / `ADMIN_PASSWORD`. The
-values in `.env.example` are local placeholders; change them anywhere else.
+`.env` is read by the API, the worker and the database scripts. Variables
+exported in your shell win over the file. Every value in `.env.example` is a
+local placeholder; see [Configuration](./configuration) for the full list.
 
-## Mobile
+## 3. Start the database and seed it
+
+```bash
+pnpm bootstrap
+```
+
+`bootstrap` runs three steps you can also run alone:
+
+```bash
+docker compose up -d --wait   # Postgres on :5434, Mailpit SMTP :1025, UI :8025
+pnpm db:migrate               # apply packages/db/migrations
+pnpm db:seed                  # create the admin from ADMIN_EMAIL / ADMIN_PASSWORD
+```
+
+The seed is idempotent: it prints `admin already exists` on later runs.
+
+## 4. Run the apps
+
+```bash
+pnpm dev:all
+```
+
+| Surface | URL                                 | Sign in with                                 |
+| ------- | ----------------------------------- | -------------------------------------------- |
+| API     | http://localhost:3001/api/v1/health | —                                            |
+| Web     | http://localhost:3000               | create an account at `/register`             |
+| Admin   | http://localhost:3002               | `ADMIN_EMAIL` / `ADMIN_PASSWORD` from `.env` |
+| Mailpit | http://localhost:8025               | — (every mail the worker sends lands here)   |
+
+`dev:all` starts the API, worker, web and admin in one terminal with prefixed
+logs. To run them separately: `pnpm dev`, `pnpm dev:worker`, `pnpm dev:web`,
+`pnpm dev:admin`.
+
+![Web home](/screenshots/web-home.png)
+
+## 5. Try the main flows
+
+1. Open http://localhost:3000/register and create an account. You land on `/account`.
+2. Sign out, click **Forgot password?** on `/login`, and enter the same email.
+3. Open Mailpit at http://localhost:8025 and follow the reset link. The worker
+   must be running for the mail to leave the queue.
+4. Sign in to the admin at http://localhost:3002. The new user is under
+   **Users**; block them and their web session stops working on the next request.
+5. On **Jobs**, enqueue `demo.fail` and watch it retry with backoff, then fail.
+
+## 6. Run the mobile app
 
 ```bash
 cd apps/mobile
@@ -32,17 +82,19 @@ flutter run --dart-define=API_BASE_URL=http://10.0.2.2:3001   # Android emulator
 flutter run --dart-define=API_BASE_URL=http://localhost:3001  # iOS simulator
 ```
 
-Debug builds allow plain HTTP to the local API; release builds expect HTTPS.
+A physical device needs your computer's LAN address, for example
+`--dart-define=API_BASE_URL=http://192.168.1.20:3001`. Details and release
+builds: [Mobile](./mobile).
 
-## Definition of done
+## 7. Check your work
 
 ```bash
-pnpm run check         # typecheck + unit and e2e tests (e2e needs Postgres)
-pnpm run format:check
+pnpm run check          # ESLint + typecheck + unit and e2e tests
+pnpm run format:check   # Prettier
 ```
 
-CI runs the same commands, then builds admin, web and these docs, and runs
-`flutter analyze` and `flutter test`.
+Both must pass before a change is done. The full list, including builds and
+Flutter, is in [Testing](./testing).
 
 ## These docs
 
@@ -51,4 +103,4 @@ pnpm docs:dev     # http://localhost:5173/super-template/
 pnpm docs:build
 ```
 
-Every push to `main` that touches `docs/` redeploys the site to GitHub Pages.
+A push to `main` that touches `docs/` redeploys the site to GitHub Pages.
