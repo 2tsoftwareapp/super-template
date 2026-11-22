@@ -10,6 +10,11 @@ interface SessionTokens {
   refreshToken: string;
 }
 
+interface RefreshPayload {
+  data?: SessionTokens;
+  error?: { code: string; message: string };
+}
+
 /**
  * Calls the API with the session cookie. On 401 it refreshes once, retries, and
  * writes the rotated cookies on the way out. One place, every BFF route.
@@ -22,18 +27,21 @@ export async function proxyWithSession(
   const accessToken = request.cookies.get("access_token")?.value;
   const refreshToken = request.cookies.get("refresh_token")?.value;
 
-  let result = await callApi(path, { ...init, ...(accessToken ? { accessToken } : {}) });
+  let result = await callApi<unknown>(path, { ...init, ...(accessToken ? { accessToken } : {}) });
   let refreshed: SessionTokens | null = null;
+  let lostRefreshRace = false;
 
   if (result.status === 401 && refreshToken) {
-    const refresh = await callApi<{ data?: SessionTokens }>("/auth/refresh", {
+    const refresh = await callApi<RefreshPayload | null>("/auth/refresh", {
       method: "POST",
       body: JSON.stringify({ refreshToken }),
     });
 
-    if (refresh.status === 200 && refresh.body.data) {
+    if (refresh.status === 200 && refresh.body?.data) {
       refreshed = refresh.body.data;
-      result = await callApi(path, { ...init, accessToken: refreshed.accessToken });
+      result = await callApi<unknown>(path, { ...init, accessToken: refreshed.accessToken });
+    } else {
+      lostRefreshRace = refresh.body?.error?.code === "AUTH_SESSION_ROTATED";
     }
   }
 
@@ -45,7 +53,8 @@ export async function proxyWithSession(
 
   if (refreshed) {
     setSessionCookies(response, refreshed);
-  } else if (result.status === 401) {
+  } else if (result.status === 401 && !lostRefreshRace) {
+    // When a parallel request won the refresh, its rotated cookies must survive this 401.
     clearSessionCookies(response);
   }
 

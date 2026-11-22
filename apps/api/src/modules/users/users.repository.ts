@@ -10,13 +10,17 @@ export interface ListUsersInput {
   search?: string;
 }
 
+/** `%` and `_` in a search term are literals, not wildcards (backslash is the default escape). */
+const escapeLike = (term: string): string => term.replace(/[\\%_]/g, "\\$&");
+
 @Injectable()
 export class UsersRepository {
   constructor(@Inject(DatabaseService) private readonly database: DatabaseService) {}
 
   async list(input: ListUsersInput): Promise<{ rows: UserRow[]; total: number }> {
-    const where = input.search
-      ? or(ilike(users.email, `%${input.search}%`), ilike(users.displayName, `%${input.search}%`))
+    const pattern = input.search ? `%${escapeLike(input.search)}%` : undefined;
+    const where = pattern
+      ? or(ilike(users.email, pattern), ilike(users.displayName, pattern))
       : undefined;
 
     const [rows, [totalRow]] = await Promise.all([

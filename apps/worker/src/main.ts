@@ -1,28 +1,52 @@
-import { claimJobs, completeJob, createDatabase, failJob } from "@lean/db";
+import { loadWorkerEnv } from "@lean/config";
+import {
+  claimJobs,
+  completeJob,
+  createDatabase,
+  failJob,
+  type ClaimedJob,
+  type Database,
+} from "@lean/db";
 
 import { handlers } from "./handlers";
+import { PermanentJobError } from "./permanent-job-error";
 
 const BATCH_SIZE = 5;
 const IDLE_SLEEP_MS = 500;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function databaseUrl(): string {
-  const url = process.env.DATABASE_URL;
+async function runJob(db: Database, job: ClaimedJob): Promise<void> {
+  const handler = handlers[job.type];
 
-  if (!url) {
-    throw new Error("DATABASE_URL is required to run the worker");
+  if (!handler) {
+    await failJob(db, job, `No handler for ${job.type}`, false);
+    return;
   }
 
-  return url;
+  try {
+    await completeJob(db, job.id, await handler(job.payload));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+
+    await failJob(db, job, message, !(error instanceof PermanentJobError));
+  }
 }
 
+/** SIGTERM/SIGINT stop claiming; the batch in hand finishes so no row is left PROCESSING. */
 async function main(): Promise<void> {
   const runOnce = process.argv.includes("--once");
-  const { db, pool } = createDatabase(databaseUrl());
+  const { db, pool } = createDatabase(loadWorkerEnv().DATABASE_URL);
+  let stopping = false;
+  const stop = () => {
+    stopping = true;
+  };
+
+  process.once("SIGTERM", stop);
+  process.once("SIGINT", stop);
 
   try {
-    for (;;) {
+    while (!stopping) {
       const batch = await claimJobs(db, BATCH_SIZE);
 
       if (batch.length === 0) {
@@ -35,20 +59,7 @@ async function main(): Promise<void> {
       }
 
       for (const job of batch) {
-        const handler = handlers[job.type];
-
-        if (!handler) {
-          await failJob(db, job.id, job.attempts, job.maxAttempts, `No handler for ${job.type}`);
-          continue;
-        }
-
-        try {
-          await completeJob(db, job.id, await handler(job.payload));
-        } catch (error) {
-          const message = error instanceof Error ? error.message : String(error);
-
-          await failJob(db, job.id, job.attempts, job.maxAttempts, message);
-        }
+        await runJob(db, job);
       }
     }
   } finally {

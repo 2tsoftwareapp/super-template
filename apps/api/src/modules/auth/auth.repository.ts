@@ -44,11 +44,27 @@ export class AuthRepository {
     return session ?? null;
   }
 
-  async revokeSession(sessionId: string): Promise<void> {
-    await this.database.db
-      .update(sessions)
-      .set({ revokedAt: new Date() })
-      .where(and(eq(sessions.id, sessionId), isNull(sessions.revokedAt)));
+  /**
+   * Revokes `sessionId` and inserts its successor in one transaction. The
+   * conditional update is the lock: of two concurrent rotations of the same
+   * session exactly one sees `revoked_at IS NULL`; the other gets `false`.
+   */
+  async rotateSession(sessionId: string, next: CreateSessionInput): Promise<boolean> {
+    return this.database.transaction(async () => {
+      const [revoked] = await this.database.db
+        .update(sessions)
+        .set({ revokedAt: new Date() })
+        .where(and(eq(sessions.id, sessionId), isNull(sessions.revokedAt)))
+        .returning({ id: sessions.id });
+
+      if (!revoked) {
+        return false;
+      }
+
+      await this.database.db.insert(sessions).values(next);
+
+      return true;
+    });
   }
 
   async revokeSessionByHash(refreshTokenHash: string): Promise<void> {

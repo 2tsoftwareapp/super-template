@@ -16,6 +16,18 @@ interface SessionPayload {
   error?: { code: string; message: string };
 }
 
+async function readLoginBody(request: NextRequest): Promise<LoginBody | null> {
+  try {
+    return (await request.json()) as LoginBody;
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return null;
+    }
+
+    throw error;
+  }
+}
+
 export async function POST(request: NextRequest): Promise<NextResponse> {
   if (!isSameOrigin(request)) {
     return NextResponse.json(
@@ -24,7 +36,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const body = (await request.json()) as LoginBody;
+  const body = await readLoginBody(request);
+
+  if (!body) {
+    return NextResponse.json(
+      { error: { code: "VALIDATION_FAILED", message: "Body must be JSON" } },
+      { status: 400 },
+    );
+  }
+
   const result = await callApi<SessionPayload>("/auth/login", {
     method: "POST",
     body: JSON.stringify({ email: body.email, password: body.password }),

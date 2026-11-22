@@ -13,7 +13,7 @@ worker, built with clean code and no ceremony.
 ```bash
 pnpm install
 docker compose up -d          # Postgres 18 + Mailpit (or point DATABASE_URL at any Postgres)
-cp .env.example .env
+cp .env.example .env          # read by db scripts, api and worker; exported vars win
 pnpm db:migrate && pnpm db:seed
 
 pnpm dev                      # api      -> http://localhost:3001
@@ -29,7 +29,10 @@ Mobile (needs Flutter 3.5+):
 cd apps/mobile
 flutter pub get
 flutter run --dart-define=API_BASE_URL=http://10.0.2.2:3001   # Android emulator
+flutter run --dart-define=API_BASE_URL=http://localhost:3001  # iOS simulator
 ```
+
+Debug builds allow plain HTTP to the local API; release builds expect HTTPS.
 
 ## Branches — two tracks
 

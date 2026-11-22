@@ -61,15 +61,39 @@ export default function UsersPage() {
     await load();
   }
 
-  async function toggleStatus(user: User): Promise<void> {
-    const next = user.status === "ACTIVE" ? "BLOCKED" : "ACTIVE";
-    await send(`/api/users/${user.id}/status`, "PATCH", { status: next });
+  async function act(response: Response, fallback: string): Promise<void> {
+    if (!response.ok) {
+      const body = (await response.json().catch(() => ({}))) as { error?: { message?: string } };
+      setError(body.error?.message ?? fallback);
+    }
+
     await load();
   }
 
+  async function toggleStatus(user: User): Promise<void> {
+    const next = user.status === "ACTIVE" ? "BLOCKED" : "ACTIVE";
+
+    if (
+      next === "BLOCKED" &&
+      !window.confirm(`Block ${user.email}? They are signed out at once.`)
+    ) {
+      return;
+    }
+
+    setError(null);
+    await act(
+      await send(`/api/users/${user.id}/status`, "PATCH", { status: next }),
+      "Could not change the status",
+    );
+  }
+
   async function remove(user: User): Promise<void> {
-    await send(`/api/users/${user.id}`, "DELETE");
-    await load();
+    if (!window.confirm(`Delete ${user.email}? This cannot be undone.`)) {
+      return;
+    }
+
+    setError(null);
+    await act(await send(`/api/users/${user.id}`, "DELETE"), "Could not delete the user");
   }
 
   return (

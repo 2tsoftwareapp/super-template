@@ -1,17 +1,26 @@
 import { z } from "zod";
 
+const mailShape = {
+  SMTP_URL: z.string().url().optional(),
+  MAIL_FROM: z.string().min(1).default("no-reply@example.local"),
+};
+
+const databaseShape = {
+  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  DATABASE_URL: z.string().min(1),
+};
+
 /**
- * Every variable the API and worker need. Parsed once at boot: a missing or
- * malformed value fails there, not three layers deep inside a request.
+ * Every variable the API needs. Parsed once at boot: a missing or malformed
+ * value fails there, not three layers deep inside a request.
  */
 export const envSchema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  ...databaseShape,
+  ...mailShape,
   API_PORT: z.coerce.number().int().positive().default(3001),
-  DATABASE_URL: z.string().min(1),
   JWT_ACCESS_SECRET: z.string().min(32, "must be at least 32 characters"),
   JWT_ACCESS_TTL: z.string().default("15m"),
   JWT_REFRESH_TTL: z.string().default("30d"),
-  SMTP_URL: z.string().url().optional(),
   STORAGE_DIR: z.string().default("./storage"),
   MAX_UPLOAD_BYTES: z.coerce
     .number()
@@ -20,10 +29,18 @@ export const envSchema = z.object({
     .default(5 * 1024 * 1024),
 });
 
-export type Env = z.infer<typeof envSchema>;
+/** The worker needs the database and mail settings, not the API's JWT secret. */
+export const workerEnvSchema = z.object({ ...databaseShape, ...mailShape });
 
-export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
-  const parsed = envSchema.safeParse(source);
+/** Read lazily by the mail job so a worker without SMTP still runs other jobs. */
+export const mailEnvSchema = z.object(mailShape);
+
+export type Env = z.infer<typeof envSchema>;
+export type WorkerEnv = z.infer<typeof workerEnvSchema>;
+export type MailEnv = z.infer<typeof mailEnvSchema>;
+
+function parseEnv<T extends z.ZodTypeAny>(schema: T, source: NodeJS.ProcessEnv): z.infer<T> {
+  const parsed = schema.safeParse(source);
 
   if (!parsed.success) {
     const details = parsed.error.issues
@@ -35,3 +52,12 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
 
   return parsed.data;
 }
+
+export const loadEnv = (source: NodeJS.ProcessEnv = process.env): Env =>
+  parseEnv(envSchema, source);
+
+export const loadWorkerEnv = (source: NodeJS.ProcessEnv = process.env): WorkerEnv =>
+  parseEnv(workerEnvSchema, source);
+
+export const loadMailEnv = (source: NodeJS.ProcessEnv = process.env): MailEnv =>
+  parseEnv(mailEnvSchema, source);

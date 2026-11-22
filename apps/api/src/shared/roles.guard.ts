@@ -9,6 +9,9 @@ import type { RequestUser } from "./current-user.decorator";
 import { AppError, ERROR_CODES } from "./errors";
 import { ROLES_KEY, type Role } from "./roles.decorator";
 
+const isRole = (value: string, allowed: Role[]): value is Role =>
+  allowed.some((role) => role === value);
+
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(@Inject(Reflector) private readonly reflector: Reflector) {}
@@ -25,8 +28,8 @@ export class RolesGuard implements CanActivate {
 
     const user = context.switchToHttp().getRequest<Request & { user?: RequestUser }>().user;
 
-    if (!user || !required.includes(user.role as Role)) {
-      throw new AppError(ERROR_CODES.AUTH_INVALID_CREDENTIALS, "Insufficient role", 403);
+    if (!user || !isRole(user.role, required)) {
+      throw new AppError(ERROR_CODES.AUTH_FORBIDDEN, "Insufficient role", 403);
     }
 
     return true;

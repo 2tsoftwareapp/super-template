@@ -9,11 +9,11 @@ import {
   Post,
   Query,
   UseGuards,
-  ValidationPipe,
 } from "@nestjs/common";
 
 import { Roles } from "../../shared/roles.decorator";
 import { RolesGuard } from "../../shared/roles.guard";
+import { validate } from "../../shared/validation";
 import { EnqueueJobDto, ListJobsQueryDto, type JobDto } from "./jobs.dto";
 import { JobsService } from "./jobs.service";
 
@@ -25,7 +25,7 @@ export class JobsController {
 
   @Get()
   list(
-    @Query(new ValidationPipe({ expectedType: ListJobsQueryDto, transform: true }))
+    @Query(validate(ListJobsQueryDto))
     query: ListJobsQueryDto,
   ) {
     return this.jobs.list(query);
@@ -38,9 +38,7 @@ export class JobsController {
 
   @Post()
   @HttpCode(201)
-  async enqueue(
-    @Body(new ValidationPipe({ expectedType: EnqueueJobDto })) input: EnqueueJobDto,
-  ): Promise<{ data: JobDto }> {
+  async enqueue(@Body(validate(EnqueueJobDto)) input: EnqueueJobDto): Promise<{ data: JobDto }> {
     return { data: await this.jobs.enqueue(input) };
   }
 }

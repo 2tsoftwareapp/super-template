@@ -3,3 +3,8 @@ dist
 .next
 coverage
 pnpm-lock.yaml
+.turbo
+.agent-work
+*.tsbuildinfo
+apps/mobile/android
+apps/mobile/ios

@@ -1,25 +1,17 @@
 import type { INestApplication } from "@nestjs/common";
 
-import { ValidationPipe } from "@nestjs/common";
-import { Test } from "@nestjs/testing";
-import jwt from "jsonwebtoken";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { AppModule } from "../src/app.module";
 import { NotificationsRepository } from "../src/modules/notifications/notifications.repository";
-import { AppExceptionFilter } from "../src/shared/app-exception.filter";
-
-process.env.DATABASE_URL = "postgresql://unused";
-process.env.JWT_ACCESS_SECRET = "0123456789012345678901234567890123";
-process.env.JWT_ACCESS_TTL = "15m";
-process.env.JWT_REFRESH_TTL = "30d";
-
-const USER_A = "66666666-6666-4666-8666-666666666666";
-const USER_B = "77777777-7777-4777-8777-777777777777";
-
-const token = (sub: string, role: "USER" | "ADMIN") =>
-  jwt.sign({ role }, process.env.JWT_ACCESS_SECRET as string, { subject: sub, expiresIn: "15m" });
+import {
+  ADMIN_ID,
+  InMemoryAuthRepository,
+  constraintError,
+  createTestApp,
+  makeUser,
+  signToken,
+} from "./support";
 
 interface Row {
   id: string;
@@ -34,7 +26,13 @@ interface Row {
 class InMemoryNotificationsRepository {
   readonly rows: Row[] = [];
 
+  constructor(private readonly knownUsers: Set<string>) {}
+
   async create(input: { userId: string; type: string; title: string; body: string }) {
+    if (!this.knownUsers.has(input.userId)) {
+      throw constraintError("23503");
+    }
+
     const row: Row = { id: crypto.randomUUID(), readAt: null, createdAt: new Date(), ...input };
     this.rows.push(row);
     return row;
@@ -62,27 +60,25 @@ class InMemoryNotificationsRepository {
 
 describe("notifications (e2e)", () => {
   let app: INestApplication;
+  const auth = new InMemoryAuthRepository();
+  const userA = auth.add(makeUser()).id;
+  const userB = auth.add(makeUser()).id;
+
+  const as = (userId: string, method: "get" | "post" | "patch", path: string) =>
+    request(app.getHttpServer())
+      [method](`/api/v1${path}`)
+      .set("authorization", `Bearer ${signToken(userId)}`);
 
   beforeAll(async () => {
-    const repository = new InMemoryNotificationsRepository();
+    const repository = new InMemoryNotificationsRepository(new Set(auth.users.keys()));
 
-    const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
-      .overrideProvider(NotificationsRepository)
-      .useValue(repository)
-      .compile();
-
-    app = moduleRef.createNestApplication();
-    app.setGlobalPrefix("api/v1");
-    app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+    app = await createTestApp(
+      (builder) => builder.overrideProvider(NotificationsRepository).useValue(repository),
+      auth,
     );
-    app.useGlobalFilters(new AppExceptionFilter());
-    await app.init();
 
-    await request(app.getHttpServer())
-      .post("/api/v1/notifications")
-      .set("authorization", `Bearer ${token(USER_A, "ADMIN")}`)
-      .send({ userId: USER_A, type: "test", title: "Hello", body: "First" })
+    await as(ADMIN_ID, "post", "/notifications")
+      .send({ userId: userA, type: "test", title: "Hello", body: "First" })
       .expect(201);
   });
 
@@ -91,54 +87,44 @@ describe("notifications (e2e)", () => {
   });
 
   it("lists only the current user's notifications with an unread count", async () => {
-    const response = await request(app.getHttpServer())
-      .get("/api/v1/notifications")
-      .set("authorization", `Bearer ${token(USER_A, "USER")}`)
-      .expect(200);
+    const response = await as(userA, "get", "/notifications").expect(200);
 
     expect(response.body.data).toHaveLength(1);
     expect(response.body.meta.unread).toBe(1);
 
-    const other = await request(app.getHttpServer())
-      .get("/api/v1/notifications")
-      .set("authorization", `Bearer ${token(USER_B, "USER")}`)
-      .expect(200);
-
+    const other = await as(userB, "get", "/notifications").expect(200);
     expect(other.body.data).toHaveLength(0);
   });
 
   it("marks a notification read and refuses someone else's row", async () => {
-    const list = await request(app.getHttpServer())
-      .get("/api/v1/notifications")
-      .set("authorization", `Bearer ${token(USER_A, "USER")}`)
-      .expect(200);
-
+    const list = await as(userA, "get", "/notifications").expect(200);
     const id = list.body.data[0].id;
 
-    const marked = await request(app.getHttpServer())
-      .patch(`/api/v1/notifications/${id}/read`)
-      .set("authorization", `Bearer ${token(USER_A, "USER")}`)
-      .expect(200);
-
+    const marked = await as(userA, "patch", `/notifications/${id}/read`).expect(200);
     expect(marked.body.data.readAt).not.toBeNull();
 
-    await request(app.getHttpServer())
-      .patch(`/api/v1/notifications/${id}/read`)
-      .set("authorization", `Bearer ${token(USER_B, "USER")}`)
-      .expect(404);
+    await as(userB, "patch", `/notifications/${id}/read`).expect(404);
   });
 
   it("only lets an admin create a notification", async () => {
-    await request(app.getHttpServer())
-      .post("/api/v1/notifications")
-      .set("authorization", `Bearer ${token(USER_A, "USER")}`)
-      .send({ userId: USER_A, type: "test", title: "x", body: "y" })
+    await as(userA, "post", "/notifications")
+      .send({ userId: userA, type: "test", title: "x", body: "y" })
       .expect(403);
 
-    await request(app.getHttpServer())
-      .post("/api/v1/notifications")
-      .set("authorization", `Bearer ${token(USER_A, "ADMIN")}`)
-      .send({ userId: USER_A, title: "missing body" })
+    await as(ADMIN_ID, "post", "/notifications")
+      .send({ userId: userA, title: "missing body" })
       .expect(400);
+  });
+
+  it("rejects a malformed or unknown recipient without a 500", async () => {
+    const malformed = await as(ADMIN_ID, "post", "/notifications")
+      .send({ userId: "nope", type: "t", title: "x", body: "y" })
+      .expect(400);
+    expect(malformed.body.error.code).toBe("VALIDATION_FAILED");
+
+    const unknown = await as(ADMIN_ID, "post", "/notifications")
+      .send({ userId: crypto.randomUUID(), type: "t", title: "x", body: "y" })
+      .expect(404);
+    expect(unknown.body.error.code).toBe("USER_NOT_FOUND");
   });
 });

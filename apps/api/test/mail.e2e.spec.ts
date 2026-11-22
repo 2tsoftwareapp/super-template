@@ -1,25 +1,12 @@
 import type { INestApplication } from "@nestjs/common";
 
-import { ValidationPipe } from "@nestjs/common";
-import { Test } from "@nestjs/testing";
-import jwt from "jsonwebtoken";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { AppModule } from "../src/app.module";
 import { JobsRepository } from "../src/modules/jobs/jobs.repository";
-import { AppExceptionFilter } from "../src/shared/app-exception.filter";
+import { ADMIN_ID, MEMBER_ID, createTestApp, signToken } from "./support";
 
-process.env.DATABASE_URL = "postgresql://unused";
-process.env.JWT_ACCESS_SECRET = "0123456789012345678901234567890123";
-process.env.JWT_ACCESS_TTL = "15m";
-process.env.JWT_REFRESH_TTL = "30d";
-
-const token = (role: "USER" | "ADMIN") =>
-  jwt.sign({ role }, process.env.JWT_ACCESS_SECRET as string, {
-    subject: "88888888-8888-4888-8888-888888888888",
-    expiresIn: "15m",
-  });
+const token = (role: "USER" | "ADMIN") => signToken(role === "ADMIN" ? ADMIN_ID : MEMBER_ID);
 
 class InMemoryJobsRepository {
   readonly rows: Array<{ id: string; type: string; payload: unknown; status: string }> = [];
@@ -51,18 +38,7 @@ describe("mail (e2e)", () => {
   const jobs = new InMemoryJobsRepository();
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
-      .overrideProvider(JobsRepository)
-      .useValue(jobs)
-      .compile();
-
-    app = moduleRef.createNestApplication();
-    app.setGlobalPrefix("api/v1");
-    app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
-    );
-    app.useGlobalFilters(new AppExceptionFilter());
-    await app.init();
+    app = await createTestApp((builder) => builder.overrideProvider(JobsRepository).useValue(jobs));
   });
 
   afterAll(async () => {

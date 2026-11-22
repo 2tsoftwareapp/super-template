@@ -13,7 +13,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _email = TextEditingController(text: 'admin@example.local');
+  final _email = TextEditingController();
   final _password = TextEditingController();
   bool _pending = false;
   String? _error;
@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      await Navigator.of(context).push(
+      await Navigator.of(context).pushReplacement(
         MaterialPageRoute<void>(
           builder: (_) => HomeScreen(api: widget.api, session: session),
         ),

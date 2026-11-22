@@ -31,7 +31,7 @@ export default function LandingPage() {
           Sign in to the admin console
         </a>
         <a
-          href="https://github.com/2tsoftwareapp/super-template/tree/lean"
+          href="https://github.com/2tsoftwareapp/super-template/tree/main"
           style={{
             padding: "10px 18px",
             borderRadius: 8,
