@@ -17,3 +17,5 @@ build/
 .DS_Store
 /storage/
 /apps/api/storage/
+docs/.vitepress/cache
+docs/.vitepress/dist

@@ -4,6 +4,7 @@ packages:
   - "apps/web"
   - "apps/worker"
   - "packages/*"
+  - "docs"
 
 allowBuilds:
   esbuild: true

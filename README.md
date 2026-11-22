@@ -3,6 +3,8 @@
 A full-stack starter with four surfaces — **api, web, admin, mobile** — plus a
 worker, built with clean code and no ceremony.
 
+**Docs:** https://2tsoftwareapp.github.io/super-template/ (source in `docs/`).
+
 - Backend: NestJS + Drizzle + Postgres, one folder per feature.
 - Web: Next.js landing. Admin: Next.js console. Mobile: Flutter.
 - Queue and jobs live in Postgres (`SKIP LOCKED`); no Redis requirement.
@@ -41,8 +43,7 @@ Debug builds allow plain HTTP to the local API; release builds expect HTTPS.
 | `main` | **this** lean template (simple, four surfaces)                                     |
 | `max`  | the full enterprise template (plugin architecture, multi-tenant, SSO/MFA, codegen) |
 
-`lean` is the working branch until the switch-over; see
-`docs/plans/lean-template-v2.md` in the `max` branch for the full rationale.
+See `docs/plans/lean-template-v2.md` in the `max` branch for the rationale.
 
 ## What the code looks like
 

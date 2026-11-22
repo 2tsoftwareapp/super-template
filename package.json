@@ -16,7 +16,9 @@
     "db:migrate": "pnpm --filter @lean/db migrate",
     "db:seed": "pnpm --filter @lean/db seed",
     "dev:web": "pnpm --filter @lean/web dev",
-    "dev:worker": "pnpm --filter @lean/worker dev"
+    "dev:worker": "pnpm --filter @lean/worker dev",
+    "docs:dev": "pnpm --filter @lean/docs dev",
+    "docs:build": "pnpm --filter @lean/docs build"
   },
   "devDependencies": {
     "prettier": "3.6.2",
